@@ -20,9 +20,9 @@ public class TestApplication extends JFrame {
                              new GridBagConstraints(0, 0, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(5, 5, 0, 5), 0, 0));
         getContentPane().add(initConnectors(),
                              new GridBagConstraints(0, 1, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
-     /*   getContentPane().add(props,
+        getContentPane().add(props,
                              new GridBagConstraints(1, 1, 1, 1, 0, 1, GridBagConstraints.NORTHWEST, GridBagConstraints.VERTICAL, new Insets(5, 0, 5, 5), 0, 0));
-*///        getContentPane().add(c,
+//        getContentPane().add(c,
 //                             new GridBagConstraints(0, 1, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
 
         setSize(800, 600);
@@ -49,13 +49,12 @@ public class TestApplication extends JFrame {
         b1.setBounds(10, 10, 100, 50);
         JLabel b2 = new DraggableLabel("Dest 1");
         b2.setBounds(200, 20, 100, 50);
-        
 //        JLabel b3=new DraggableLabel("Source 2");
 //        b3.setBounds(200,500,100,25);
 //        JLabel b4=new DraggableLabel("Dest 2");
 //        b4.setBounds(400,300,100,25);
         connectors[0] = new JConnector(b1, b2, ConnectLine.LINE_ARROW_SOURCE, JConnector.CONNECT_LINE_TYPE_RECTANGULAR, Color.red);
-       // props = new ConnectorPropertiesPanel(connectors[0]);
+        props = new ConnectorPropertiesPanel(connectors[0]);
 //        connectors[1]=new JConnector(b3, b4, ConnectLine.LINE_ARROW_DEST, Color.blue);
         ConnectorContainer cc = new ConnectorContainer(connectors);
         cc.setLayout(null);

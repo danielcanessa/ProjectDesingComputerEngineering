@@ -16,8 +16,19 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Window;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JWindow;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 
 /**
@@ -29,25 +40,28 @@ public class GUI extends javax.swing.JFrame {
     /**
      * Creates new form GUI
      */
-    private int resizeMousePosition;
+    public static boolean relations; //to fix
+    public static List<HardwareModel> hardwareList;
+    public static JLabel selectedJLabel;
+    public static boolean repaint;
+    GUIActions GUIActions;
 
     public GUI() {
+
         initComponents();
-        
-          
-        makeInvisible();
+
         initGlobalValues();
-        
-        
-    /*    this.jPanelBoard.add(initConnectors(),
+
+        hardwareList = new ArrayList<>();
+
+        /*    this.jPanelBoard.add(initConnectors(),
                              new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
       
-        */
-
+         */
     }
 
     //http://java-sl.com/connector.html
-    protected ConnectorContainer initConnectors() {
+    /* protected ConnectorContainer initConnectors() {
         JLabel b1 = new DraggableLabel("Source 1");
         b1.setBounds(10, 10, 100, 50);
         JLabel b2 = new DraggableLabel("Dest 1");
@@ -81,8 +95,7 @@ public class GUI extends javax.swing.JFrame {
       //  this.jPanel_Main.add(b2);
 
           return cc;
-    }
-
+    }*/
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -94,9 +107,8 @@ public class GUI extends javax.swing.JFrame {
 
         jPanel_Main = new javax.swing.JPanel();
         jPanelBoard = new javax.swing.JPanel();
-        jLabelAddAux = new javax.swing.JLabel();
         jButtonAdd = new javax.swing.JButton();
-        jLabelAdd = new javax.swing.JLabel();
+        jButtonRelations = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -107,24 +119,18 @@ public class GUI extends javax.swing.JFrame {
         jPanelBoard.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanelBoard.setLayout(new java.awt.GridBagLayout());
 
-        jLabelAddAux.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/add.png"))); // NOI18N
-
-        jButtonAdd.setText("jButton1");
+        jButtonAdd.setBackground(new java.awt.Color(255, 255, 255));
+        jButtonAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/add.png"))); // NOI18N
         jButtonAdd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonAddActionPerformed(evt);
             }
         });
 
-        jLabelAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/add.png"))); // NOI18N
-        jLabelAdd.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
-                jLabelAddMouseDragged(evt);
-            }
-        });
-        jLabelAdd.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jLabelAddMouseReleased(evt);
+        jButtonRelations.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/union.png"))); // NOI18N
+        jButtonRelations.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRelationsActionPerformed(evt);
             }
         });
 
@@ -134,124 +140,202 @@ public class GUI extends javax.swing.JFrame {
             jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
             .addGroup(jPanel_MainLayout.createSequentialGroup()
                 .addGap(23, 23, 23)
-                .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel_MainLayout.createSequentialGroup()
-                        .addComponent(jPanelBoard, javax.swing.GroupLayout.PREFERRED_SIZE, 1053, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabelAddAux)
-                            .addComponent(jLabelAdd)))
-                    .addComponent(jButtonAdd)))
+                .addComponent(jPanelBoard, javax.swing.GroupLayout.PREFERRED_SIZE, 1053, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jButtonAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonRelations, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addGap(49, 49, 49))
         );
         jPanel_MainLayout.setVerticalGroup(
             jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel_MainLayout.createSequentialGroup()
-                .addGap(29, 29, 29)
-                .addComponent(jButtonAdd)
-                .addGap(31, 31, 31)
+                .addGap(98, 98, 98)
                 .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel_MainLayout.createSequentialGroup()
-                        .addComponent(jLabelAdd)
-                        .addGap(49, 49, 49)
-                        .addComponent(jLabelAddAux))
+                        .addComponent(jButtonAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButtonRelations, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanelBoard, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
-        getContentPane().add(jPanel_Main, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 0, 1140, 570));
+        getContentPane().add(jPanel_Main, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 0, 1180, 570));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void paintHardware() {
+        this.jPanelBoard.removeAll();
+        this.jPanelBoard.validate();
 
-    private void jLabelAddMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelAddMouseReleased
+        JConnector[] connectors = new JConnector[GUI.hardwareList.size() + 1];
 
-        JLabel label = new JLabel();
-        label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/add.png")));
-        label.setBounds(0, 0, 64, 64); //64x64
+        JLabel newLabel = new DraggableLabel("Label: " + (GUI.hardwareList.size() + 1));
 
-        label.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            @Override
-            public void mouseDragged(java.awt.event.MouseEvent event) {
-                label.setLocation(event.getXOnScreen() - resizeMousePosition, event.getYOnScreen() - resizeMousePosition);
+        newLabel.setBounds(0, 0, 100, 50);
+
+        HardwareModel model = new HardwareModel();
+        model.setX(0);
+        model.setY(0);
+        model.setLabel(newLabel);
+        model.setInput(null);
+        model.setOutput1(null);
+        model.setOutput2(null);
+
+        hardwareList.add(model);
+
+        int index = 0;
+
+        for (int i = 0; i < hardwareList.size(); i++) {
+
+            if (hardwareList.get(i).getOutput1() != null) {
+                System.out.println("entre: " + index);
+                connectors[index] = new JConnector(hardwareList.get(i).getLabel(), hardwareList.get(i).getOutput1(), ConnectLine.LINE_ARROW_SOURCE, JConnector.CONNECT_LINE_TYPE_RECTANGULAR, Color.red);
+                index++;
             }
-        });
 
-        label.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                JLabel labelGet = (JLabel) evt.getSource();
+        }
 
-                //Si toma el elemento
-                labelGet.setText("hola soy yo");
-                System.out.println("clicked");
+        ConnectorContainer conectorContainer = new ConnectorContainer(connectors);
+
+        conectorContainer.setLayout(null);
+
+        for (int i = 0; i < hardwareList.size(); i++) {
+
+            conectorContainer.add(hardwareList.get(i).getLabel());
+
+        }
+
+        conectorContainer.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+
+        this.jPanelBoard.add(conectorContainer,
+                new GridBagConstraints(0, 1, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
+
+        this.jPanelBoard.validate();
+        this.jPanelBoard.repaint();
+
+        this.jPanel_Main.validate();
+        this.jPanel_Main.repaint();
+    }
+
+    private void repaintHardware() {
+        this.jPanelBoard.removeAll();
+        this.jPanelBoard.validate();
+
+        JConnector[] connectors = new JConnector[GUI.hardwareList.size() + 1];
+
+        int index = 0;
+
+        for (int i = 0; i < hardwareList.size(); i++) {
+
+            if (hardwareList.get(i).getOutput1() != null) {
+                connectors[index] = new JConnector(hardwareList.get(i).getLabel(), hardwareList.get(i).getOutput1(), ConnectLine.LINE_ARROW_SOURCE, JConnector.CONNECT_LINE_TYPE_RECTANGULAR, Color.red);
+                index++;
             }
-        });
 
-        this.jPanel_Main.add(label);
+        }
 
-        label.setLocation(evt.getXOnScreen() - resizeMousePosition, evt.getYOnScreen() - resizeMousePosition);
+        ConnectorContainer conectorContainer = new ConnectorContainer(connectors);
 
-        this.jLabelAddAux.setVisible(false);
+        conectorContainer.setLayout(null);
 
+        for (int i = 0; i < hardwareList.size(); i++) {
 
-        /* label.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
-                jLabelAddMouseDragged(evt);
-            }
-        }); */
-        //System.out.println("ya debria verse");
-    }//GEN-LAST:event_jLabelAddMouseReleased
+            conectorContainer.add(hardwareList.get(i).getLabel());
 
-    private void jLabelAddMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelAddMouseDragged
-        System.out.println("Me estan moviendo: x:" + evt.getXOnScreen() + " y:" + evt.getYOnScreen());
-        this.jLabelAddAux.setVisible(true);
-        this.jLabelAddAux.setLocation(evt.getXOnScreen() - resizeMousePosition, evt.getYOnScreen() - resizeMousePosition);
+        }
 
-    }//GEN-LAST:event_jLabelAddMouseDragged
+        conectorContainer.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
+
+        this.jPanelBoard.add(conectorContainer,
+                new GridBagConstraints(0, 1, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
+
+        this.jPanelBoard.validate();
+        this.jPanelBoard.repaint();
+
+        this.jPanel_Main.validate();
+        this.jPanel_Main.repaint();
+    }
 
     private void jButtonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddActionPerformed
-        
-        System.out.println("Button");
-        
-     //   this.jPanelBoard.removeAll();
-      /*  JLabel label = new DraggableLabel("");
-        label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/add.png")));
-        label.setBounds(0, 0, 64, 64); //64x64
-        
-        this.jPanelBoard.add(label);
 
-        label.setLocation(101,204);*/
+        paintHardware();
+        //label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/add.png")));
+        //label.setBounds(0, 0, 64, 64); //64x64
+
+
+        /*   JConnector[] connectors = new JConnector[2];
       
-       JConnector[] connectors = new JConnector[2];
         JLabel b1 = new DraggableLabel("Source 1");
         b1.setBounds(10, 10, 100, 50);
         JLabel b2 = new DraggableLabel("Dest 1");
         b2.setBounds(200, 20, 100, 50);
-
-       
-
-       connectors[0] = new JConnector(b1, b2, ConnectLine.LINE_ARROW_SOURCE, JConnector.CONNECT_LINE_TYPE_RECTANGULAR, Color.red);
+        JLabel b3=new DraggableLabel("Source 2");
+         b3.setBounds(200,300,100,25);
+        JLabel b4=new DraggableLabel("Dest 2");
+        b4.setBounds(100,100,100,25);
         
-       ConnectorContainer cc = new ConnectorContainer(connectors);
+        HardwareModel model = new HardwareModel();
+        model.setX(10);
+        model.setY(10);
+        model.setLabel(b1);
+        
+        HardwareModel model2 = new HardwareModel();
+        model2.setX(200);
+        model2.setY(20);
+        model2.setLabel(b2);
+        
+        HardwareModel model3 = new HardwareModel();
+        model3.setX(200);
+        model3.setY(300);
+        model3.setLabel(b3);
+        
+        HardwareModel model4 = new HardwareModel();
+        model4.setX(100);
+        model4.setY(100);
+        model4.setLabel(b4);
+        
+        GUI.hardwareList.add(model);
+        GUI.hardwareList.add(model2);
+        GUI.hardwareList.add(model3);
+        GUI.hardwareList.add(model4);
+        
+        
+        
+        
+        connectors[0] = new JConnector(hardwareList.get(0).getLabel(), hardwareList.get(1).getLabel(), ConnectLine.LINE_ARROW_SOURCE, JConnector.CONNECT_LINE_TYPE_RECTANGULAR, Color.red);
+       
+        connectors[1]=new JConnector(hardwareList.get(2).getLabel(), hardwareList.get(3).getLabel(), ConnectLine.LINE_ARROW_DEST, Color.blue);
+      
+        ConnectorContainer cc = new ConnectorContainer(connectors);
         cc.setLayout(null);
 
-        cc.add(b1);
-        cc.add(b2);
-        
+        cc.add(hardwareList.get(0).getLabel());
+        cc.add(hardwareList.get(1).getLabel());
+        cc.add(hardwareList.get(2).getLabel());
+        cc.add(hardwareList.get(3).getLabel());
 
         cc.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-
-         this.jPanelBoard.add(cc,
-                             new GridBagConstraints(0, 1, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
-    
-     
-         this.jPanelBoard.validate();
-        this.jPanelBoard.updateUI();
         
-      
-       
+        this.jPanelBoard.add(cc,
+                new GridBagConstraints(0, 1, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
+
+          this.jPanelBoard.validate();
+        this.jPanelBoard.repaint();
+        
+        this.jPanel_Main.validate();
+        this.jPanel_Main.repaint();
+         */
+
     }//GEN-LAST:event_jButtonAddActionPerformed
+
+    private void jButtonRelationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRelationsActionPerformed
+        selectedJLabel = null;
+        relations = !relations;
+
+        System.out.println("El estado de relations: " + relations);
+    }//GEN-LAST:event_jButtonRelationsActionPerformed
 
     /**
      * @param args the command line arguments
@@ -290,17 +374,34 @@ public class GUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAdd;
-    private javax.swing.JLabel jLabelAdd;
-    private javax.swing.JLabel jLabelAddAux;
+    private javax.swing.JButton jButtonRelations;
     private javax.swing.JPanel jPanelBoard;
     private javax.swing.JPanel jPanel_Main;
     // End of variables declaration//GEN-END:variables
 
-    private void makeInvisible() {
-        this.jLabelAddAux.setVisible(false);
+    private void initGlobalValues() {
+        relations = false;
+        GUIActions = new GUIActions();
+        GUIActions.start();
+
     }
 
-    private void initGlobalValues() {
-        this.resizeMousePosition = 40;
+    private class GUIActions extends Thread {
+
+        @Override
+        public void run() {
+            while (true) {
+                if (GUI.repaint) {                    
+                    repaintHardware();
+                    GUI.repaint = false;
+
+                }
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
     }
 }
