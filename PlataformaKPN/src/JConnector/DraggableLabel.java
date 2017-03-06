@@ -8,9 +8,10 @@ import javax.swing.border.*;
 import plataformakpn.HardwareModel;
 import java.util.List;
 import plataformakpn.GUI;
-import static plataformakpn.GUI.hardwareList;
-import static plataformakpn.GUI.relations;
 import static plataformakpn.GUI.selectedJLabel;
+import static plataformakpn.GUI.hardwareGraph;
+import static plataformakpn.GUI.relationsFlag;
+import static plataformakpn.GUI.removeFlag;
 
 public class DraggableLabel extends JLabel {
 
@@ -37,7 +38,7 @@ public class DraggableLabel extends JLabel {
 
         @Override
         public void mouseDragged(MouseEvent e) {
-            //System.out.println("Primero");
+            //System.out.println(e.getX() +", "+ e.getY());
 
             Point dragPoint = e.getPoint();
             int xDiff = pressPoint.x - dragPoint.x;
@@ -105,9 +106,8 @@ public class DraggableLabel extends JLabel {
 
             //Update the JLabel position
             JLabel label = (JLabel) e.getComponent();
-
-            for (int i = 0; i < hardwareList.size(); i++) {
-                HardwareModel model = hardwareList.get(i);
+            for (int i = 0; i < hardwareGraph.size(); i++) {
+                HardwareModel model = hardwareGraph.get(i);
                 if (model.getLabel() == label) {
                     model.setX(label.getX());
                     model.setY(label.getY());
@@ -115,32 +115,81 @@ public class DraggableLabel extends JLabel {
             }
 
             //Doing relations
-            System.out.println("Relations init: " + relations);
+            if (relationsFlag) {
 
-            if (relations) {
                 if (selectedJLabel == null) {
-                    System.out.println("Seleccione a un label");
                     selectedJLabel = label;
                 } else {
+                   
 
-                    System.out.println("Estoy bucando al jlabel seleccionado en la lista");
-                    for (int i = 0; i < hardwareList.size(); i++) {
-                        HardwareModel model = hardwareList.get(i);
-                        if (model.getLabel() == selectedJLabel) {
-                            System.out.println("Asigne al label la salida");
-                            model.setOutput1(label);
-                        }
+                    HardwareModel modelSource = getModel(selectedJLabel);
+                    HardwareModel modelDest = getModel(label);
+
+                    System.out.println(verifyModels(modelSource, modelDest));
+                    if (verifyModels(modelSource, modelDest)) 
+                    {
+                        modelSource.getOutputs().add(label);
+                        modelDest.getInputs().add(selectedJLabel);
                     }
 
-                    System.out.println("Limpie al label seleccionado");
                     selectedJLabel = null;
                 }
-
+            }
+            
+            //deleting labels
+            if(removeFlag)
+            {
+               hardwareGraph.remove(label);                 
             }
 
             //activating repaint
-            GUI.repaint = true;
+            GUI.repaintFlag = true;
 
+        }
+
+        private HardwareModel getModel(JLabel label) {
+            for (int i = 0; i < hardwareGraph.size(); i++) {
+
+                HardwareModel model = hardwareGraph.get(i);
+
+                if (model.getLabel() == label) {
+
+                    return model;
+                }
+            }
+            return null;
+        }
+
+        /* 
+        * Type Hardware
+        * 0 means duplication process
+        * 1 means add process
+        * 2 means production process
+        * 3 means constant generation process
+        * 4 means sink process
+         */
+        private boolean verifyModels(HardwareModel modelSource, HardwareModel modelDest) {
+            boolean resultSource = false;
+            boolean resultDest = false;
+
+            if (modelSource.getHardwareType() != 0 && modelSource.getOutputs().size() < 1) {
+                resultSource = true;
+            }
+            if (modelSource.getHardwareType() == 0 && modelSource.getOutputs().size() < 2) {
+                resultSource = true;
+            }
+
+            if ((modelDest.getHardwareType() == 1 || modelDest.getHardwareType() == 2) 
+                    && modelDest.getInputs().size() < 2)  {
+                resultDest = true;
+            }
+            if ((modelDest.getHardwareType() == 0 || modelDest.getHardwareType() == 3 || modelDest.getHardwareType() == 4) 
+                    && modelDest.getInputs().size() < 1) {
+               
+                resultDest = true;
+            }
+            return resultSource&resultDest;
+            
         }
     }
 }

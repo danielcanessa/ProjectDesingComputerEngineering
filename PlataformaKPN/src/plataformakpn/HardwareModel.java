@@ -6,6 +6,8 @@
 package plataformakpn;
 
 import JConnector.DraggableLabel;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JLabel;
 
 /**
@@ -16,15 +18,16 @@ public class HardwareModel
 {
     private int x;
     private int y;
-    private JLabel label;
+    private JLabel label;    
+    private List<JLabel> outputs;
+    private List<JLabel> inputs;
+    private int hardwareType;
     
-    private JLabel input;
-    private JLabel output1;
-    private JLabel output2;
-    
+        
     public HardwareModel()
     {
-        
+        outputs = new ArrayList<>();     
+        inputs = new ArrayList<>();     
     }
 
     /**
@@ -68,47 +71,63 @@ public class HardwareModel
     public void setLabel(JLabel label) {
         this.label = label;
     }
+
+    /**
+     * @return the outputs
+     */
+    public List<JLabel> getOutputs() {
+        return outputs;
+    }
+
+    /**
+     * @param outputs the outputs to set
+     */
+    public void setOutputs(List<JLabel> outputs) {
+        this.outputs = outputs;
+    }
     
-     /**
-     * @return the input
-     */
-    public JLabel getInput() {
-        return input;
+    public boolean verifyIfOutputAlreadyExist(JLabel label)
+    {
+        return outputs.contains(label);        
     }
 
     /**
-     * @param input the label to set
+     * @return the hardwareType
+     * 0 means duplication process
+     * 1 means add process
+     * 2 means product process
+     * 3 means constant generation process
+     * 4 means sink process
      */
-    public void setInput(JLabel input) {
-        this.input = input;
+    public int getHardwareType() {
+        return hardwareType;
     }
 
     /**
-     * @return the output1
+     * @param hardwareType the hardwareType to set
+     * 0 means duplication process
+     * 1 means add process
+     * 2 means production process
+     * 3 means constant generation process
+     * 4 means sink process
      */
-    public JLabel getOutput1() {
-        return output1;
+    public void setHardwareType(int hardwareType) {
+        this.hardwareType = hardwareType;
     }
 
     /**
-     * @param output1 the output1 to set
+     * @return the inputs
      */
-    public void setOutput1(JLabel output1) {
-        this.output1 = output1;
+    public List<JLabel> getInputs() {
+        return inputs;
     }
 
     /**
-     * @return the output2
+     * @param inputs the inputs to set
      */
-    public JLabel getOutput2() {
-        return output2;
+    public void setInputs(List<JLabel> inputs) {
+        this.inputs = inputs;
     }
-
-    /**
-     * @param output2 the output2 to set
-     */
-    public void setOutput2(JLabel output2) {
-        this.output2 = output2;
-    }
+    
     
 }

@@ -7,28 +7,19 @@ package plataformakpn;
 
 import JConnector.ConnectLine;
 import JConnector.ConnectorContainer;
-import JConnector.ConnectorPropertiesPanel;
 import JConnector.DraggableLabel;
 import JConnector.JConnector;
 import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.Cursor;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Window;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.layout.Border;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JWindow;
-import javax.swing.SwingUtilities;
+import javax.swing.JOptionPane;
 import javax.swing.border.EtchedBorder;
 
 /**
@@ -40,10 +31,11 @@ public class GUI extends javax.swing.JFrame {
     /**
      * Creates new form GUI
      */
-    public static boolean relations; //to fix
-    public static List<HardwareModel> hardwareList;
+    public static boolean relationsFlag; //to fix
+    public static HardwareGraph hardwareGraph;
     public static JLabel selectedJLabel;
-    public static boolean repaint;
+    public static boolean repaintFlag;
+    public static boolean removeFlag;
     GUIActions GUIActions;
 
     public GUI() {
@@ -52,7 +44,7 @@ public class GUI extends javax.swing.JFrame {
 
         initGlobalValues();
 
-        hardwareList = new ArrayList<>();
+        hardwareGraph = new HardwareGraph();
 
         /*    this.jPanelBoard.add(initConnectors(),
                              new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
@@ -105,17 +97,27 @@ public class GUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jOptionPaneErrors = new javax.swing.JOptionPane();
         jPanel_Main = new javax.swing.JPanel();
         jPanelBoard = new javax.swing.JPanel();
         jButtonAdd = new javax.swing.JButton();
         jButtonRelations = new javax.swing.JButton();
+        jButtonTrash = new javax.swing.JButton();
+        jButtonProduct = new javax.swing.JButton();
+        jButtonConstantGeneration = new javax.swing.JButton();
+        jButtonDuplication = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+
+        jOptionPaneErrors.setBackground(new java.awt.Color(255, 255, 255));
+        jOptionPaneErrors.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel_Main.setBackground(new java.awt.Color(255, 255, 255));
 
-        jPanelBoard.setBackground(new java.awt.Color(255, 255, 255));
+        jPanelBoard.setBackground(new java.awt.Color(204, 204, 204));
         jPanelBoard.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanelBoard.setLayout(new java.awt.GridBagLayout());
 
@@ -134,76 +136,145 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
+        jButtonTrash.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/trash.png"))); // NOI18N
+        jButtonTrash.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonTrashActionPerformed(evt);
+            }
+        });
+
+        jButtonProduct.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/product.png"))); // NOI18N
+        jButtonProduct.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonProductActionPerformed(evt);
+            }
+        });
+
+        jButtonConstantGeneration.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/constant.png"))); // NOI18N
+        jButtonConstantGeneration.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonConstantGenerationActionPerformed(evt);
+            }
+        });
+
+        jButtonDuplication.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/duplication.png"))); // NOI18N
+        jButtonDuplication.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonDuplicationActionPerformed(evt);
+            }
+        });
+
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/sink.png"))); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("jButton2");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel_MainLayout = new javax.swing.GroupLayout(jPanel_Main);
         jPanel_Main.setLayout(jPanel_MainLayout);
         jPanel_MainLayout.setHorizontalGroup(
             jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
             .addGroup(jPanel_MainLayout.createSequentialGroup()
                 .addGap(23, 23, 23)
-                .addComponent(jPanelBoard, javax.swing.GroupLayout.PREFERRED_SIZE, 1053, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jPanelBoard, javax.swing.GroupLayout.PREFERRED_SIZE, 1053, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonTrash, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jButtonAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonRelations, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addGap(49, 49, 49))
+                    .addComponent(jButtonRelations, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jButtonProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jButtonConstantGeneration, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jButtonDuplication, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addGap(169, 169, 169))
+            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel_MainLayout.createSequentialGroup()
+                .addGap(375, 375, 375)
+                .addComponent(jButton2)
+                .addContainerGap())
         );
         jPanel_MainLayout.setVerticalGroup(
             jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel_MainLayout.createSequentialGroup()
-                .addGap(98, 98, 98)
+                .addGap(46, 46, 46)
+                .addComponent(jButton2)
+                .addGap(38, 38, 38)
                 .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanelBoard, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel_MainLayout.createSequentialGroup()
                         .addComponent(jButtonAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jButtonRelations, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanelBoard, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                        .addComponent(jButtonProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButtonConstantGeneration, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButtonDuplication, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButtonRelations, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonTrash, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel_Main, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 0, 1180, 570));
+        getContentPane().add(jPanel_Main, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 0, 1180, 660));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private int getConnectorsSize() {
+        int result = 0;
+
+        for (int i = 0; i < hardwareGraph.size(); i++) {
+
+            result += hardwareGraph.get(i).getOutputs().size();
+
+        }
+        return result;
+    }
 
     private void paintHardware() {
         this.jPanelBoard.removeAll();
         this.jPanelBoard.validate();
 
-        JConnector[] connectors = new JConnector[GUI.hardwareList.size() + 1];
-
-        JLabel newLabel = new DraggableLabel("Label: " + (GUI.hardwareList.size() + 1));
-
-        newLabel.setBounds(0, 0, 100, 50);
-
-        HardwareModel model = new HardwareModel();
-        model.setX(0);
-        model.setY(0);
-        model.setLabel(newLabel);
-        model.setInput(null);
-        model.setOutput1(null);
-        model.setOutput2(null);
-
-        hardwareList.add(model);
+        JConnector[] connectors = new JConnector[getConnectorsSize()];
 
         int index = 0;
 
-        for (int i = 0; i < hardwareList.size(); i++) {
+        for (int i = 0; i < hardwareGraph.size(); i++) {
 
-            if (hardwareList.get(i).getOutput1() != null) {
-                System.out.println("entre: " + index);
-                connectors[index] = new JConnector(hardwareList.get(i).getLabel(), hardwareList.get(i).getOutput1(), ConnectLine.LINE_ARROW_SOURCE, JConnector.CONNECT_LINE_TYPE_RECTANGULAR, Color.red);
-                index++;
+            int ouputsSize = hardwareGraph.get(i).getOutputs().size();
+            if (ouputsSize > 0) {
+
+                for (int j = 0; j < ouputsSize; j++) {
+                    if (hardwareGraph.verifySameOutput(hardwareGraph.get(i), hardwareGraph.get(i).getOutputs().get(j))) {
+                        connectors[index] = new JConnector(hardwareGraph.get(i).getLabel(), hardwareGraph.get(i).getOutputs().get(j), ConnectLine.LINE_ARROW_DEST, JConnector.CONNECT_LINE_TYPE_RECTANGULAR, Color.orange);
+
+                    } else {
+                        connectors[index] = new JConnector(hardwareGraph.get(i).getLabel(), hardwareGraph.get(i).getOutputs().get(j), ConnectLine.LINE_ARROW_DEST, JConnector.CONNECT_LINE_TYPE_RECTANGULAR, Color.BLUE);
+
+                    }
+                    index++;
+                }
             }
-
         }
 
         ConnectorContainer conectorContainer = new ConnectorContainer(connectors);
 
         conectorContainer.setLayout(null);
 
-        for (int i = 0; i < hardwareList.size(); i++) {
+        for (int i = 0; i < hardwareGraph.size(); i++) {
 
-            conectorContainer.add(hardwareList.get(i).getLabel());
+            conectorContainer.add(hardwareGraph.get(i).getLabel());
 
         }
 
@@ -219,123 +290,103 @@ public class GUI extends javax.swing.JFrame {
         this.jPanel_Main.repaint();
     }
 
-    private void repaintHardware() {
-        this.jPanelBoard.removeAll();
-        this.jPanelBoard.validate();
-
-        JConnector[] connectors = new JConnector[GUI.hardwareList.size() + 1];
-
-        int index = 0;
-
-        for (int i = 0; i < hardwareList.size(); i++) {
-
-            if (hardwareList.get(i).getOutput1() != null) {
-                connectors[index] = new JConnector(hardwareList.get(i).getLabel(), hardwareList.get(i).getOutput1(), ConnectLine.LINE_ARROW_SOURCE, JConnector.CONNECT_LINE_TYPE_RECTANGULAR, Color.red);
-                index++;
-            }
-
-        }
-
-        ConnectorContainer conectorContainer = new ConnectorContainer(connectors);
-
-        conectorContainer.setLayout(null);
-
-        for (int i = 0; i < hardwareList.size(); i++) {
-
-            conectorContainer.add(hardwareList.get(i).getLabel());
-
-        }
-
-        conectorContainer.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-
-        this.jPanelBoard.add(conectorContainer,
-                new GridBagConstraints(0, 1, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
-
-        this.jPanelBoard.validate();
-        this.jPanelBoard.repaint();
-
-        this.jPanel_Main.validate();
-        this.jPanel_Main.repaint();
-    }
 
     private void jButtonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddActionPerformed
-
-        paintHardware();
-        //label.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/add.png")));
-        //label.setBounds(0, 0, 64, 64); //64x64
-
-
-        /*   JConnector[] connectors = new JConnector[2];
-      
-        JLabel b1 = new DraggableLabel("Source 1");
-        b1.setBounds(10, 10, 100, 50);
-        JLabel b2 = new DraggableLabel("Dest 1");
-        b2.setBounds(200, 20, 100, 50);
-        JLabel b3=new DraggableLabel("Source 2");
-         b3.setBounds(200,300,100,25);
-        JLabel b4=new DraggableLabel("Dest 2");
-        b4.setBounds(100,100,100,25);
-        
-        HardwareModel model = new HardwareModel();
-        model.setX(10);
-        model.setY(10);
-        model.setLabel(b1);
-        
-        HardwareModel model2 = new HardwareModel();
-        model2.setX(200);
-        model2.setY(20);
-        model2.setLabel(b2);
-        
-        HardwareModel model3 = new HardwareModel();
-        model3.setX(200);
-        model3.setY(300);
-        model3.setLabel(b3);
-        
-        HardwareModel model4 = new HardwareModel();
-        model4.setX(100);
-        model4.setY(100);
-        model4.setLabel(b4);
-        
-        GUI.hardwareList.add(model);
-        GUI.hardwareList.add(model2);
-        GUI.hardwareList.add(model3);
-        GUI.hardwareList.add(model4);
-        
-        
-        
-        
-        connectors[0] = new JConnector(hardwareList.get(0).getLabel(), hardwareList.get(1).getLabel(), ConnectLine.LINE_ARROW_SOURCE, JConnector.CONNECT_LINE_TYPE_RECTANGULAR, Color.red);
-       
-        connectors[1]=new JConnector(hardwareList.get(2).getLabel(), hardwareList.get(3).getLabel(), ConnectLine.LINE_ARROW_DEST, Color.blue);
-      
-        ConnectorContainer cc = new ConnectorContainer(connectors);
-        cc.setLayout(null);
-
-        cc.add(hardwareList.get(0).getLabel());
-        cc.add(hardwareList.get(1).getLabel());
-        cc.add(hardwareList.get(2).getLabel());
-        cc.add(hardwareList.get(3).getLabel());
-
-        cc.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-        
-        this.jPanelBoard.add(cc,
-                new GridBagConstraints(0, 1, 1, 1, 1, 1, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 0, 0));
-
-          this.jPanelBoard.validate();
-        this.jPanelBoard.repaint();
-        
-        this.jPanel_Main.validate();
-        this.jPanel_Main.repaint();
-         */
+        String imagePath = "/Images/add48x48.png";
+        int hardwareType = 1;
+        String toolTip = "Add process ID:" + hardwareGraph.size();
+        addHardwareBlock(imagePath, hardwareType, toolTip);
 
     }//GEN-LAST:event_jButtonAddActionPerformed
 
     private void jButtonRelationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRelationsActionPerformed
         selectedJLabel = null;
-        relations = !relations;
+        removeFlag = false;
+        relationsFlag = !relationsFlag;
 
-        System.out.println("El estado de relations: " + relations);
+        if (relationsFlag) {
+            setCursor(Cursor.HAND_CURSOR);
+        } else {
+            setCursor(Cursor.getDefaultCursor());
+        }
+
     }//GEN-LAST:event_jButtonRelationsActionPerformed
+
+    private void jButtonTrashActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTrashActionPerformed
+        relationsFlag = false;
+
+        removeFlag = !removeFlag;
+
+        if (removeFlag) {
+            setCursor(Cursor.CROSSHAIR_CURSOR);
+        } else {
+            setCursor(Cursor.getDefaultCursor());
+        }
+
+    }//GEN-LAST:event_jButtonTrashActionPerformed
+
+    private void addHardwareBlock(String imagePath, int hardwareType, String toolTip) {
+        JLabel newLabel = new DraggableLabel("");
+
+        newLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource(imagePath)));
+
+        newLabel.setToolTipText(toolTip);
+
+        newLabel.setHorizontalAlignment(0);
+        newLabel.setBorder(javax.swing.border.LineBorder.createBlackLineBorder());
+
+        newLabel.setBounds(0, 0, 48, 48);
+
+        HardwareModel model = new HardwareModel();
+        model.setX(0);
+        model.setY(0);
+        model.setLabel(newLabel);
+        model.setHardwareType(hardwareType);
+
+        hardwareGraph.add(model);
+
+        paintHardware();
+
+    }
+    private void jButtonProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonProductActionPerformed
+        String imagePath = "/Images/product48x48.png";
+        int hardwareType = 2;
+        String toolTip = "Product process ID:" + hardwareGraph.size();
+        addHardwareBlock(imagePath, hardwareType, toolTip);
+    }//GEN-LAST:event_jButtonProductActionPerformed
+
+    private void jButtonConstantGenerationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConstantGenerationActionPerformed
+        String imagePath = "/Images/constant48x48.png";
+        int hardwareType = 3;
+        String toolTip = "Constant generation process ID:" + hardwareGraph.size();
+        addHardwareBlock(imagePath, hardwareType, toolTip);
+    }//GEN-LAST:event_jButtonConstantGenerationActionPerformed
+
+    private void jButtonDuplicationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDuplicationActionPerformed
+        String imagePath = "/Images/duplication48x48.png";
+        int hardwareType = 0;
+        String toolTip = "Duplication process ID:" + hardwareGraph.size();
+        addHardwareBlock(imagePath, hardwareType, toolTip);
+    }//GEN-LAST:event_jButtonDuplicationActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        String imagePath = "/Images/sink48x48.png";
+        int hardwareType = 4;
+        String toolTip = "Sink process ID:" + hardwareGraph.size();
+        addHardwareBlock(imagePath, hardwareType, toolTip);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+     /*   JOptionPane.showMessageDialog(
+                this.jPanel_Main,
+                "Un aviso puñetero");*/
+     this.jOptionPaneErrors.setMessage("Error");
+    
+     this.jOptionPaneErrors.validate();
+     this.jOptionPaneErrors.updateUI();
+
+
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -373,14 +424,21 @@ public class GUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButtonAdd;
+    private javax.swing.JButton jButtonConstantGeneration;
+    private javax.swing.JButton jButtonDuplication;
+    private javax.swing.JButton jButtonProduct;
     private javax.swing.JButton jButtonRelations;
+    private javax.swing.JButton jButtonTrash;
+    private javax.swing.JOptionPane jOptionPaneErrors;
     private javax.swing.JPanel jPanelBoard;
     private javax.swing.JPanel jPanel_Main;
     // End of variables declaration//GEN-END:variables
 
     private void initGlobalValues() {
-        relations = false;
+        relationsFlag = false;
         GUIActions = new GUIActions();
         GUIActions.start();
 
@@ -391,9 +449,9 @@ public class GUI extends javax.swing.JFrame {
         @Override
         public void run() {
             while (true) {
-                if (GUI.repaint) {                    
-                    repaintHardware();
-                    GUI.repaint = false;
+                if (GUI.repaintFlag) {
+                    paintHardware();
+                    GUI.repaintFlag = false;
 
                 }
                 try {
