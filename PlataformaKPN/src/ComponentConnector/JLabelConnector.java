@@ -1,5 +1,6 @@
-package JConnector;
+package ComponentConnector;
 
+import static ComponentConnector.ConnectLine.LINE_ARROW_DEST;
 import javax.swing.*;
 import java.awt.*;
 
@@ -12,49 +13,29 @@ import java.awt.*;
  * @author Stanislav Lapitsky
  * @version 1.0
  */
-public class JConnector extends JPanel {
-    public static final int CONNECT_LINE_TYPE_SIMPLE = 0;
+public class JLabelConnector extends JPanel {    
     public static final int CONNECT_LINE_TYPE_RECTANGULAR = 1;
     protected JComponent source;
     protected JComponent dest;
     protected ConnectLine line;
-    protected int lineArrow = ConnectLine.LINE_ARROW_NONE;
+    protected int lineArrow = ConnectLine.LINE_ARROW_DEST;
     protected int lineType = CONNECT_LINE_TYPE_RECTANGULAR;
     protected Color lineColor;
 
-    /**
-     * Constructs default connector.
-     * @param source JComponent
-     * @param dest JComponent
-     */
-    public JConnector(JComponent source, JComponent dest) {
-        this(source, dest, ConnectLine.LINE_ARROW_NONE, Color.BLACK);
-    }
-
-    /**
-     * Constructs a connector with specified arrow and color.
-     * @param source JComponent
-     * @param dest JComponent
-     * @param lineArrow int
-     * @param lineColor Color
-     */
-    public JConnector(JComponent source, JComponent dest, int lineArrow, Color lineColor) {
-        this(source, dest, lineArrow, CONNECT_LINE_TYPE_RECTANGULAR, lineColor);
-    }
+   
+   
 
     /**
      * Constructs a connector with specified arrow, line type and color.
      * @param source JComponent
      * @param dest JComponent
-     * @param lineArrow int
-     * @param lineType int
      * @param lineColor Color
      */
-    public JConnector(JComponent source, JComponent dest, int lineArrow, int lineType, Color lineColor) {
+    public JLabelConnector(JComponent source, JComponent dest, Color lineColor) {
         this.source = source;
         this.dest = dest;
-        this.lineArrow = lineArrow;
-        this.lineType = lineType;
+        this.lineArrow = LINE_ARROW_DEST;
+        this.lineType = CONNECT_LINE_TYPE_RECTANGULAR;
         this.lineColor = lineColor;
     }
 
@@ -63,6 +44,7 @@ public class JConnector extends JPanel {
      * between components and set the clip back.
      * @param g Graphics
      */
+    @Override
     public void paint(Graphics g) {
         super.paint(g);
         Graphics2D g2d = (Graphics2D) g;
@@ -104,15 +86,11 @@ public class JConnector extends JPanel {
                 y2 = rDest.y + rDest.height;
             }
             line = new ConnectLine(new Point(x1, y1), new Point(x2, y2), ConnectLine.LINE_TYPE_RECT_2BREAK, ConnectLine.LINE_START_VERTICAL, lineArrow);
-            if (lineType == CONNECT_LINE_TYPE_SIMPLE) {
-                line.setLineType(ConnectLine.LINE_TYPE_SIMPLE);
-            }
+            
         }
         else if (yIntersect) {
-            int y1 = rSource.y + rSource.height / 2;
-            ;
-            int y2 = rDest.y + rDest.height / 2;
-            ;
+            int y1 = rSource.y + rSource.height / 2;            
+            int y2 = rDest.y + rDest.height / 2;            
             int x1;
             int x2;
             if (rSource.x + rSource.width <= rDest.x) {
@@ -124,9 +102,7 @@ public class JConnector extends JPanel {
                 x2 = rDest.x + rDest.width;
             }
             line = new ConnectLine(new Point(x1, y1), new Point(x2, y2), ConnectLine.LINE_TYPE_RECT_2BREAK, ConnectLine.LINE_START_HORIZONTAL, lineArrow);
-            if (lineType == CONNECT_LINE_TYPE_SIMPLE) {
-                line.setLineType(ConnectLine.LINE_TYPE_SIMPLE);
-            }
+            
         }
         else {
             int y1;
@@ -157,44 +133,19 @@ public class JConnector extends JPanel {
                 x2 = rDest.x + rDest.width / 2;
             }
             line = new ConnectLine(new Point(x1, y1), new Point(x2, y2), ConnectLine.LINE_TYPE_RECT_1BREAK, ConnectLine.LINE_START_HORIZONTAL, lineArrow);
-            if (lineType == CONNECT_LINE_TYPE_SIMPLE) {
-                line.setLineType(ConnectLine.LINE_TYPE_SIMPLE);
-            }
+           
         }
     }
 
     protected Rectangle getLineBounds() {
         int add = 10;
-        int maxX = Math.max(line.getP1().x, line.getP2().x);
-        int minX = Math.min(line.getP1().x, line.getP2().x);
-        int maxY = Math.max(line.getP1().y, line.getP2().y);
-        int minY = Math.min(line.getP1().y, line.getP2().y);
+        int maxX = Math.max(line.getPointSource().x, line.getPointDestination().x);
+        int minX = Math.min(line.getPointSource().x, line.getPointDestination().x);
+        int maxY = Math.max(line.getPointSource().y, line.getPointDestination().y);
+        int minY = Math.min(line.getPointSource().y, line.getPointDestination().y);
 
         Rectangle res = new Rectangle(minX - add, minY - add, maxX - minX + 2 * add, maxY - minY + 2 * add);
         return res;
     }
-
-    public Color getLineColor() {
-        return lineColor;
-    }
-
-    public void setLineColor(Color c) {
-        lineColor = c;
-    }
-
-    public int getLineType() {
-        return lineType;
-    }
-
-    public void setLineType(int type) {
-        lineType = type;
-    }
-
-    public int getLineArrow() {
-        return lineArrow;
-    }
-
-    public void setLineArrow(int arrow) {
-        lineArrow = arrow;
-    }
+    
 }

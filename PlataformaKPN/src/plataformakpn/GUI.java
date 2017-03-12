@@ -5,21 +5,26 @@
  */
 package plataformakpn;
 
-import JConnector.ConnectLine;
-import JConnector.ConnectorContainer;
-import JConnector.DraggableLabel;
-import JConnector.JConnector;
+import ComponentConnector.ConnectLine;
+import ComponentConnector.ConnectorContainer;
+import ComponentConnector.DragLabel;
+import ComponentConnector.JLabelConnector;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Window;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.scene.layout.Border;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 
 /**
@@ -33,9 +38,12 @@ public class GUI extends javax.swing.JFrame {
      */
     public static boolean relationsFlag; //to fix
     public static HardwareGraph hardwareGraph;
+    public static HardwareModel selectedModelByQueueProcess;
     public static JLabel selectedJLabel;
     public static boolean repaintFlag;
     public static boolean removeFlag;
+    public static int currentHardwareIdentifier;
+
     GUIActions GUIActions;
 
     public GUI() {
@@ -53,41 +61,6 @@ public class GUI extends javax.swing.JFrame {
     }
 
     //http://java-sl.com/connector.html
-    /* protected ConnectorContainer initConnectors() {
-        JLabel b1 = new DraggableLabel("Source 1");
-        b1.setBounds(10, 10, 100, 50);
-        JLabel b2 = new DraggableLabel("Dest 1");
-        b2.setBounds(200, 20, 100, 50);
-
-        JConnector[] connectors = new JConnector[2];
-//        JLabel b3=new DraggableLabel("Source 2");
-//        b3.setBounds(200,500,100,25);
-//        JLabel b4=new DraggableLabel("Dest 2");
-//        b4.setBounds(400,300,100,25);
-        connectors[0] = new JConnector(b1, b2, ConnectLine.LINE_ARROW_DEST, JConnector.CONNECT_LINE_TYPE_RECTANGULAR, Color.black);
-        //      props = new ConnectorPropertiesPanel(connectors[0]);
-//        connectors[1]=new JConnector(b3, b4, ConnectLine.LINE_ARROW_DEST, Color.blue);
-        ConnectorContainer cc = new ConnectorContainer(connectors);
-        //cc.setLayout(null);
-
-        cc.add(b1);
-        cc.add(b2);
-        //cc.add(b3);
-//        cc.add(b4);
-
-       
-
-        cc.setBorder(new EtchedBorder(EtchedBorder.LOWERED));
-
-        //this.jPanel_Main.add(cc);
-
-          
-    
-      //  this.jPanel_Main.add(b1);
-      //  this.jPanel_Main.add(b2);
-
-          return cc;
-    }*/
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -98,6 +71,12 @@ public class GUI extends javax.swing.JFrame {
     private void initComponents() {
 
         jOptionPaneErrors = new javax.swing.JOptionPane();
+        jDialogFifo = new javax.swing.JDialog();
+        jPanelDialog = new javax.swing.JPanel();
+        jLabelFIFO = new javax.swing.JLabel();
+        jTextFieldFifo = new javax.swing.JTextField();
+        jButtonApplyQueue = new javax.swing.JButton();
+        jCheckBoxFifo = new javax.swing.JCheckBox();
         jPanel_Main = new javax.swing.JPanel();
         jPanelBoard = new javax.swing.JPanel();
         jButtonAdd = new javax.swing.JButton();
@@ -108,16 +87,81 @@ public class GUI extends javax.swing.JFrame {
         jButtonDuplication = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jButtonQueue = new javax.swing.JButton();
 
         jOptionPaneErrors.setBackground(new java.awt.Color(255, 255, 255));
         jOptionPaneErrors.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        jDialogFifo.getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jPanelDialog.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabelFIFO.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabelFIFO.setText("Elementos del FIFO:");
+
+        jTextFieldFifo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextFieldFifoActionPerformed(evt);
+            }
+        });
+
+        jButtonApplyQueue.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/apply32x32.png"))); // NOI18N
+        jButtonApplyQueue.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonApplyQueueActionPerformed(evt);
+            }
+        });
+
+        jCheckBoxFifo.setText("Generación constante");
+        jCheckBoxFifo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxFifoActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanelDialogLayout = new javax.swing.GroupLayout(jPanelDialog);
+        jPanelDialog.setLayout(jPanelDialogLayout);
+        jPanelDialogLayout.setHorizontalGroup(
+            jPanelDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelDialogLayout.createSequentialGroup()
+                .addGroup(jPanelDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelDialogLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabelFIFO, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextFieldFifo))
+                    .addGroup(jPanelDialogLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jCheckBoxFifo)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+            .addGroup(jPanelDialogLayout.createSequentialGroup()
+                .addGap(141, 141, 141)
+                .addComponent(jButtonApplyQueue, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(151, Short.MAX_VALUE))
+        );
+        jPanelDialogLayout.setVerticalGroup(
+            jPanelDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelDialogLayout.createSequentialGroup()
+                .addGap(22, 22, 22)
+                .addGroup(jPanelDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelFIFO, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextFieldFifo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jCheckBoxFifo)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+                .addComponent(jButtonApplyQueue)
+                .addContainerGap())
+        );
+
+        jDialogFifo.getContentPane().add(jPanelDialog, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel_Main.setBackground(new java.awt.Color(255, 255, 255));
 
-        jPanelBoard.setBackground(new java.awt.Color(204, 204, 204));
+        jPanelBoard.setBackground(new java.awt.Color(255, 255, 255));
         jPanelBoard.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanelBoard.setLayout(new java.awt.GridBagLayout());
 
@@ -171,35 +215,50 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
-        jButton2.setText("jButton2");
+        jButton2.setText("Imprimir relaciones");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
             }
         });
 
+        jButtonQueue.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/queue.png"))); // NOI18N
+        jButtonQueue.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonQueueActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel_MainLayout = new javax.swing.GroupLayout(jPanel_Main);
         jPanel_Main.setLayout(jPanel_MainLayout);
         jPanel_MainLayout.setHorizontalGroup(
-            jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel_MainLayout.createSequentialGroup()
+                .addGap(375, 375, 375)
+                .addComponent(jButton2))
             .addGroup(jPanel_MainLayout.createSequentialGroup()
                 .addGap(23, 23, 23)
-                .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jPanelBoard, javax.swing.GroupLayout.PREFERRED_SIZE, 1053, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonTrash, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanelBoard, javax.swing.GroupLayout.PREFERRED_SIZE, 1053, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButtonAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonRelations, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jButtonProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jButtonConstantGeneration, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jButtonDuplication, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addGap(169, 169, 169))
-            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel_MainLayout.createSequentialGroup()
-                .addGap(375, 375, 375)
-                .addComponent(jButton2)
-                .addContainerGap())
+                .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel_MainLayout.createSequentialGroup()
+                        .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel_MainLayout.createSequentialGroup()
+                                .addComponent(jButtonRelations, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel_MainLayout.createSequentialGroup()
+                                .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jButtonQueue, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)))
+                        .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButtonDuplication, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButtonAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButtonTrash, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel_MainLayout.createSequentialGroup()
+                        .addComponent(jButtonConstantGeneration, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButtonProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))))
         );
         jPanel_MainLayout.setVerticalGroup(
             jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -208,25 +267,32 @@ public class GUI extends javax.swing.JFrame {
                 .addComponent(jButton2)
                 .addGap(38, 38, 38)
                 .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanelBoard, javax.swing.GroupLayout.PREFERRED_SIZE, 452, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanelBoard, javax.swing.GroupLayout.PREFERRED_SIZE, 487, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel_MainLayout.createSequentialGroup()
-                        .addComponent(jButtonAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel_MainLayout.createSequentialGroup()
+                                .addComponent(jButtonQueue, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(16, 16, 16)
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel_MainLayout.createSequentialGroup()
+                                .addGap(1, 1, 1)
+                                .addComponent(jButtonDuplication, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jButtonAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(18, 18, 18)
-                        .addComponent(jButtonProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButtonConstantGeneration, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButtonDuplication, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButtonRelations, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonTrash, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(19, Short.MAX_VALUE))
+                        .addGroup(jPanel_MainLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel_MainLayout.createSequentialGroup()
+                                .addComponent(jButtonProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(73, 73, 73)
+                                .addComponent(jButtonTrash, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel_MainLayout.createSequentialGroup()
+                                .addComponent(jButtonConstantGeneration, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(73, 73, 73)
+                                .addComponent(jButtonRelations, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(40, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel_Main, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 0, 1180, 660));
+        getContentPane().add(jPanel_Main, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 0, 1270, 700));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -246,7 +312,7 @@ public class GUI extends javax.swing.JFrame {
         this.jPanelBoard.removeAll();
         this.jPanelBoard.validate();
 
-        JConnector[] connectors = new JConnector[getConnectorsSize()];
+        JLabelConnector[] connectors = new JLabelConnector[getConnectorsSize()];
 
         int index = 0;
 
@@ -257,10 +323,10 @@ public class GUI extends javax.swing.JFrame {
 
                 for (int j = 0; j < ouputsSize; j++) {
                     if (hardwareGraph.verifySameOutput(hardwareGraph.get(i), hardwareGraph.get(i).getOutputs().get(j))) {
-                        connectors[index] = new JConnector(hardwareGraph.get(i).getLabel(), hardwareGraph.get(i).getOutputs().get(j), ConnectLine.LINE_ARROW_DEST, JConnector.CONNECT_LINE_TYPE_RECTANGULAR, Color.orange);
+                        connectors[index] = new JLabelConnector(hardwareGraph.get(i).getLabel(), hardwareGraph.get(i).getOutputs().get(j), Color.orange);
 
                     } else {
-                        connectors[index] = new JConnector(hardwareGraph.get(i).getLabel(), hardwareGraph.get(i).getOutputs().get(j), ConnectLine.LINE_ARROW_DEST, JConnector.CONNECT_LINE_TYPE_RECTANGULAR, Color.BLUE);
+                        connectors[index] = new JLabelConnector(hardwareGraph.get(i).getLabel(), hardwareGraph.get(i).getOutputs().get(j), Color.BLUE);
 
                     }
                     index++;
@@ -271,6 +337,7 @@ public class GUI extends javax.swing.JFrame {
         ConnectorContainer conectorContainer = new ConnectorContainer(connectors);
 
         conectorContainer.setLayout(null);
+        conectorContainer.setBackground(Color.white);
 
         for (int i = 0; i < hardwareGraph.size(); i++) {
 
@@ -294,8 +361,9 @@ public class GUI extends javax.swing.JFrame {
     private void jButtonAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddActionPerformed
         String imagePath = "/Images/add48x48.png";
         int hardwareType = 1;
-        String toolTip = "Add process ID:" + hardwareGraph.size();
-        addHardwareBlock(imagePath, hardwareType, toolTip);
+        String toolTip = "Add process ID:";
+        String name = "adder";
+        createHardwareBlock(imagePath, hardwareType, toolTip, name);
 
     }//GEN-LAST:event_jButtonAddActionPerformed
 
@@ -325,21 +393,12 @@ public class GUI extends javax.swing.JFrame {
 
     }//GEN-LAST:event_jButtonTrashActionPerformed
 
-    private void addHardwareBlock(String imagePath, int hardwareType, String toolTip) {
-        JLabel newLabel = new DraggableLabel("");
-
-        newLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource(imagePath)));
-
-        newLabel.setToolTipText(toolTip);
-
-        newLabel.setHorizontalAlignment(0);
-        newLabel.setBorder(javax.swing.border.LineBorder.createBlackLineBorder());
-
-        newLabel.setBounds(0, 0, 48, 48);
+    private void createHardwareBlock(String imagePath, int hardwareType, String toolTip, String name) {
+        JLabel newLabel = new DragLabel("", imagePath, toolTip, jDialogFifo, name);
 
         HardwareModel model = new HardwareModel();
-        model.setX(0);
-        model.setY(0);
+        model.setPosX(0);
+        model.setPosY(0);
         model.setLabel(newLabel);
         model.setHardwareType(hardwareType);
 
@@ -351,42 +410,73 @@ public class GUI extends javax.swing.JFrame {
     private void jButtonProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonProductActionPerformed
         String imagePath = "/Images/product48x48.png";
         int hardwareType = 2;
-        String toolTip = "Product process ID:" + hardwareGraph.size();
-        addHardwareBlock(imagePath, hardwareType, toolTip);
+        String toolTip = "Product process Id:";
+        String name = "product";
+        createHardwareBlock(imagePath, hardwareType, toolTip, name);
     }//GEN-LAST:event_jButtonProductActionPerformed
 
     private void jButtonConstantGenerationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConstantGenerationActionPerformed
         String imagePath = "/Images/constant48x48.png";
         int hardwareType = 3;
-        String toolTip = "Constant generation process ID:" + hardwareGraph.size();
-        addHardwareBlock(imagePath, hardwareType, toolTip);
+        String toolTip = "Constant generation process Id:";
+        String name = "constantGeneration";
+        createHardwareBlock(imagePath, hardwareType, toolTip, name);
     }//GEN-LAST:event_jButtonConstantGenerationActionPerformed
 
     private void jButtonDuplicationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDuplicationActionPerformed
         String imagePath = "/Images/duplication48x48.png";
         int hardwareType = 0;
-        String toolTip = "Duplication process ID:" + hardwareGraph.size();
-        addHardwareBlock(imagePath, hardwareType, toolTip);
+        String toolTip = "Duplication process Id:";
+        String name = "duplication";
+        createHardwareBlock(imagePath, hardwareType, toolTip, name);
     }//GEN-LAST:event_jButtonDuplicationActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String imagePath = "/Images/sink48x48.png";
         int hardwareType = 4;
-        String toolTip = "Sink process ID:" + hardwareGraph.size();
-        addHardwareBlock(imagePath, hardwareType, toolTip);
+        String toolTip = "Sink process Id:";
+        String name = "sink";
+        createHardwareBlock(imagePath, hardwareType, toolTip, name);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-     /*   JOptionPane.showMessageDialog(
-                this.jPanel_Main,
-                "Un aviso puñetero");*/
-     this.jOptionPaneErrors.setMessage("Error");
-    
-     this.jOptionPaneErrors.validate();
-     this.jOptionPaneErrors.updateUI();
+        hardwareGraph.printGraph();
 
 
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jTextFieldFifoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldFifoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextFieldFifoActionPerformed
+
+    private void jButtonApplyQueueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonApplyQueueActionPerformed
+        String text = this.jTextFieldFifo.getText().trim().replace(" ", "");
+        String[] parts = text.split(",");
+        
+        selectedModelByQueueProcess.setConstantGeneration(this.jCheckBoxFifo.isSelected());
+       
+        for (int i = 0; i < parts.length; i++) {
+            try {
+                selectedModelByQueueProcess.getInputQueue().add(Float.parseFloat(parts[i]));
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+
+            }
+        }
+
+    }//GEN-LAST:event_jButtonApplyQueueActionPerformed
+
+    private void jCheckBoxFifoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxFifoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBoxFifoActionPerformed
+
+    private void jButtonQueueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonQueueActionPerformed
+        String imagePath = "/Images/queue48x48.png";
+        int hardwareType = 5;
+        String toolTip = "Queue process Id:";
+        String name = "queue";
+        createHardwareBlock(imagePath, hardwareType, toolTip, name);
+    }//GEN-LAST:event_jButtonQueueActionPerformed
 
     /**
      * @param args the command line arguments
@@ -427,14 +517,21 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButtonAdd;
+    private javax.swing.JButton jButtonApplyQueue;
     private javax.swing.JButton jButtonConstantGeneration;
     private javax.swing.JButton jButtonDuplication;
     private javax.swing.JButton jButtonProduct;
+    private javax.swing.JButton jButtonQueue;
     private javax.swing.JButton jButtonRelations;
     private javax.swing.JButton jButtonTrash;
+    private javax.swing.JCheckBox jCheckBoxFifo;
+    private javax.swing.JDialog jDialogFifo;
+    private javax.swing.JLabel jLabelFIFO;
     private javax.swing.JOptionPane jOptionPaneErrors;
     private javax.swing.JPanel jPanelBoard;
+    private javax.swing.JPanel jPanelDialog;
     private javax.swing.JPanel jPanel_Main;
+    private javax.swing.JTextField jTextFieldFifo;
     // End of variables declaration//GEN-END:variables
 
     private void initGlobalValues() {

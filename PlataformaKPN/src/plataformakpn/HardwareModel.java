@@ -5,7 +5,7 @@
  */
 package plataformakpn;
 
-import JConnector.DraggableLabel;
+import ComponentConnector.DragLabel;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JLabel;
@@ -16,46 +16,49 @@ import javax.swing.JLabel;
  */
 public class HardwareModel
 {
-    private int x;
-    private int y;
+    private int posX;
+    private int posY;
     private JLabel label;    
     private List<JLabel> outputs;
     private List<JLabel> inputs;
-    private int hardwareType;
+    private int hardwareType;      
+    private List<Float> inputQueue;
+    private boolean constantGeneration;
     
         
     public HardwareModel()
     {
         outputs = new ArrayList<>();     
-        inputs = new ArrayList<>();     
+        inputs = new ArrayList<>(); 
+        inputQueue = new ArrayList<>();
     }
 
     /**
-     * @return the x
+     * @return the posX
      */
-    public int getX() {
-        return x;
+    public int getPosX() {
+        return posX;
     }
 
     /**
-     * @param x the x to set
+     * @param posX the posX to set
      */
-    public void setX(int x) {
-        this.x = x;
+    public void setPosX(int posX) {
+        this.posX = posX;
     }
 
     /**
-     * @return the y
+     * @return the posY
      */
-    public int getY() {
-        return y;
+    public int getPosY() {
+        return posY;
     }
 
     /**
-     * @param y the y to set
+     * @param posY the posY to set
      */
-    public void setY(int y) {
-        this.y = y;
+    public void setPosY(int posY) {
+        this.posY = posY;
     }
 
     /**
@@ -98,6 +101,7 @@ public class HardwareModel
      * 2 means product process
      * 3 means constant generation process
      * 4 means sink process
+     * 5 means queue process
      */
     public int getHardwareType() {
         return hardwareType;
@@ -110,6 +114,7 @@ public class HardwareModel
      * 2 means production process
      * 3 means constant generation process
      * 4 means sink process
+     * 5 means queue process
      */
     public void setHardwareType(int hardwareType) {
         this.hardwareType = hardwareType;
@@ -127,6 +132,34 @@ public class HardwareModel
      */
     public void setInputs(List<JLabel> inputs) {
         this.inputs = inputs;
+    }
+
+    /**
+     * @return the inputQueue
+     */
+    public List<Float> getInputQueue() {
+        return inputQueue;
+    }
+
+    /**
+     * @param inputQueue the inputQueue to set
+     */
+    public void setInputQueue(List<Float> inputQueue) {
+        this.inputQueue = inputQueue;
+    }
+
+    /**
+     * @return the constantGeneration
+     */
+    public boolean isConstantGeneration() {
+        return constantGeneration;
+    }
+
+    /**
+     * @param constantGeneration the constantGeneration to set
+     */
+    public void setConstantGeneration(boolean constantGeneration) {
+        this.constantGeneration = constantGeneration;
     }
     
     

@@ -16,9 +16,11 @@ import javax.swing.JLabel;
 public class HardwareGraph {
 
     public List<HardwareModel> hardwareGraph;
+    private int hardwareIdentifier;
 
     public HardwareGraph() {
         hardwareGraph = new ArrayList<>();
+        hardwareIdentifier =0;
     }
     
     public boolean verifySameOutput(HardwareModel model, JLabel label)
@@ -37,6 +39,16 @@ public class HardwareGraph {
     public HardwareModel get(int i) {
         return hardwareGraph.get(i);
     }
+    
+    public HardwareModel search(JLabel label) {
+        for (int i = 0; i < hardwareGraph.size(); i++) {
+            if(hardwareGraph.get(i).getLabel().equals(label))
+            {
+                return hardwareGraph.get(i);                
+            }            
+        }
+        return null;
+    }
 
     public void add(HardwareModel model) {
         hardwareGraph.add(model);
@@ -49,15 +61,20 @@ public class HardwareGraph {
     public void printGraph()
     {
         for (int i = 0; i < hardwareGraph.size(); i++) {
-            System.out.println("Nodo: "+hardwareGraph.get(i).getLabel().getText());
+            System.out.println("Nodo: "+hardwareGraph.get(i).getLabel().getName());
             System.out.println("Entradas:");
             for (int j = 0; j < hardwareGraph.get(i).getInputs().size(); j++) {
-                System.out.println("    "+hardwareGraph.get(i).getInputs().get(j).getText());               
+                System.out.println("    "+hardwareGraph.get(i).getInputs().get(j).getName());               
             }
             System.out.println("Salidas:");
             for (int j = 0; j < hardwareGraph.get(i).getOutputs().size(); j++) {
-                System.out.println("    "+hardwareGraph.get(i).getOutputs().get(j).getText());
+                System.out.println("    "+hardwareGraph.get(i).getOutputs().get(j).getName());
             }
+            System.out.println("Cola entrada:");
+            for (int j = 0; j < hardwareGraph.get(i).getInputQueue().size(); j++) {
+                System.out.println("    "+hardwareGraph.get(i).getInputQueue().get(j));
+            }
+            System.out.println("Generación constante: "+hardwareGraph.get(i).isConstantGeneration());
             
             
             
@@ -87,5 +104,15 @@ public class HardwareGraph {
         }
 
     }
+
+    /**
+     * @return the hardwareIdentifier
+     */
+    public int getHardwareIdentifier() {
+        this.hardwareIdentifier++;
+        return hardwareIdentifier;
+    }
+
+    
 
 }

@@ -1,48 +1,80 @@
-package JConnector;
+package ComponentConnector;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Iterator;
 import javax.swing.*;
 import javax.swing.border.*;
 import plataformakpn.HardwareModel;
-import java.util.List;
 import plataformakpn.GUI;
 import static plataformakpn.GUI.selectedJLabel;
 import static plataformakpn.GUI.hardwareGraph;
 import static plataformakpn.GUI.relationsFlag;
 import static plataformakpn.GUI.removeFlag;
+import static plataformakpn.GUI.selectedModelByQueueProcess;
 
-public class DraggableLabel extends JLabel {
+public class DragLabel extends JLabel {
 
-    Point pressPoint;
-    Point releasePoint;
+    Point sourcePoint;
+    Point destinationPoint;
     DragProcessor dragProcessor = new DragProcessor();
+    JPanel panel;
+    JDialog jDialogFifo;
 
-    public DraggableLabel(String title) {
+    public DragLabel(String title, String imagePath, String toolTip, JDialog jDialogFifo, String name) {
         super(title);
-        setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), new EmptyBorder(1, 5, 1, 1)));
+        this.jDialogFifo = jDialogFifo;
+        //setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), new EmptyBorder(1, 5, 1, 1)));     
+        this.initializeJLabel(imagePath, toolTip, name);
+
+    }
+
+    private void initializeJLabel(String imagePath, String toolTip, String name) {
         addMouseListener(dragProcessor);
         addMouseMotionListener(dragProcessor);
-
+        setIcon(new javax.swing.ImageIcon(getClass().getResource(imagePath)));
+        setHorizontalAlignment(0);
+        setBorder(javax.swing.border.LineBorder.createBlackLineBorder());
+        setBounds(0, 0, 48, 48);
+        int id = hardwareGraph.getHardwareIdentifier();
+        setName(name + id);
+        setToolTipText(toolTip + id);
     }
 
     protected class DragProcessor extends MouseAdapter implements MouseListener, MouseMotionListener {
 
         Window dragWindow = new JWindow() {
+            @Override
             public void paint(Graphics g) {
                 super.paint(g);
-                DraggableLabel.this.paint(g);
+                DragLabel.this.paint(g);
             }
         };
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getClickCount() == 2) {
+                JLabel label = (JLabel) e.getComponent();
+               
+                HardwareModel model = hardwareGraph.search(label);
+                if (model.getHardwareType() == 5) //queue process
+                {
+                    selectedModelByQueueProcess = model;
+                    jDialogFifo.setLocationRelativeTo(label);
+                    jDialogFifo.setModal(true);
+                    jDialogFifo.pack();
+                    jDialogFifo.setVisible(true);
+
+                }
+            }
+        }
 
         @Override
         public void mouseDragged(MouseEvent e) {
             //System.out.println(e.getX() +", "+ e.getY());
 
             Point dragPoint = e.getPoint();
-            int xDiff = pressPoint.x - dragPoint.x;
-            int yDiff = pressPoint.y - dragPoint.y;
+            int xDiff = sourcePoint.x - dragPoint.x;
+            int yDiff = sourcePoint.y - dragPoint.y;
 
             Rectangle b = e.getComponent().getBounds();
             Point p = b.getLocation();
@@ -61,9 +93,7 @@ public class DraggableLabel extends JLabel {
         @Override
         public void mousePressed(MouseEvent e) {
 
-            JLabel label = (JLabel) e.getComponent();
-
-            pressPoint = e.getPoint();
+            sourcePoint = e.getPoint();
             Rectangle b = e.getComponent().getBounds();
             Point p = b.getLocation();
             SwingUtilities.convertPointToScreen(p, e.getComponent().getParent());
@@ -76,11 +106,11 @@ public class DraggableLabel extends JLabel {
         public void mouseReleased(MouseEvent e) {
             //System.out.println("Cuarto");
 
-            releasePoint = e.getPoint();
+            destinationPoint = e.getPoint();
             dragWindow.setVisible(false);
 
-            int xDiff = pressPoint.x - releasePoint.x;
-            int yDiff = pressPoint.y - releasePoint.y;
+            int xDiff = sourcePoint.x - destinationPoint.x;
+            int yDiff = sourcePoint.y - destinationPoint.y;
 
             Rectangle b = e.getComponent().getBounds();
             Point p = b.getLocation();
@@ -88,18 +118,18 @@ public class DraggableLabel extends JLabel {
             p.x -= xDiff;
             p.y -= yDiff;
 
-            SwingUtilities.convertPointFromScreen(p, DraggableLabel.this.getParent());
+            SwingUtilities.convertPointFromScreen(p, DragLabel.this.getParent());
             if (p.x <= 0) {
                 p.x = 1;
             }
-            if (p.x > DraggableLabel.this.getParent().getWidth() - b.width) {
-                p.x = DraggableLabel.this.getParent().getWidth() - b.width;
+            if (p.x > DragLabel.this.getParent().getWidth() - b.width) {
+                p.x = DragLabel.this.getParent().getWidth() - b.width;
             }
             if (p.y <= 0) {
                 p.y = 1;
             }
-            if (p.y > DraggableLabel.this.getParent().getHeight() - b.height) {
-                p.y = DraggableLabel.this.getParent().getHeight() - b.height;
+            if (p.y > DragLabel.this.getParent().getHeight() - b.height) {
+                p.y = DragLabel.this.getParent().getHeight() - b.height;
             }
             setLocation(p);
             getParent().repaint();
@@ -109,8 +139,8 @@ public class DraggableLabel extends JLabel {
             for (int i = 0; i < hardwareGraph.size(); i++) {
                 HardwareModel model = hardwareGraph.get(i);
                 if (model.getLabel() == label) {
-                    model.setX(label.getX());
-                    model.setY(label.getY());
+                    model.setPosX(label.getX());
+                    model.setPosY(label.getY());
                 }
             }
 
@@ -120,14 +150,12 @@ public class DraggableLabel extends JLabel {
                 if (selectedJLabel == null) {
                     selectedJLabel = label;
                 } else {
-                   
 
                     HardwareModel modelSource = getModel(selectedJLabel);
                     HardwareModel modelDest = getModel(label);
 
                     System.out.println(verifyModels(modelSource, modelDest));
-                    if (verifyModels(modelSource, modelDest)) 
-                    {
+                    if (verifyModels(modelSource, modelDest)) {
                         modelSource.getOutputs().add(label);
                         modelDest.getInputs().add(selectedJLabel);
                     }
@@ -135,11 +163,10 @@ public class DraggableLabel extends JLabel {
                     selectedJLabel = null;
                 }
             }
-            
+
             //deleting labels
-            if(removeFlag)
-            {
-               hardwareGraph.remove(label);                 
+            if (removeFlag) {
+                hardwareGraph.remove(label);
             }
 
             //activating repaint
@@ -179,17 +206,17 @@ public class DraggableLabel extends JLabel {
                 resultSource = true;
             }
 
-            if ((modelDest.getHardwareType() == 1 || modelDest.getHardwareType() == 2) 
-                    && modelDest.getInputs().size() < 2)  {
+            if ((modelDest.getHardwareType() == 1 || modelDest.getHardwareType() == 2)
+                    && modelDest.getInputs().size() < 2) {
                 resultDest = true;
             }
-            if ((modelDest.getHardwareType() == 0 || modelDest.getHardwareType() == 3 || modelDest.getHardwareType() == 4) 
+            if ((modelDest.getHardwareType() == 0 || modelDest.getHardwareType() == 3 || modelDest.getHardwareType() == 4)
                     && modelDest.getInputs().size() < 1) {
-               
+
                 resultDest = true;
             }
-            return resultSource&resultDest;
-            
+            return resultSource & resultDest;
+
         }
     }
 }

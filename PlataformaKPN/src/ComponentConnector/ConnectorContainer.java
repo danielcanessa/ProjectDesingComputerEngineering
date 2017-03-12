@@ -1,4 +1,4 @@
-package JConnector;
+package ComponentConnector;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,19 +15,20 @@ import java.awt.*;
  * @version 1.0
  */
 public class ConnectorContainer extends JPanel {
-    JConnector[] connectors;
+    JLabelConnector[] connectors;
     public ConnectorContainer() {
+        
     }
 
-    public ConnectorContainer(JConnector[] connectors) {
+    public ConnectorContainer(JLabelConnector[] connectors) {
         this.connectors = connectors;
     }
 
-    public void setConnectors(JConnector[] connectors) {
+    public void setConnectors(JLabelConnector[] connectors) {
         this.connectors = connectors;
     }
 
-    public JConnector[] getConnectors() {
+    public JLabelConnector[] getConnectors() {
         return connectors;
     }
 
@@ -35,9 +36,9 @@ public class ConnectorContainer extends JPanel {
     public void paint(Graphics g) {
         super.paint(g);
         if (connectors != null) {
-            for (int i = 0; i < connectors.length; i++) {
-                if (connectors[i] != null) {
-                    connectors[i].paint(g);
+            for (JLabelConnector connector : connectors) {
+                if (connector != null) {
+                    connector.paint(g);
                 }
             }
         }
