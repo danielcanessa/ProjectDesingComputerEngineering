@@ -24,17 +24,25 @@ public class DragLabel extends JLabel {
         super(title);
         this.jDialogFifo = jDialogFifo;
         //setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), new EmptyBorder(1, 5, 1, 1)));     
-        this.initializeJLabel(imagePath, toolTip, name);
+        this.initializeJLabel(imagePath, toolTip, name,0,0);
 
     }
 
-    private void initializeJLabel(String imagePath, String toolTip, String name) {
+    public DragLabel(String title, String imagePath, String toolTip, JDialog jDialogFifo, String name,int posX, int posY) {
+        super(title);
+        this.jDialogFifo = jDialogFifo;
+        //setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), new EmptyBorder(1, 5, 1, 1)));     
+        this.initializeJLabel(imagePath, toolTip, name,posX,posY);
+
+    }
+    
+    private void initializeJLabel(String imagePath, String toolTip, String name,int posX, int posY) {
         addMouseListener(dragProcessor);
         addMouseMotionListener(dragProcessor);
         setIcon(new javax.swing.ImageIcon(getClass().getResource(imagePath)));
         setHorizontalAlignment(0);
         setBorder(javax.swing.border.LineBorder.createBlackLineBorder());
-        setBounds(0, 0, 48, 48);
+        setBounds(posX, posY, 48, 48);
         int id = hardwareGraph.getHardwareIdentifier();
         setName(name + id);
         setToolTipText(toolTip + id);
