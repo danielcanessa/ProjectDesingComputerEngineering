@@ -14,22 +14,20 @@ import javax.swing.JLabel;
  *
  * @author Daniel
  */
-public class HardwareModel
-{
+public class HardwareModel {
+
     private int posX;
     private int posY;
-    private JLabel label;    
+    private JLabel label;
     private List<JLabel> outputs;
     private List<JLabel> inputs;
-    private int hardwareType;      
+    private int hardwareType;
     private List<Float> inputQueue;
     private boolean constantGeneration;
-    
-        
-    public HardwareModel()
-    {
-        outputs = new ArrayList<>();     
-        inputs = new ArrayList<>(); 
+
+    public HardwareModel() {
+        outputs = new ArrayList<>();
+        inputs = new ArrayList<>();
         inputQueue = new ArrayList<>();
     }
 
@@ -88,33 +86,24 @@ public class HardwareModel
     public void setOutputs(List<JLabel> outputs) {
         this.outputs = outputs;
     }
-    
-    public boolean verifyIfOutputAlreadyExist(JLabel label)
-    {
-        return outputs.contains(label);        
+
+    public boolean verifyIfOutputAlreadyExist(JLabel label) {
+        return outputs.contains(label);
     }
 
     /**
-     * @return the hardwareType
-     * 0 means duplication process
-     * 1 means add process
-     * 2 means product process
-     * 3 means constant generation process
-     * 4 means sink process
-     * 5 means queue process
+     * @return the hardwareType 0 means duplication process 1 means add process
+     * 2 means product process 3 means constant generation process 4 means sink
+     * process 5 means queue process 6 means view process
      */
     public int getHardwareType() {
         return hardwareType;
     }
 
     /**
-     * @param hardwareType the hardwareType to set
-     * 0 means duplication process
-     * 1 means add process
-     * 2 means production process
-     * 3 means constant generation process
-     * 4 means sink process
-     * 5 means queue process
+     * @param hardwareType the hardwareType to set 0 means duplication process 1
+     * means add process 2 means production process 3 means constant generation
+     * process 4 means sink process 5 means queue process 6 means view process
      */
     public void setHardwareType(int hardwareType) {
         this.hardwareType = hardwareType;
@@ -161,6 +150,17 @@ public class HardwareModel
     public void setConstantGeneration(boolean constantGeneration) {
         this.constantGeneration = constantGeneration;
     }
-    
-    
+
+    public int getInputSize() {
+        int result = 0;
+        for (int i = 0; i < inputs.size(); i++) {
+            if (!inputs.get(i).getName().contains("view")) {
+                result++;
+            }
+
+        }
+        System.out.println(result);
+        return result;
+    }
+
 }

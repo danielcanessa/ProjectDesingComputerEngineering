@@ -10,6 +10,7 @@ import static plataformakpn.GUI.selectedJLabel;
 import static plataformakpn.GUI.hardwareGraph;
 import static plataformakpn.GUI.relationsFlag;
 import static plataformakpn.GUI.removeFlag;
+import static plataformakpn.GUI.selectedColor;
 import static plataformakpn.GUI.selectedModelByQueueProcess;
 
 public class DragLabel extends JLabel {
@@ -18,25 +19,15 @@ public class DragLabel extends JLabel {
     Point destinationPoint;
     DragProcessor dragProcessor = new DragProcessor();
     JPanel panel;
-    JDialog jDialogFifo;
+    JDialog jDialog;
 
-    public DragLabel(String title, String imagePath, String toolTip, JDialog jDialogFifo, String name) {
-        super(title);
-        this.jDialogFifo = jDialogFifo;
-        //setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), new EmptyBorder(1, 5, 1, 1)));     
-        this.initializeJLabel(imagePath, toolTip, name,0,0);
+    public DragLabel(String imagePath, String toolTip, JDialog jDialog, String name, int posX, int posY) {
+        this.jDialog = jDialog;
+        this.initializeJLabel(imagePath, toolTip, name, posX, posY);
 
     }
 
-    public DragLabel(String title, String imagePath, String toolTip, JDialog jDialogFifo, String name,int posX, int posY) {
-        super(title);
-        this.jDialogFifo = jDialogFifo;
-        //setBorder(new CompoundBorder(new EtchedBorder(EtchedBorder.LOWERED), new EmptyBorder(1, 5, 1, 1)));     
-        this.initializeJLabel(imagePath, toolTip, name,posX,posY);
-
-    }
-    
-    private void initializeJLabel(String imagePath, String toolTip, String name,int posX, int posY) {
+    private void initializeJLabel(String imagePath, String toolTip, String name, int posX, int posY) {
         addMouseListener(dragProcessor);
         addMouseMotionListener(dragProcessor);
         setIcon(new javax.swing.ImageIcon(getClass().getResource(imagePath)));
@@ -60,42 +51,44 @@ public class DragLabel extends JLabel {
 
         @Override
         public void mouseClicked(MouseEvent e) {
+            //double click over hardware abstraction
             if (e.getClickCount() == 2) {
                 JLabel label = (JLabel) e.getComponent();
-               
+                //getting the data of the abstraction double clicked
                 HardwareModel model = hardwareGraph.search(label);
-                if (model.getHardwareType() == 5) //queue process
-                {
+                //queue process, jDialogFiFo
+                if (model.getHardwareType() == 5) {
                     selectedModelByQueueProcess = model;
-                    jDialogFifo.setLocationRelativeTo(label);
-                    jDialogFifo.setModal(true);
-                    jDialogFifo.pack();
-                    jDialogFifo.setVisible(true);
-
+                    jDialog.setLocationRelativeTo(label);
+                    jDialog.setModal(true);
+                    jDialog.pack();
+                    jDialog.setVisible(true);
+                } //view process, FDialogView
+                else if (model.getHardwareType() == 6) {
+                    jDialog.setLocationRelativeTo(label);
+                    jDialog.setModal(true);
+                    jDialog.pack();
+                    jDialog.setVisible(true);
                 }
             }
         }
 
         @Override
         public void mouseDragged(MouseEvent e) {
-            //System.out.println(e.getX() +", "+ e.getY());
-
+            //moving the hardware abstraction
             Point dragPoint = e.getPoint();
             int xDiff = sourcePoint.x - dragPoint.x;
             int yDiff = sourcePoint.y - dragPoint.y;
-
             Rectangle b = e.getComponent().getBounds();
             Point p = b.getLocation();
             SwingUtilities.convertPointToScreen(p, e.getComponent().getParent());
             p.x -= xDiff;
             p.y -= yDiff;
-
             dragWindow.setLocation(p);
         }
 
         @Override
         public void mouseMoved(MouseEvent e) {
-            //System.out.println("Segundo");
         }
 
         @Override
@@ -112,8 +105,7 @@ public class DragLabel extends JLabel {
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            //System.out.println("Cuarto");
-
+            //drawing again the lines
             destinationPoint = e.getPoint();
             dragWindow.setVisible(false);
 
@@ -142,8 +134,29 @@ public class DragLabel extends JLabel {
             setLocation(p);
             getParent().repaint();
 
-            //Update the JLabel position
+            //get the label selected
             JLabel label = (JLabel) e.getComponent();
+
+            //Update the JLabel position
+            updateHardwarePosition(label);
+
+            //Create relations
+            createNewRelation(label);
+
+            //Delete labels
+            deleteHardware(label);
+
+            //activating repaint
+            GUI.repaintFlag = true;
+        }
+
+        private void deleteHardware(JLabel label) {
+            if (removeFlag) {
+                hardwareGraph.remove(label);
+            }
+        }
+
+        private void updateHardwarePosition(JLabel label) {
             for (int i = 0; i < hardwareGraph.size(); i++) {
                 HardwareModel model = hardwareGraph.get(i);
                 if (model.getLabel() == label) {
@@ -151,12 +164,15 @@ public class DragLabel extends JLabel {
                     model.setPosY(label.getY());
                 }
             }
+        }
 
-            //Doing relations
+        private void createNewRelation(JLabel label) {
             if (relationsFlag) {
 
                 if (selectedJLabel == null) {
                     selectedJLabel = label;
+                    selectedJLabel.setBorder(BorderFactory.createLineBorder(selectedColor));
+
                 } else {
 
                     HardwareModel modelSource = getModel(selectedJLabel);
@@ -168,18 +184,11 @@ public class DragLabel extends JLabel {
                         modelDest.getInputs().add(selectedJLabel);
                     }
 
+                    selectedJLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
                     selectedJLabel = null;
+
                 }
             }
-
-            //deleting labels
-            if (removeFlag) {
-                hardwareGraph.remove(label);
-            }
-
-            //activating repaint
-            GUI.repaintFlag = true;
-
         }
 
         private HardwareModel getModel(JLabel label) {
@@ -208,22 +217,37 @@ public class DragLabel extends JLabel {
             boolean resultDest = false;
 
             if (modelSource.getHardwareType() != 0 && modelSource.getOutputs().size() < 1) {
-                resultSource = true;
+                if (modelSource.getHardwareType() == 5) { //queue process can only be connect to a constant generation process
+                    if (modelDest.getHardwareType() == 3) {
+                        resultSource = true;
+                    }
+
+                } else {
+                    resultSource = true;
+                }
             }
             if (modelSource.getHardwareType() == 0 && modelSource.getOutputs().size() < 2) {
                 resultSource = true;
             }
 
             if ((modelDest.getHardwareType() == 1 || modelDest.getHardwareType() == 2)
-                    && modelDest.getInputs().size() < 2) {
+                    && modelDest.getInputSize() < 2) {
                 resultDest = true;
             }
-            if ((modelDest.getHardwareType() == 0 || modelDest.getHardwareType() == 3 || modelDest.getHardwareType() == 4)
-                    && modelDest.getInputs().size() < 1) {
+            if ((modelDest.getHardwareType() == 0 || modelDest.getHardwareType() == 3
+                    || modelDest.getHardwareType() == 4)
+                    && modelDest.getInputSize() < 1) {
 
                 resultDest = true;
             }
-            return resultSource & resultDest;
+
+            if (modelSource.getHardwareType() == 6 && modelSource.getOutputs().size() < 1
+                    && modelDest.getHardwareType() != 6) //it doesn't matter the amount of view process connected
+            {
+                return true;
+            } else {
+                return resultSource & resultDest;
+            }
 
         }
     }

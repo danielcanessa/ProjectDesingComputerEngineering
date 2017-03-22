@@ -62,22 +62,19 @@ public class HardwareGraph {
     {
         for (int i = 0; i < hardwareGraph.size(); i++) {
             System.out.println("Nodo: "+hardwareGraph.get(i).getLabel().getName());
-            System.out.println("Entradas:");
+            System.out.println("    Entradas:");
             for (int j = 0; j < hardwareGraph.get(i).getInputs().size(); j++) {
-                System.out.println("    "+hardwareGraph.get(i).getInputs().get(j).getName());               
+                System.out.println("        "+hardwareGraph.get(i).getInputs().get(j).getName());               
             }
-            System.out.println("Salidas:");
+            System.out.println("    Salidas:");
             for (int j = 0; j < hardwareGraph.get(i).getOutputs().size(); j++) {
-                System.out.println("    "+hardwareGraph.get(i).getOutputs().get(j).getName());
+                System.out.println("        "+hardwareGraph.get(i).getOutputs().get(j).getName());
             }
-            System.out.println("Cola entrada:");
+            System.out.println("    Cola entrada:");
             for (int j = 0; j < hardwareGraph.get(i).getInputQueue().size(); j++) {
-                System.out.println("    "+hardwareGraph.get(i).getInputQueue().get(j));
+                System.out.println("        "+hardwareGraph.get(i).getInputQueue().get(j));
             }
-            System.out.println("Generación constante: "+hardwareGraph.get(i).isConstantGeneration());
-            
-            
-            
+            System.out.println("    Generación constante: "+hardwareGraph.get(i).isConstantGeneration());   
         }
     }
     
