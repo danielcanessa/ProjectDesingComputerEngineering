@@ -1,17 +1,24 @@
 package ComponentConnector;
 
+import KPN.AddProcess;
+import KPN.ConstantGenerationProcess;
+import KPN.DuplicationProcess;
+import KPN.KPNNetwork;
+import KPN.ProductProcess;
+import KPN.SinkProcess;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.border.*;
 import plataformakpn.HardwareModel;
 import plataformakpn.GUI;
 import static plataformakpn.GUI.selectedJLabel;
 import static plataformakpn.GUI.hardwareGraph;
+import static plataformakpn.GUI.labelsView;
 import static plataformakpn.GUI.relationsFlag;
 import static plataformakpn.GUI.removeFlag;
 import static plataformakpn.GUI.selectedColor;
-import static plataformakpn.GUI.selectedModelByQueueProcess;
+import static plataformakpn.GUI.textFieldView;
+import static plataformakpn.GUI.selectedModelJDialog;
 
 public class DragLabel extends JLabel {
 
@@ -20,9 +27,13 @@ public class DragLabel extends JLabel {
     DragProcessor dragProcessor = new DragProcessor();
     JPanel panel;
     JDialog jDialog;
+    JTextField jTextFieldFifo;
+    JSpinner spinner;
 
-    public DragLabel(String imagePath, String toolTip, JDialog jDialog, String name, int posX, int posY) {
+    public DragLabel(String imagePath, String toolTip, JDialog jDialog, String name, int posX, int posY, JTextField jTextFieldFifo, JSpinner spinner) {
         this.jDialog = jDialog;
+        this.jTextFieldFifo = jTextFieldFifo;
+        this.spinner = spinner;
         this.initializeJLabel(imagePath, toolTip, name, posX, posY);
 
     }
@@ -49,6 +60,14 @@ public class DragLabel extends JLabel {
             }
         };
 
+        private void makeVisibleJDialogFifo() {
+            for (int i = 0; i < 4; i++) {
+                textFieldView.get(i).setVisible(true);
+                labelsView.get(i).setVisible(true);
+            }
+
+        }
+
         @Override
         public void mouseClicked(MouseEvent e) {
             //double click over hardware abstraction
@@ -56,19 +75,95 @@ public class DragLabel extends JLabel {
                 JLabel label = (JLabel) e.getComponent();
                 //getting the data of the abstraction double clicked
                 HardwareModel model = hardwareGraph.search(label);
-                //queue process, jDialogFiFo
-                if (model.getHardwareType() == 5) {
-                    selectedModelByQueueProcess = model;
+
+                //constant generation process, jDialogDelay
+                if (model.getHardwareType() == 3) {
+                    selectedModelJDialog = model;
+
+                    spinner.setValue(model.getDelayIterations());
+                    jDialog.setLocationRelativeTo(label);
+
+                    jDialog.setModal(true);
+                    jDialog.pack();
+                    jDialog.setVisible(true);
+
+                } //queue process, jDialogFiFo
+                else if (model.getHardwareType() == 5) {
+
+                    selectedModelJDialog = model;
+
+                    jTextFieldFifo.setText(model.getInputQueue().toString().replace("[", "").replace("]", ""));
+
                     jDialog.setLocationRelativeTo(label);
                     jDialog.setModal(true);
                     jDialog.pack();
                     jDialog.setVisible(true);
                 } //view process, FDialogView
                 else if (model.getHardwareType() == 6) {
+
+                    makeVisibleJDialogFifo();
                     jDialog.setLocationRelativeTo(label);
+
+                    if (model.getOutputs().get(0) != null) {
+                        String hardware = model.getOutputs().get(0).getName();
+                        if (hardware.contains("duplication")) {
+                            DuplicationProcess thread = (DuplicationProcess) KPNNetwork.searchThread(hardware);
+
+                            labelsView.get(1).setVisible(false);
+                            textFieldView.get(1).setVisible(false);
+
+                            textFieldView.get(0).setText(thread.getQueueIn().toString());
+                            textFieldView.get(2).setText(thread.getQueueOut1().toString());
+                            textFieldView.get(3).setText(thread.getQueueOut2().toString());
+
+                        } else if (hardware.contains("add")) {
+                            AddProcess thread = (AddProcess) KPNNetwork.searchThread(hardware);
+
+                            labelsView.get(3).setVisible(false);
+                            textFieldView.get(3).setVisible(false);
+
+                            textFieldView.get(0).setText(thread.getQueueIn1().toString());
+                            textFieldView.get(1).setText(thread.getQueueIn2().toString());
+                            textFieldView.get(2).setText(thread.getQueueOut().toString());
+
+                        } else if (hardware.contains("product")) {
+                            ProductProcess thread = (ProductProcess) KPNNetwork.searchThread(hardware);
+
+                            labelsView.get(3).setVisible(false);
+                            textFieldView.get(3).setVisible(false);
+
+                            textFieldView.get(0).setText(thread.getQueueIn1().toString());
+                            textFieldView.get(1).setText(thread.getQueueIn2().toString());
+                            textFieldView.get(2).setText(thread.getQueueOut().toString());
+
+                        } else if (hardware.contains("constantGeneration")) {
+                            ConstantGenerationProcess thread = (ConstantGenerationProcess) KPNNetwork.searchThread(hardware);
+
+                            labelsView.get(1).setVisible(false);
+                            textFieldView.get(1).setVisible(false);
+                            labelsView.get(3).setVisible(false);
+                            textFieldView.get(3).setVisible(false);
+
+                            textFieldView.get(0).setText(thread.getQueueIn().toString());
+                            textFieldView.get(2).setText(thread.getQueueOut().toString());
+                        } else if (hardware.contains("sink")) {
+                            SinkProcess thread = (SinkProcess) KPNNetwork.searchThread(hardware);
+
+                            labelsView.get(1).setVisible(false);
+                            textFieldView.get(1).setVisible(false);
+                            labelsView.get(3).setVisible(false);
+                            textFieldView.get(3).setVisible(false);
+
+                            textFieldView.get(0).setText(thread.getQueueIn().toString());
+                            textFieldView.get(2).setText(thread.getQueueOut().toString());
+                        }
+
+                    }
+
                     jDialog.setModal(true);
                     jDialog.pack();
                     jDialog.setVisible(true);
+
                 }
             }
         }

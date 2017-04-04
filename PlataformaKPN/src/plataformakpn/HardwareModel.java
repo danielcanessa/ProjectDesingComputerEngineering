@@ -7,7 +7,9 @@ package plataformakpn;
 
 import ComponentConnector.DragLabel;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import javax.swing.JLabel;
 
 /**
@@ -22,13 +24,17 @@ public class HardwareModel {
     private List<JLabel> outputs;
     private List<JLabel> inputs;
     private int hardwareType;
-    private List<Float> inputQueue;
+    private Queue<Float> inputQueue;
     private boolean constantGeneration;
+    
+    private int delayIterations;
 
     public HardwareModel() {
         outputs = new ArrayList<>();
         inputs = new ArrayList<>();
-        inputQueue = new ArrayList<>();
+        inputQueue = new LinkedList<>();
+      
+        setDelayIterations(0);
     }
 
     /**
@@ -126,14 +132,14 @@ public class HardwareModel {
     /**
      * @return the inputQueue
      */
-    public List<Float> getInputQueue() {
+    public Queue<Float> getInputQueue() {
         return inputQueue;
     }
 
     /**
      * @param inputQueue the inputQueue to set
      */
-    public void setInputQueue(List<Float> inputQueue) {
+    public void setInputQueue(Queue<Float> inputQueue) {
         this.inputQueue = inputQueue;
     }
 
@@ -161,6 +167,20 @@ public class HardwareModel {
         }
         System.out.println(result);
         return result;
+    }
+
+    /**
+     * @return the delayIterations
+     */
+    public int getDelayIterations() {
+        return delayIterations;
+    }
+
+    /**
+     * @param delayIterations the delayIterations to set
+     */
+    public void setDelayIterations(int delayIterations) {
+        this.delayIterations = delayIterations;
     }
 
 }

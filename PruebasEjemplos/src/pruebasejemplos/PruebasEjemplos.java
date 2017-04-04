@@ -14,11 +14,88 @@ import java.util.Queue;
  */
 public class PruebasEjemplos {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        Hilo1 a = new Hilo1();
+    
+    
+    /*public static int factorial(int number)
+    {
+        int result=1;
+        while(number>0)
+        {           
+            result=result*number;
+            number--;            
+        }
+        return result;
+    }
+    
+    public static int castStringToInt(String a)
+    {
+        int result=0;
+        
+        int factor=1;
+        
+        int negative=1;
+        
+        int stop=0;
+       
+        if(a.charAt(0)=='-')
+        {
+            negative*=-1;
+            stop++;
+            
+        }
+        
+        for (int i = a.length()-1; i >=stop; i--) {        
+            
+            result= result+((a.charAt(i) - '0')*factor);
+            factor*=10;
+                        
+        }
+        
+        result*=negative;
+        
+        return result;
+    }*/
+
+    public int adder(int a, int b)
+    {
+        int result;
+        result = a + b;
+        return result;
+    }
+    
+    public int substraction(int a, int b)
+    {        
+        int result;
+        result = a - b;
+        return result;
+    }
+    
+    public void main(String[] args) {
+       
+        String a ="-123456";
+        
+        
+        
+      /*  System.out.println("String to int: " + castStringToInt(a));
+        
+        int b=1234567;
+        char  result[10];
+        
+        int i =0;
+        while(b!=0)
+        {
+            result[i] = (char) (b%10 + '0');
+        }
+        
+        System.out.println((7 + '0'));*/
+        
+        
+        
+        
+     //   System.out.println(factorial(5));
+        
+        
+       /* Hilo1 a = new Hilo1();
         Hilo2 b = new Hilo2();
         
         
@@ -46,7 +123,7 @@ public class PruebasEjemplos {
         // Like size and contains can be used with this
         // implementation.
         int size = b.getQueueIn().size();
-        System.out.println("Size of queue-" + size);
+        System.out.println("Size of queue-" + size);*/
     }
 
 }

@@ -71,10 +71,9 @@ public class HardwareGraph {
                 System.out.println("        "+hardwareGraph.get(i).getOutputs().get(j).getName());
             }
             System.out.println("    Cola entrada:");
-            for (int j = 0; j < hardwareGraph.get(i).getInputQueue().size(); j++) {
-                System.out.println("        "+hardwareGraph.get(i).getInputQueue().get(j));
-            }
-            System.out.println("    Generación constante: "+hardwareGraph.get(i).isConstantGeneration());   
+            System.out.println("        "+hardwareGraph.get(i).getInputQueue());
+            
+            System.out.println("    Generación constante: "+hardwareGraph.get(i).isConstantGeneration() +", Delay: "+hardwareGraph.get(i).getDelayIterations());   
         }
     }
     

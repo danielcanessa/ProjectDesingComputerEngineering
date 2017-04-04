@@ -7,9 +7,8 @@ package KPN;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import plataformakpn.GUI;
+import static plataformakpn.GUI.userThreadDebuging;
+import plataformakpn.HardwareModel;
 
 /**
  *
@@ -17,24 +16,24 @@ import plataformakpn.GUI;
  */
 public class AddProcess extends Thread {
 
-    private Queue<Float> queueIn1;
-    private Queue<Float> queueIn2;
-    private Queue<Float> queueOut;
-    private boolean killThread;
-    private boolean pauseThread;
+    private volatile Queue<Float> queueIn1;
+    private volatile Queue<Float> queueIn2;
+    private volatile Queue<Float> queueOut;
+    private volatile boolean killThread;
+    private volatile boolean pauseThread;
 
-    private boolean queue1InputAssigned;
-    private boolean queue2InputAssigned;
-    private boolean queueOutputAssigned;
+    private volatile String queue1InputAssigned;
+    private volatile String queue2InputAssigned;
+    private volatile String queueOutputAssigned;
 
     public AddProcess() {
         this.queueIn1 = new LinkedList<>();
         this.queueIn2 = new LinkedList<>();
         this.queueOut = new LinkedList<>();
-        this.killThread = false;
-        this.queue1InputAssigned = false;
-        this.queue2InputAssigned = false;
-        this.queueOutputAssigned = false;
+        this.killThread = false;        
+        this.queue1InputAssigned = "";
+        this.queue2InputAssigned = "";
+        this.queueOutputAssigned = "";
 
     }
 
@@ -49,7 +48,9 @@ public class AddProcess extends Thread {
                     }
 
                     //race condition
-                    setPauseThread(true);
+                     if (userThreadDebuging) {
+                        setPauseThread(true);
+                    }
                 }
                 Thread.sleep(100);
             } catch (Exception ex) {
@@ -146,13 +147,13 @@ public class AddProcess extends Thread {
      * @return the queue1InputAssigned
      */
     public boolean isQueue1InputAssigned() {
-        return queue1InputAssigned;
+        return !queue1InputAssigned.equals("");
     }
 
     /**
      * @param queue1InputAssigned the queue1InputAssigned to set
      */
-    public void setQueue1InputAssigned(boolean queue1InputAssigned) {
+    public void setQueue1InputAssigned(String queue1InputAssigned) {
         this.queue1InputAssigned = queue1InputAssigned;
     }
 
@@ -160,13 +161,13 @@ public class AddProcess extends Thread {
      * @return the queue2InputAssigned
      */
     public boolean isQueue2InputAssigned() {
-        return queue2InputAssigned;
+        return !queue2InputAssigned.equals("");
     }
 
     /**
      * @param queue2InputAssigned the queue2InputAssigned to set
      */
-    public void setQueue2InputAssigned(boolean queue2InputAssigned) {
+    public void setQueue2InputAssigned(String queue2InputAssigned) {
         this.queue2InputAssigned = queue2InputAssigned;
     }
 
@@ -174,14 +175,251 @@ public class AddProcess extends Thread {
      * @return the queueOutputAssigned
      */
     public boolean isQueueOutputAssigned() {
-        return queueOutputAssigned;
+        return !queueOutputAssigned.equals("");
     }
 
     /**
      * @param queueOutputAssigned the queueOutputAssigned to set
      */
-    public void setQueueOutputAssigned(boolean queueOutputAssigned) {
+    public void setQueueOutputAssigned(String queueOutputAssigned) {
         this.queueOutputAssigned = queueOutputAssigned;
+    }
+
+    /**
+     * @return the queue1InputAssigned
+     */
+    public String getQueue1InputAssigned() {
+        return queue1InputAssigned;
+    }
+
+    /**
+     * @return the queue2InputAssigned
+     */
+    public String getQueue2InputAssigned() {
+        return queue2InputAssigned;
+    }
+
+    /**
+     * @return the queueOutputAssigned
+     */
+    public String getQueueOutputAssigned() {
+        return queueOutputAssigned;
+    }
+    
+    
+    public void joinAddProcess(String name, HardwareModel model) {
+
+        AddProcess addProcess = (AddProcess) KPNNetwork.searchThread(name); //current add process
+
+        for (int j = 0; j < model.getInputs().size(); j++) { //join the process with the inputs
+
+            String inputName = model.getInputs().get(j).getName();
+            int hardwareTypeInput = KPNNetwork.getHardwareTypeByName(inputName);
+
+            switch (hardwareTypeInput) {
+                case 0: //duplication process case
+                    DuplicationProcess duplicationInputProcess = (DuplicationProcess) KPNNetwork.searchThread(inputName); //getting the process
+                    JoinInput_Add_Duplication(addProcess, duplicationInputProcess);
+                    break;
+                case 1: //add process case
+                    AddProcess addInputProcess = (AddProcess) KPNNetwork.searchThread(inputName); //getting the process
+                    JoinInput_Add_Add(addProcess, addInputProcess);
+                    break;
+                case 2:
+                    ProductProcess productInputProcess = (ProductProcess) KPNNetwork.searchThread(inputName); //getting the process
+                    JoinInput_Add_Product(addProcess, productInputProcess);
+                    break;
+                case 3:
+                    ConstantGenerationProcess constantGenerationInputProcess = (ConstantGenerationProcess) KPNNetwork.searchThread(inputName); //getting the process
+                    JoinInput_Add_ConstantGeneration(addProcess, constantGenerationInputProcess);
+                    break;
+                case 4:
+                    SinkProcess SinkInputProcess = (SinkProcess) KPNNetwork.searchThread(inputName); //getting the process
+                    JoinInput_Add_Sink(addProcess, SinkInputProcess);
+                    break;
+            }
+
+        }
+        for (int j = 0; j < model.getOutputs().size(); j++) {
+
+            String outputName = model.getOutputs().get(j).getName();
+            int hardwareTypeOutput = KPNNetwork.getHardwareTypeByName(outputName);
+
+            switch (hardwareTypeOutput) {
+                case 0: //duplication process case
+                    DuplicationProcess duplicationOutputProcess = (DuplicationProcess) KPNNetwork.searchThread(outputName); //getting the process
+                    JoinOutput_Add_Duplication(addProcess, duplicationOutputProcess);
+                    break;
+                case 1: //add process case
+                    AddProcess addOutputProcess = (AddProcess) KPNNetwork.searchThread(outputName); //getting the process
+                    JoinOutput_Add_Add(addProcess, addOutputProcess);
+                    break;
+                case 2:
+                    ProductProcess productOutputProcess = (ProductProcess) KPNNetwork.searchThread(outputName); //getting the process
+                    JoinOutput_Add_Product(addProcess, productOutputProcess);
+                    break;
+                case 3:
+                    ConstantGenerationProcess constantGenerationOutputProcess = (ConstantGenerationProcess) KPNNetwork.searchThread(outputName); //getting the process
+                    JoinOutput_Add_ConstantGeneration(addProcess, constantGenerationOutputProcess);
+                    break;
+                case 4:
+                    SinkProcess sinkOutputProcess = (SinkProcess) KPNNetwork.searchThread(outputName); //getting the process
+                    JoinOutput_Add_Sink(addProcess, sinkOutputProcess);
+                    break;
+            }
+        }
+    }
+
+    private void JoinInput_Add_Duplication(AddProcess addProcess, DuplicationProcess duplicationInputProcess) {
+        if (!addProcess.isQueue1InputAssigned()) { //if the input 1 of the add process still without assignation
+            if (!duplicationInputProcess.isQueueOutput1Assigned()) { //if ouput1 of the duplication process still without assignation
+                addProcess.setQueueIn1(duplicationInputProcess.getQueueOut1());
+                duplicationInputProcess.setQueueOutput1Assigned(addProcess.getName());
+                addProcess.setQueue1InputAssigned(duplicationInputProcess.getName());
+            } else if (!duplicationInputProcess.isQueueOutput2Assigned()) { //if ouput2 of the duplication process still without assignation
+                addProcess.setQueueIn1(duplicationInputProcess.getQueueOut2());
+                duplicationInputProcess.setQueueOutput2Assigned(addProcess.getName());
+                addProcess.setQueue1InputAssigned(duplicationInputProcess.getName());
+            }
+        } else if (!addProcess.isQueue2InputAssigned()) { //if the input 1 of the add process is already assigned but input 2 still without assignation
+            if (!duplicationInputProcess.isQueueOutput1Assigned()) { //if ouput1 of the duplication process still without assignation
+                addProcess.setQueueIn2(duplicationInputProcess.getQueueOut1());
+                duplicationInputProcess.setQueueOutput1Assigned(addProcess.getName());
+                addProcess.setQueue2InputAssigned(duplicationInputProcess.getName());
+            } else if (!duplicationInputProcess.isQueueOutput2Assigned()) { //if ouput2 of the duplication process still without assignation
+                addProcess.setQueueIn2(duplicationInputProcess.getQueueOut2());
+                duplicationInputProcess.setQueueOutput2Assigned(addProcess.getName());
+                addProcess.setQueue2InputAssigned(duplicationInputProcess.getName());
+            }
+        }
+    }
+
+    private void JoinInput_Add_Add(AddProcess addProcess, AddProcess addInputProcess) {
+        if (!addProcess.isQueue1InputAssigned()) { //if the input 1 of the add process still without assignation
+            if (!addInputProcess.isQueueOutputAssigned()) { //if ouput of the add process still without assignation
+                addProcess.setQueueIn1(addInputProcess.getQueueOut());
+                addInputProcess.setQueueOutputAssigned(addProcess.getName());
+                addProcess.setQueue1InputAssigned(addInputProcess.getName());
+            }
+        } else if (!addInputProcess.isQueue2InputAssigned()) { //if the input 1 of the add process is already assigned but input 2 still without assignation
+            if (!addInputProcess.isQueueOutputAssigned()) { //if ouput of the add process still without assignation
+                addProcess.setQueueIn2(addInputProcess.getQueueOut());
+                addInputProcess.setQueueOutputAssigned(addProcess.getName());
+                addProcess.setQueue2InputAssigned(addInputProcess.getName());
+            }
+        }
+    }
+
+    private void JoinInput_Add_Product(AddProcess addProcess, ProductProcess productInputProcess) {
+        if (!addProcess.isQueue1InputAssigned()) { //if the input 1 of the add process still without assignation
+            if (!productInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
+                addProcess.setQueueIn1(productInputProcess.getQueueOut());
+                productInputProcess.setQueueOutputAssigned(addProcess.getName());
+                addProcess.setQueue1InputAssigned(productInputProcess.getName());
+            }
+        } else if (!productInputProcess.isQueue2InputAssigned()) { //if the input 1 of the add process is already assigned but input 2 still without assignation
+            if (!productInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
+                addProcess.setQueueIn2(productInputProcess.getQueueOut());
+                productInputProcess.setQueueOutputAssigned(addProcess.getName());
+                addProcess.setQueue2InputAssigned(productInputProcess.getName());
+            }
+        }
+    }
+
+    private void JoinInput_Add_ConstantGeneration(AddProcess addProcess, ConstantGenerationProcess constantGenerationInputProcess) {
+        if (!addProcess.isQueue1InputAssigned()) { //if the input 1 of the add process still without assignation
+            if (!constantGenerationInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
+                addProcess.setQueueIn1(constantGenerationInputProcess.getQueueOut());
+                constantGenerationInputProcess.setQueueOutputAssigned(addProcess.getName());
+                addProcess.setQueue1InputAssigned(constantGenerationInputProcess.getName());
+            }
+        } else if (!addProcess.isQueue2InputAssigned()) { //if the input 1 of the add process is already assigned but input 2 still without assignation
+            if (!constantGenerationInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
+                addProcess.setQueueIn2(constantGenerationInputProcess.getQueueOut());
+                constantGenerationInputProcess.setQueueOutputAssigned(addProcess.getName());
+                addProcess.setQueue2InputAssigned(constantGenerationInputProcess.getName());
+            }
+        }
+
+    }
+
+    private void JoinInput_Add_Sink(AddProcess addProcess, SinkProcess SinkInputProcess) {
+        if (!addProcess.isQueue1InputAssigned()) { //if the input 1 of the add process still without assignation
+            if (!SinkInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
+                addProcess.setQueueIn1(SinkInputProcess.getQueueOut());
+                SinkInputProcess.setQueueOutputAssigned(addProcess.getName());
+                addProcess.setQueue1InputAssigned(SinkInputProcess.getName());
+            }
+        } else if (!addProcess.isQueue2InputAssigned()) { //if the input 1 of the add process is already assigned but input 2 still without assignation
+            if (!SinkInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
+                addProcess.setQueueIn2(SinkInputProcess.getQueueOut());
+                SinkInputProcess.setQueueOutputAssigned(addProcess.getName());
+                addProcess.setQueue2InputAssigned(SinkInputProcess.getName());
+            }
+        }
+    }
+
+    private void JoinOutput_Add_Duplication(AddProcess addProcess, DuplicationProcess duplicationOutputProcess) {
+        if (!addProcess.isQueueOutputAssigned()) { //if the output of the add process still without assignation
+            if (!duplicationOutputProcess.isQueueInputAssigned()) { //if ouput1 of the duplication process still without assignation
+                addProcess.setQueueOut(duplicationOutputProcess.getQueueIn());
+                duplicationOutputProcess.setQueueInputAssigned(addProcess.getName());
+                addProcess.setQueueOutputAssigned(duplicationOutputProcess.getName());
+            }
+        }
+
+    }
+
+    private void JoinOutput_Add_Add(AddProcess addProcess, AddProcess addOutputProcess) {
+        if (!addProcess.isQueueOutputAssigned()) { //if the input 1 of the add process still without assignation
+            if (!addOutputProcess.isQueue1InputAssigned()) { //if ouput of the add process still without assignation
+                addProcess.setQueueOut(addOutputProcess.getQueueIn1());
+                addOutputProcess.setQueue1InputAssigned(addProcess.getName());
+                addProcess.setQueueOutputAssigned(addOutputProcess.getName());
+            } else if (!addOutputProcess.isQueue2InputAssigned()) { //if the input 1 of the add process is already assigned but input 2 still without assignation
+                addProcess.setQueueOut(addOutputProcess.getQueueIn2());
+                addOutputProcess.setQueue2InputAssigned(addProcess.getName());
+                addProcess.setQueueOutputAssigned(addOutputProcess.getName());
+            }
+        }
+
+    }
+
+    private void JoinOutput_Add_Product(AddProcess addProcess, ProductProcess productOutputProcess) {
+        if (!addProcess.isQueueOutputAssigned()) { //if the input 1 of the add process still without assignation
+            if (!productOutputProcess.isQueue1InputAssigned()) { //if ouput of the add process still without assignation
+                addProcess.setQueueOut(productOutputProcess.getQueueIn1());
+                productOutputProcess.setQueue1InputAssigned(addProcess.getName());
+                addProcess.setQueueOutputAssigned(productOutputProcess.getName());
+            } else if (!productOutputProcess.isQueue2InputAssigned()) { //if the input 1 of the add process is already assigned but input 2 still without assignation
+                addProcess.setQueueOut(productOutputProcess.getQueueIn2());
+                productOutputProcess.setQueue2InputAssigned(addProcess.getName());
+                addProcess.setQueueOutputAssigned(productOutputProcess.getName());
+            }
+        }
+
+    }
+
+    private void JoinOutput_Add_ConstantGeneration(AddProcess addProcess, ConstantGenerationProcess constantGenerationOutputProcess) {
+        if (!addProcess.isQueueOutputAssigned()) { //if the input 1 of the add process still without assignation
+            if (!constantGenerationOutputProcess.isQueueInputAssigned()) { //if ouput of the product process still without assignation
+                addProcess.setQueueOut(constantGenerationOutputProcess.getQueueIn());
+                constantGenerationOutputProcess.setQueueInputAssigned(addProcess.getName());
+                addProcess.setQueueOutputAssigned(constantGenerationOutputProcess.getName());
+            }
+        }
+
+    }
+
+    private void JoinOutput_Add_Sink(AddProcess addProcess, SinkProcess sinkOutputProcess) {
+        if (!addProcess.isQueueOutputAssigned()) { //if the input 1 of the add process still without assignation
+            if (!sinkOutputProcess.isQueueInputAssigned()) { //if ouput of the product process still without assignation
+                addProcess.setQueueOut(sinkOutputProcess.getQueueIn());
+                sinkOutputProcess.setQueueInputAssigned(addProcess.getName());
+                addProcess.setQueueOutputAssigned(sinkOutputProcess.getName());
+            }
+        }
+
     }
 
 }
