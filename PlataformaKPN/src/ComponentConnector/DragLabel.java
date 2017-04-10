@@ -29,11 +29,13 @@ public class DragLabel extends JLabel {
     JDialog jDialog;
     JTextField jTextFieldFifo;
     JSpinner spinner;
+    Component jGUI;
 
-    public DragLabel(String imagePath, String toolTip, JDialog jDialog, String name, int posX, int posY, JTextField jTextFieldFifo, JSpinner spinner) {
+    public DragLabel(String imagePath, String toolTip, JDialog jDialog, String name, int posX, int posY, JTextField jTextFieldFifo, JSpinner spinner, Component jGUI) {
         this.jDialog = jDialog;
         this.jTextFieldFifo = jTextFieldFifo;
         this.spinner = spinner;
+        this.jGUI = jGUI;
         this.initializeJLabel(imagePath, toolTip, name, posX, posY);
 
     }
@@ -46,7 +48,7 @@ public class DragLabel extends JLabel {
         setBorder(javax.swing.border.LineBorder.createBlackLineBorder());
         setBounds(posX, posY, 48, 48);
         int id = hardwareGraph.getHardwareIdentifier();
-        setName(name + id);
+        setName("ID: " + id + ", Name: " + name);
         setToolTipText(toolTip + id);
     }
 
@@ -277,6 +279,15 @@ public class DragLabel extends JLabel {
                     if (verifyModels(modelSource, modelDest)) {
                         modelSource.getOutputs().add(label);
                         modelDest.getInputs().add(selectedJLabel);
+                    } else {
+                        //custom title, error icon          
+
+                        JOptionPane.showMessageDialog(jGUI,
+                                "Not supported operation.",
+                                "Error creating connection",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+
                     }
 
                     selectedJLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -311,7 +322,7 @@ public class DragLabel extends JLabel {
             boolean resultSource = false;
             boolean resultDest = false;
 
-            if (modelSource.getHardwareType() != 0 && modelSource.getOutputs().size() < 1) {
+            if (modelSource.getHardwareType() != 0 && modelSource.getHardwareType() != 4 && modelSource.getOutputs().size() < 1) {
                 if (modelSource.getHardwareType() == 5) { //queue process can only be connect to a constant generation process
                     if (modelDest.getHardwareType() == 3) {
                         resultSource = true;

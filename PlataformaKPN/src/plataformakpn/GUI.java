@@ -92,6 +92,7 @@ public class GUI extends javax.swing.JFrame {
         jLabelDelay = new javax.swing.JLabel();
         jButtonApplyDelay = new javax.swing.JButton();
         jSpinnerDelay = new javax.swing.JSpinner();
+        jDialog1 = new javax.swing.JDialog();
         jPanel_Main = new javax.swing.JPanel();
         jButtonProductDragable = new javax.swing.JButton();
         jButtonAddDragable = new javax.swing.JButton();
@@ -111,7 +112,7 @@ public class GUI extends javax.swing.JFrame {
         jButtonProduct = new javax.swing.JButton();
         jButtonQueue = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        jTextAreaOutput = new javax.swing.JTextArea();
         jPanelJXTaskContainer = new javax.swing.JPanel();
         jXTaskPaneHardwareAbstraction = new org.jdesktop.swingx.JXTaskPane();
         jXTaskPaneActions = new org.jdesktop.swingx.JXTaskPane();
@@ -279,6 +280,17 @@ public class GUI extends javax.swing.JFrame {
         jDialogDelayLayout.setVerticalGroup(
             jDialogDelayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanelDialog2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+
+        javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
+        jDialog1.getContentPane().setLayout(jDialog1Layout);
+        jDialog1Layout.setHorizontalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        jDialog1Layout.setVerticalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -466,11 +478,11 @@ public class GUI extends javax.swing.JFrame {
         });
         jPanel_Main.add(jButtonQueue, new org.netbeans.lib.awtextra.AbsoluteConstraints(1280, 150, 66, 64));
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        jTextAreaOutput.setColumns(20);
+        jTextAreaOutput.setRows(5);
+        jScrollPane1.setViewportView(jTextAreaOutput);
 
-        jPanel_Main.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 620, 970, 133));
+        jPanel_Main.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 620, 970, 210));
 
         jPanelJXTaskContainer.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -551,7 +563,7 @@ public class GUI extends javax.swing.JFrame {
         });
         jPanel_Main.add(createKPN, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 20, -1, -1));
 
-        getContentPane().add(jPanel_Main, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1370, 770));
+        getContentPane().add(jPanel_Main, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1370, 850));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -760,8 +772,7 @@ public class GUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextFieldOutput1ActionPerformed
 
-    AddProcess add;
-    ProductProcess product;
+   
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         /* add = new AddProcess();
         product = new ProductProcess();
@@ -779,6 +790,10 @@ public class GUI extends javax.swing.JFrame {
         product.start();*/
 
         net.printKPNNetwork();
+        
+         this.jTextAreaOutput.append("Output\n");      
+        this.jTextAreaOutput.append(net.getKPNNetworkOutput());
+         this.jTextAreaOutput.append("-------------------------------------------\n");
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -796,7 +811,11 @@ public class GUI extends javax.swing.JFrame {
         }
          */
         net.resumeKPNNetwork();
-        net.printKPNNetwork();
+        //net.printKPNNetwork();
+        
+        
+        this.jTextAreaOutput.append(net.getKPNNetworkOutput());
+        this.jTextAreaOutput.append("-------------------------------------------\n");
         // net.pauseKPNNetwork();
 
 
@@ -807,6 +826,8 @@ public class GUI extends javax.swing.JFrame {
         net = new KPNNetwork(hardwareGraph);
         net.pauseKPNNetwork();
         net.startKPNNetwork();
+        
+        this.jTextAreaOutput.setText("Output\n");
 
     }//GEN-LAST:event_createKPNActionPerformed
 
@@ -884,6 +905,7 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JButton jButtonView;
     private javax.swing.JButton jButtonViewDragable;
     private javax.swing.JCheckBox jCheckBoxFifo;
+    private javax.swing.JDialog jDialog1;
     private javax.swing.JDialog jDialogDelay;
     private javax.swing.JDialog jDialogFifo;
     private javax.swing.JDialog jDialogView;
@@ -903,7 +925,7 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel_Main;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSpinner jSpinnerDelay;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextArea jTextAreaOutput;
     private javax.swing.JTextField jTextFieldFifo;
     private javax.swing.JTextField jTextFieldInput1;
     private javax.swing.JTextField jTextFieldInput2;
@@ -950,6 +972,10 @@ public class GUI extends javax.swing.JFrame {
 
         this.jButtonRelations.setBorder(BorderFactory.createEmptyBorder());
         this.jButtonTrash.setBorder(BorderFactory.createEmptyBorder());
+        
+        //jTextAreaOutput.setContentType("text/html");
+        jTextAreaOutput.setEditable(false);
+        this.jTextAreaOutput.setText("Output\n");
     }
 
     private int getConnectorsSize() {
@@ -1017,16 +1043,16 @@ public class GUI extends javax.swing.JFrame {
 
         switch (hardwareType) {
             case 3:
-                newLabel = new DragLabel(imagePath, toolTip, jDialogDelay, name, posX, posY, null,jSpinnerDelay);
+                newLabel = new DragLabel(imagePath, toolTip, jDialogDelay, name, posX, posY, null,jSpinnerDelay,this);
                 break;
             case 5:
-                newLabel = new DragLabel(imagePath, toolTip, jDialogFifo, name, posX, posY, jTextFieldFifo,null);
+                newLabel = new DragLabel(imagePath, toolTip, jDialogFifo, name, posX, posY, jTextFieldFifo,null,this);
                 break;
             case 6:
-                newLabel = new DragLabel(imagePath, toolTip, jDialogView, name, posX, posY, null, null);
+                newLabel = new DragLabel(imagePath, toolTip, jDialogView, name, posX, posY, null, null,this);
                 break;
             default:
-                newLabel = new DragLabel(imagePath, toolTip, null, name, posX, posY, null,null);
+                newLabel = new DragLabel(imagePath, toolTip, null, name, posX, posY, null,null,this);
                 break;
         }
 
@@ -1042,7 +1068,7 @@ public class GUI extends javax.swing.JFrame {
     private void createAddRepresentation(int posX, int posY) {
         String imagePath = "/Images/add48x48.png";
         int hardwareType = 1;
-        String toolTip = "Add process ID:";
+        String toolTip = "Hardware: adder, ID: ";
         String name = "adder";
         createHardwareBlock(imagePath, hardwareType, toolTip, name, posX, posY);
 
@@ -1051,7 +1077,7 @@ public class GUI extends javax.swing.JFrame {
     private void createProductRepresentation(int posX, int posY) {
         String imagePath = "/Images/product48x48.png";
         int hardwareType = 2;
-        String toolTip = "Product process Id:";
+        String toolTip = "Hardware: producer, ID: ";
         String name = "product";
         createHardwareBlock(imagePath, hardwareType, toolTip, name, posX, posY);
 
@@ -1060,7 +1086,7 @@ public class GUI extends javax.swing.JFrame {
     private void createConstantGenerationRepresentation(int posX, int posY) {
         String imagePath = "/Images/constant48x48.png";
         int hardwareType = 3;
-        String toolTip = "Constant generation process Id:";
+        String toolTip = "Hardware: constant generator, ID: ";
         String name = "constantGeneration";
         createHardwareBlock(imagePath, hardwareType, toolTip, name, posX, posY);
 
@@ -1069,7 +1095,7 @@ public class GUI extends javax.swing.JFrame {
     private void createDuplicationRepresentation(int posX, int posY) {
         String imagePath = "/Images/duplication48x48.png";
         int hardwareType = 0;
-        String toolTip = "Duplication process Id:";
+        String toolTip = "Hardware: duplicate, ID: ";
         String name = "duplication";
         createHardwareBlock(imagePath, hardwareType, toolTip, name, posX, posY);
 
@@ -1078,7 +1104,7 @@ public class GUI extends javax.swing.JFrame {
     private void createQueueRepresentation(int posX, int posY) {
         String imagePath = "/Images/queue48x48.png";
         int hardwareType = 5;
-        String toolTip = "Queue process Id:";
+        String toolTip = "Hardware: queue, ID: ";
         String name = "queue";
         createHardwareBlock(imagePath, hardwareType, toolTip, name, posX, posY);
     }
@@ -1086,7 +1112,7 @@ public class GUI extends javax.swing.JFrame {
     private void createViewRepresentation(int posX, int posY) {
         String imagePath = "/Images/view48x48.png";
         int hardwareType = 6;
-        String toolTip = "View process Id:";
+        String toolTip = "Hardware: viewer, ID: ";
         String name = "view";
         createHardwareBlock(imagePath, hardwareType, toolTip, name, posX, posY);
     }
@@ -1094,7 +1120,7 @@ public class GUI extends javax.swing.JFrame {
     private void createSinkRepresentation(int posX, int posY) {
         String imagePath = "/Images/sink48x48.png";
         int hardwareType = 4;
-        String toolTip = "Sink process Id:";
+        String toolTip = "Hardware: sink, ID: ";
         String name = "sink";
         createHardwareBlock(imagePath, hardwareType, toolTip, name, posX, posY);
     }

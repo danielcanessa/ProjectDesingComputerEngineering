@@ -23,6 +23,7 @@ public class ConstantGenerationProcess extends Thread {
     private volatile boolean constantGeneration;
     private volatile boolean killThread;
     private volatile boolean pauseThread;
+    private volatile int delayIterations;
 
     private volatile String queueInputAssigned;
     private volatile String queueOutputAssigned;
@@ -43,15 +44,17 @@ public class ConstantGenerationProcess extends Thread {
                     if (queueIn.size() > 0) {
                         float nextNumber = queueIn.poll();
 
-                        if (isConstantGeneration()) {
+                        if (isConstantGeneration() && getDelayIterations() == 0) {
                             queueIn.add(nextNumber);
+                        } else if (getDelayIterations() > 0) {
+                            setDelayIterations(getDelayIterations() - 1);
                         }
 
                         this.queueOut.add(nextNumber);
 
                     }
                     //race condition
-                     if (userThreadDebuging) {
+                    if (userThreadDebuging) {
                         setPauseThread(true);
                     }
 
@@ -189,7 +192,6 @@ public class ConstantGenerationProcess extends Thread {
         return queueOutputAssigned;
     }
 
-    
     public void joinConstantGenerationProcess(String name, HardwareModel model, HardwareGraph hardwareAbstraction) {
 
         ConstantGenerationProcess constantGenerationProcess = (ConstantGenerationProcess) searchThread(name); //current constantGeneration process
@@ -258,11 +260,18 @@ public class ConstantGenerationProcess extends Thread {
 
     private void JoinInput_ConstantGeneration_Duplication(ConstantGenerationProcess constantGenerationProcess, DuplicationProcess duplicationInputProcess) {
         if (!constantGenerationProcess.isQueueInputAssigned()) { //if the input 1 of the constantGeneration process still without assignation
+
             if (!duplicationInputProcess.isQueueOutput1Assigned()) { //if ouput1 of the duplication process still without assignation
+
                 constantGenerationProcess.setQueueIn(duplicationInputProcess.getQueueOut1());
+
                 duplicationInputProcess.setQueueOutput1Assigned(constantGenerationProcess.getName());
+
                 constantGenerationProcess.setQueueInputAssigned(duplicationInputProcess.getName());
+
             } else if (!duplicationInputProcess.isQueueOutput2Assigned()) { //if ouput2 of the duplication process still without assignation
+                System.out.println("aqui2");
+
                 constantGenerationProcess.setQueueIn(duplicationInputProcess.getQueueOut2());
                 duplicationInputProcess.setQueueOutput2Assigned(constantGenerationProcess.getName());
                 constantGenerationProcess.setQueueInputAssigned(duplicationInputProcess.getName());
@@ -311,6 +320,7 @@ public class ConstantGenerationProcess extends Thread {
     }
 
     private void JoinInput_ConstantGeneration_Queue(ConstantGenerationProcess constantGenerationProcess, HardwareModel model) {
+
         constantGenerationProcess.setQueueIn(model.getInputQueue());
         constantGenerationProcess.setConstantGeneration(model.isConstantGeneration());
     }
@@ -363,7 +373,7 @@ public class ConstantGenerationProcess extends Thread {
         }
 
     }
-    
+
     private void JoinOutput_ConstantGeneration_Sink(ConstantGenerationProcess constantGenerationProcess, SinkProcess sinkOutputProcess) {
         if (!constantGenerationProcess.isQueueOutputAssigned()) { //if the input 1 of the constantGeneration process still without assignation
             if (!sinkOutputProcess.isQueueInputAssigned()) { //if ouput of the product process still without assignation
@@ -372,6 +382,20 @@ public class ConstantGenerationProcess extends Thread {
                 constantGenerationProcess.setQueueOutputAssigned(sinkOutputProcess.getName());
             }
         }
+    }
+
+    /**
+     * @return the delayIterations
+     */
+    public int getDelayIterations() {
+        return delayIterations;
+    }
+
+    /**
+     * @param delayIterations the delayIterations to set
+     */
+    public void setDelayIterations(int delayIterations) {
+        this.delayIterations = delayIterations;
     }
 
 }
