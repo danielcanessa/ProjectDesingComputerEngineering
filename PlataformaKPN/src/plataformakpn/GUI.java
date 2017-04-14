@@ -15,11 +15,13 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
@@ -52,6 +54,8 @@ public class GUI extends javax.swing.JFrame {
     public GUI() {
 
         initComponents();
+
+        this.setIconImage(Toolkit.getDefaultToolkit().getImage("/Images/icon.png"));
 
         modifyGUI();
 
@@ -111,15 +115,16 @@ public class GUI extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jButtonProduct = new javax.swing.JButton();
         jButtonQueue = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextAreaOutput = new javax.swing.JTextArea();
         jPanelJXTaskContainer = new javax.swing.JPanel();
         jXTaskPaneHardwareAbstraction = new org.jdesktop.swingx.JXTaskPane();
         jXTaskPaneActions = new org.jdesktop.swingx.JXTaskPane();
         jButtonView = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        printKPN = new javax.swing.JButton();
         iterateKPN = new javax.swing.JButton();
         createKPN = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextPaneOutput = new javax.swing.JTextPane();
+        exportKPN = new javax.swing.JButton();
 
         jDialogFifo.getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -294,8 +299,10 @@ public class GUI extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("KPN Platform");
         setMaximumSize(new java.awt.Dimension(1200, 500));
         setMinimumSize(new java.awt.Dimension(1200, 500));
+        setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel_Main.setBackground(new java.awt.Color(255, 255, 255));
@@ -336,7 +343,7 @@ public class GUI extends javax.swing.JFrame {
         jPanelBoard.setBackground(new java.awt.Color(255, 255, 255));
         jPanelBoard.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanelBoard.setLayout(new java.awt.GridBagLayout());
-        jPanel_Main.add(jPanelBoard, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 110, 970, 490));
+        jPanel_Main.add(jPanelBoard, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 110, 970, 450));
 
         jButtonAdd.setBackground(new java.awt.Color(255, 255, 255));
         jButtonAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/add48x48.png"))); // NOI18N
@@ -438,7 +445,7 @@ public class GUI extends javax.swing.JFrame {
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel_Main.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 60, -1, -1));
+        jPanel_Main.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 50, -1, -1));
 
         jButtonProduct.setBackground(new java.awt.Color(255, 255, 255));
         jButtonProduct.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/product48x48.png"))); // NOI18N
@@ -477,12 +484,6 @@ public class GUI extends javax.swing.JFrame {
             }
         });
         jPanel_Main.add(jButtonQueue, new org.netbeans.lib.awtextra.AbsoluteConstraints(1280, 150, 66, 64));
-
-        jTextAreaOutput.setColumns(20);
-        jTextAreaOutput.setRows(5);
-        jScrollPane1.setViewportView(jTextAreaOutput);
-
-        jPanel_Main.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 620, 970, 210));
 
         jPanelJXTaskContainer.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -536,14 +537,14 @@ public class GUI extends javax.swing.JFrame {
         });
         jPanel_Main.add(jButtonView, new org.netbeans.lib.awtextra.AbsoluteConstraints(1200, 290, 60, -1));
 
-        jButton1.setBackground(new java.awt.Color(255, 255, 255));
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/print.png"))); // NOI18N
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        printKPN.setBackground(new java.awt.Color(255, 255, 255));
+        printKPN.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/print.png"))); // NOI18N
+        printKPN.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                printKPNActionPerformed(evt);
             }
         });
-        jPanel_Main.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 20, -1, -1));
+        jPanel_Main.add(printKPN, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 20, -1, -1));
 
         iterateKPN.setBackground(new java.awt.Color(255, 255, 255));
         iterateKPN.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/start.png"))); // NOI18N
@@ -563,7 +564,20 @@ public class GUI extends javax.swing.JFrame {
         });
         jPanel_Main.add(createKPN, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 20, -1, -1));
 
-        getContentPane().add(jPanel_Main, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1370, 850));
+        jScrollPane1.setViewportView(jTextPaneOutput);
+
+        jPanel_Main.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 570, 970, 180));
+
+        exportKPN.setBackground(new java.awt.Color(255, 255, 255));
+        exportKPN.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/export.png"))); // NOI18N
+        exportKPN.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportKPNActionPerformed(evt);
+            }
+        });
+        jPanel_Main.add(exportKPN, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 20, -1, -1));
+
+        getContentPane().add(jPanel_Main, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1370, 770));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -772,8 +786,8 @@ public class GUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextFieldOutput1ActionPerformed
 
-   
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+
+    private void printKPNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printKPNActionPerformed
         /* add = new AddProcess();
         product = new ProductProcess();
 
@@ -790,13 +804,16 @@ public class GUI extends javax.swing.JFrame {
         product.start();*/
 
         net.printKPNNetwork();
-        
-         this.jTextAreaOutput.append("Output\n");      
-        this.jTextAreaOutput.append(net.getKPNNetworkOutput());
-         this.jTextAreaOutput.append("-------------------------------------------\n");
 
-    }//GEN-LAST:event_jButton1ActionPerformed
+        this.jTextPaneOutput.setText("Output<br>");
+        this.jTextPaneOutput.setText(getTextPane() + net.getKPNNetworkOutput());
+        this.jTextPaneOutput.setText(getTextPane() + "-------------------------------------------<br>");
 
+    }//GEN-LAST:event_printKPNActionPerformed
+
+    private String getTextPane() {
+        return jTextPaneOutput.getText().replaceAll("</*html>|</*head>|</*body>|\n|\r", "").trim();
+    }
 
     private void iterateKPNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_iterateKPNActionPerformed
         /* try {
@@ -812,12 +829,13 @@ public class GUI extends javax.swing.JFrame {
          */
         net.resumeKPNNetwork();
         //net.printKPNNetwork();
-        
-        
-        this.jTextAreaOutput.append(net.getKPNNetworkOutput());
-        this.jTextAreaOutput.append("-------------------------------------------\n");
-        // net.pauseKPNNetwork();
 
+        //jTextPaneOutput.setContentType("text");
+        this.jTextPaneOutput.setText(getTextPane() + net.getKPNNetworkOutput());
+
+        this.jTextPaneOutput.setText(getTextPane() + "-------------------------------------------<br>");
+
+        // net.pauseKPNNetwork();
 
     }//GEN-LAST:event_iterateKPNActionPerformed
 
@@ -826,8 +844,8 @@ public class GUI extends javax.swing.JFrame {
         net = new KPNNetwork(hardwareGraph);
         net.pauseKPNNetwork();
         net.startKPNNetwork();
-        
-        this.jTextAreaOutput.setText("Output\n");
+
+        this.jTextPaneOutput.setText("<b>Output<b/><br>");
 
     }//GEN-LAST:event_createKPNActionPerformed
 
@@ -840,11 +858,24 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextFieldInput2ActionPerformed
 
     private void jButtonApplyDelayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonApplyDelayActionPerformed
-       int delay = (int) this.jSpinnerDelay.getValue();
+        int delay = (int) this.jSpinnerDelay.getValue();
         selectedModelJDialog.setDelayIterations(delay);
 
-        
+
     }//GEN-LAST:event_jButtonApplyDelayActionPerformed
+
+    private void exportKPNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportKPNActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setBackground(Color.white);
+
+        // Demonstrate "Save" dialog:
+        int rVal = fileChooser.showSaveDialog(this);
+        if (rVal == JFileChooser.APPROVE_OPTION) {
+            String path = fileChooser.getCurrentDirectory().toString() + "/" + fileChooser.getSelectedFile().getName() + ".xml";
+            net.exportKPNToXML(path);
+
+        }
+    }//GEN-LAST:event_exportKPNActionPerformed
 
     /**
      * @param args the command line arguments
@@ -883,8 +914,8 @@ public class GUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton createKPN;
+    private javax.swing.JButton exportKPN;
     private javax.swing.JButton iterateKPN;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButtonAdd;
     private javax.swing.JButton jButtonAddDragable;
@@ -925,14 +956,15 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel_Main;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSpinner jSpinnerDelay;
-    private javax.swing.JTextArea jTextAreaOutput;
     private javax.swing.JTextField jTextFieldFifo;
     private javax.swing.JTextField jTextFieldInput1;
     private javax.swing.JTextField jTextFieldInput2;
     private javax.swing.JTextField jTextFieldOutput1;
     private javax.swing.JTextField jTextFieldOutput2;
+    private javax.swing.JTextPane jTextPaneOutput;
     private org.jdesktop.swingx.JXTaskPane jXTaskPaneActions;
     private org.jdesktop.swingx.JXTaskPane jXTaskPaneHardwareAbstraction;
+    private javax.swing.JButton printKPN;
     // End of variables declaration//GEN-END:variables
 
     private void initValues() {
@@ -945,17 +977,17 @@ public class GUI extends javax.swing.JFrame {
 
         labelsView = new ArrayList<>();
         textFieldView = new ArrayList<>();
-        
+
         labelsView.add(jLabelInput1);
         labelsView.add(jLabelInput2);
         labelsView.add(jLabelOutput1);
         labelsView.add(jLabelOutput2);
-        
+
         textFieldView.add(jTextFieldInput1);
         textFieldView.add(jTextFieldInput2);
         textFieldView.add(jTextFieldOutput1);
         textFieldView.add(jTextFieldOutput2);
-       
+
     }
 
     private void modifyGUI() {
@@ -972,10 +1004,10 @@ public class GUI extends javax.swing.JFrame {
 
         this.jButtonRelations.setBorder(BorderFactory.createEmptyBorder());
         this.jButtonTrash.setBorder(BorderFactory.createEmptyBorder());
-        
-        //jTextAreaOutput.setContentType("text/html");
-        jTextAreaOutput.setEditable(false);
-        this.jTextAreaOutput.setText("Output\n");
+
+        jTextPaneOutput.setContentType("text/html");
+        jTextPaneOutput.setEditable(false);
+        this.jTextPaneOutput.setText("<b>Output</b><br>");
     }
 
     private int getConnectorsSize() {
@@ -1043,16 +1075,16 @@ public class GUI extends javax.swing.JFrame {
 
         switch (hardwareType) {
             case 3:
-                newLabel = new DragLabel(imagePath, toolTip, jDialogDelay, name, posX, posY, null,jSpinnerDelay,this);
+                newLabel = new DragLabel(imagePath, toolTip, jDialogDelay, name, posX, posY, null, jSpinnerDelay, this);
                 break;
             case 5:
-                newLabel = new DragLabel(imagePath, toolTip, jDialogFifo, name, posX, posY, jTextFieldFifo,null,this);
+                newLabel = new DragLabel(imagePath, toolTip, jDialogFifo, name, posX, posY, jTextFieldFifo, null, this);
                 break;
             case 6:
-                newLabel = new DragLabel(imagePath, toolTip, jDialogView, name, posX, posY, null, null,this);
+                newLabel = new DragLabel(imagePath, toolTip, jDialogView, name, posX, posY, null, null, this);
                 break;
             default:
-                newLabel = new DragLabel(imagePath, toolTip, null, name, posX, posY, null,null,this);
+                newLabel = new DragLabel(imagePath, toolTip, null, name, posX, posY, null, null, this);
                 break;
         }
 

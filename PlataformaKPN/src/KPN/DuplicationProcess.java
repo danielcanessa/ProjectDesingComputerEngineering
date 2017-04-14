@@ -26,6 +26,8 @@ public class DuplicationProcess extends Thread {
     private String queueInputAssigned;
     private String queueOutput1Assigned;
     private String queueOutput2Assigned;
+    
+    private int XMLOutput;
 
     public DuplicationProcess() {
         this.queueIn1 = new LinkedList<>();
@@ -35,6 +37,8 @@ public class DuplicationProcess extends Thread {
         this.queueInputAssigned = "";
         this.queueOutput1Assigned = "";
         this.queueOutput2Assigned = "";
+        
+        XMLOutput=0;
 
     }
 
@@ -432,6 +436,26 @@ public class DuplicationProcess extends Thread {
             }
         }
 
+    }
+
+    /**
+     * @return the XMLOutput
+     */
+    public int getXMLOutput() {
+        switch (XMLOutput) {
+            case 0:
+                XMLOutput=1;
+                break;
+            case 1:
+                XMLOutput=2;
+                break;
+            case 2:
+                XMLOutput=1;
+                break;
+            default:
+                break;
+        }
+        return XMLOutput;
     }
 
 }
