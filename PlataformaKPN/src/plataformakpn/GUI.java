@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -54,8 +55,6 @@ public class GUI extends javax.swing.JFrame {
     public GUI() {
 
         initComponents();
-
-        this.setIconImage(Toolkit.getDefaultToolkit().getImage("/Images/icon.png"));
 
         modifyGUI();
 
@@ -96,7 +95,6 @@ public class GUI extends javax.swing.JFrame {
         jLabelDelay = new javax.swing.JLabel();
         jButtonApplyDelay = new javax.swing.JButton();
         jSpinnerDelay = new javax.swing.JSpinner();
-        jDialog1 = new javax.swing.JDialog();
         jPanel_Main = new javax.swing.JPanel();
         jButtonProductDragable = new javax.swing.JButton();
         jButtonAddDragable = new javax.swing.JButton();
@@ -287,19 +285,9 @@ public class GUI extends javax.swing.JFrame {
             .addComponent(jPanelDialog2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
-        javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
-        jDialog1.getContentPane().setLayout(jDialog1Layout);
-        jDialog1Layout.setHorizontalGroup(
-            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        jDialog1Layout.setVerticalGroup(
-            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("KPN Platform");
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/Images/icon.png")));
         setMaximumSize(new java.awt.Dimension(1200, 500));
         setMinimumSize(new java.awt.Dimension(1200, 500));
         setResizable(false);
@@ -936,7 +924,6 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JButton jButtonView;
     private javax.swing.JButton jButtonViewDragable;
     private javax.swing.JCheckBox jCheckBoxFifo;
-    private javax.swing.JDialog jDialog1;
     private javax.swing.JDialog jDialogDelay;
     private javax.swing.JDialog jDialogFifo;
     private javax.swing.JDialog jDialogView;
@@ -1008,6 +995,10 @@ public class GUI extends javax.swing.JFrame {
         jTextPaneOutput.setContentType("text/html");
         jTextPaneOutput.setEditable(false);
         this.jTextPaneOutput.setText("<b>Output</b><br>");
+
+        this.jDialogDelay.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/Images/icon.png")));
+        this.jDialogFifo.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/Images/icon.png")));
+        this.jDialogView.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/Images/icon.png")));
     }
 
     private int getConnectorsSize() {
