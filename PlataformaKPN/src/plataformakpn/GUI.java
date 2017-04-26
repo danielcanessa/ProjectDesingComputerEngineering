@@ -45,6 +45,8 @@ public class GUI extends javax.swing.JFrame {
     public static int currentHardwareIdentifier;
     public static Color selectedColor;
 
+    private KPNNetwork net;
+
     public volatile static boolean userThreadDebuging;
 
     public static List<JLabel> labelsView;
@@ -113,6 +115,8 @@ public class GUI extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jButtonProduct = new javax.swing.JButton();
         jButtonQueue = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextPaneOutput = new javax.swing.JTextPane();
         jPanelJXTaskContainer = new javax.swing.JPanel();
         jXTaskPaneHardwareAbstraction = new org.jdesktop.swingx.JXTaskPane();
         jXTaskPaneActions = new org.jdesktop.swingx.JXTaskPane();
@@ -120,8 +124,6 @@ public class GUI extends javax.swing.JFrame {
         printKPN = new javax.swing.JButton();
         iterateKPN = new javax.swing.JButton();
         createKPN = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextPaneOutput = new javax.swing.JTextPane();
         exportKPN = new javax.swing.JButton();
 
         jDialogFifo.getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -288,9 +290,15 @@ public class GUI extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("KPN Platform");
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/Images/icon.png")));
-        setMaximumSize(new java.awt.Dimension(1200, 500));
-        setMinimumSize(new java.awt.Dimension(1200, 500));
+        setMaximumSize(new java.awt.Dimension(1200, 770));
+        setMinimumSize(new java.awt.Dimension(1200, 770));
+        setPreferredSize(new java.awt.Dimension(1200, 770));
         setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel_Main.setBackground(new java.awt.Color(255, 255, 255));
@@ -433,7 +441,7 @@ public class GUI extends javax.swing.JFrame {
                 jButton2ActionPerformed(evt);
             }
         });
-        jPanel_Main.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 50, -1, -1));
+        jPanel_Main.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1200, 660, -1, -1));
 
         jButtonProduct.setBackground(new java.awt.Color(255, 255, 255));
         jButtonProduct.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/product48x48.png"))); // NOI18N
@@ -473,6 +481,10 @@ public class GUI extends javax.swing.JFrame {
         });
         jPanel_Main.add(jButtonQueue, new org.netbeans.lib.awtextra.AbsoluteConstraints(1280, 150, 66, 64));
 
+        jScrollPane1.setViewportView(jTextPaneOutput);
+
+        jPanel_Main.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 570, 970, 180));
+
         jPanelJXTaskContainer.setBackground(new java.awt.Color(255, 255, 255));
 
         jXTaskPaneHardwareAbstraction.setBackground(new java.awt.Color(255, 255, 255));
@@ -487,12 +499,10 @@ public class GUI extends javax.swing.JFrame {
             jPanelJXTaskContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelJXTaskContainerLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jXTaskPaneHardwareAbstraction, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelJXTaskContainerLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jXTaskPaneActions, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGroup(jPanelJXTaskContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jXTaskPaneActions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jXTaskPaneHardwareAbstraction, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(43, Short.MAX_VALUE))
         );
         jPanelJXTaskContainerLayout.setVerticalGroup(
             jPanelJXTaskContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -551,10 +561,6 @@ public class GUI extends javax.swing.JFrame {
             }
         });
         jPanel_Main.add(createKPN, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 20, -1, -1));
-
-        jScrollPane1.setViewportView(jTextPaneOutput);
-
-        jPanel_Main.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 570, 970, 180));
 
         exportKPN.setBackground(new java.awt.Color(255, 255, 255));
         exportKPN.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/export.png"))); // NOI18N
@@ -827,8 +833,12 @@ public class GUI extends javax.swing.JFrame {
 
     }//GEN-LAST:event_iterateKPNActionPerformed
 
-    KPNNetwork net;
+
     private void createKPNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createKPNActionPerformed
+        if (net != null) {
+            net.freeKPNNetwork(); //just in case that threads were created before
+        }
+
         net = new KPNNetwork(hardwareGraph);
         net.pauseKPNNetwork();
         net.startKPNNetwork();
@@ -864,6 +874,14 @@ public class GUI extends javax.swing.JFrame {
 
         }
     }//GEN-LAST:event_exportKPNActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        System.out.println("Memory free");
+        if (net != null) {
+            net.freeKPNNetwork();
+        }
+        // TODO add your handling code here:
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments

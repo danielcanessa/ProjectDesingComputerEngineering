@@ -307,6 +307,24 @@ public class KPNNetwork {
             constantGenerationProcessList.get(i).setPauseThread(false);
         }
     }
+    
+    public void freeKPNNetwork() {
+        for (int i = 0; i < this.duplicationProcessList.size(); i++) {
+            duplicationProcessList.get(i).setKillThread(true);
+        }
+        for (int i = 0; i < this.addProcessList.size(); i++) {
+            addProcessList.get(i).setKillThread(true);
+        }
+        for (int i = 0; i < this.productProcessList.size(); i++) {
+            productProcessList.get(i).setKillThread(true);
+        }
+        for (int i = 0; i < this.sinkProcessList.size(); i++) {
+            sinkProcessList.get(i).setKillThread(true);
+        }
+        for (int i = 0; i < this.constantGenerationProcessList.size(); i++) {
+            constantGenerationProcessList.get(i).setKillThread(true);
+        }
+    }
 
     public void printKPNNetwork() {
         for (int i = 0; i < this.duplicationProcessList.size(); i++) {
