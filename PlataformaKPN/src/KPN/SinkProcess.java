@@ -8,22 +8,50 @@ package KPN;
 import static KPN.KPNNetwork.searchThread;
 import java.util.LinkedList;
 import java.util.Queue;
+import static plataformakpn.GUI.hardwareGraph;
 import static plataformakpn.GUI.userThreadDebuging;
 import plataformakpn.HardwareModel;
 
 /**
+ * This class contains the definition and the methods of the sink process
+ * thread.
  *
- * @author Daniel
+ * @author Daniel Canessa Valverde
+ * @version 1.0
+ *
  */
 public class SinkProcess extends Thread {
 
+    /**
+     * This variable represents the input queue of the sink process.
+     */
     private volatile Queue<Float> queueIn;
+    /**
+     * This variable represents the output queue of the sink process.
+     */
     private volatile Queue<Float> queueOut;
+    /**
+     * This variable is used as thread stop condition.
+     */
     private volatile boolean killThread;
+    /**
+     * This variable is used as thread pause condition.
+     */
     private volatile boolean pauseThread;
+    /**
+     * This variable is used to know the name of the thread how share output
+     * queue with the sink process input queue.
+     */
     private volatile String queueInputAssigned;
+    /**
+     * This variable is used to know the name of the thread how share input
+     * queue with the sink process output queue.
+     */
     private volatile String queueOutputAssigned;
 
+    /**
+     * Class constructor.
+     */
     public SinkProcess() {
         this.queueIn = new LinkedList<>();
         this.queueOut = new LinkedList<>();
@@ -32,30 +60,48 @@ public class SinkProcess extends Thread {
         this.queueOutputAssigned = "";
     }
 
+    /**
+     * This method implements the logic of the sink process.
+     */
     @Override
     public void run() {
+        //stop condition
         while (!killThread) {
             try {
+                //iteration control condition
                 while (!isPauseThread()) {
+                    //logic
                     if (queueIn.size() > 0) {
                         this.queueOut.add(queueIn.poll());
-
                     }
-
-                    //race condition
-                     if (userThreadDebuging) {
+                    //just in case infinite loop
+                    if (userThreadDebuging) {
                         setPauseThread(true);
                     }
-
+                    //waiting for another threads
+                    Thread.sleep(200);
+                    //updating GUI
+                    updateToolTip();
                 }
+                //join threads
                 Thread.sleep(100);
-
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
         }
     }
 
+    /**
+     * This method updates the tooltip message of the labels with the most
+     * updated information about the queues.
+     */
+    public void updateToolTip() {
+        hardwareGraph.updateToolTip(this.getName(), this.getQueueIn(), null, this.getQueueOut(), null);
+    }
+
+    /**
+     * This method prints in the console the input queues and the output queue
+     */
     public void printQueues() {
         System.out.println("Sink:");
         System.out.println("    queueIn:" + this.getQueueIn());
@@ -63,6 +109,11 @@ public class SinkProcess extends Thread {
         System.out.println("----------------------------------------");
     }
 
+    /**
+     * This method established the name of the current thread.
+     *
+     * @param threadName
+     */
     public void setThreadName(String threadName) {
         this.setName(threadName);
     }
@@ -166,7 +217,7 @@ public class SinkProcess extends Thread {
     public String getQueueOutputAssigned() {
         return queueOutputAssigned;
     }
-    
+
     public void joinSinkProcess(String name, HardwareModel model) {
 
         SinkProcess sinkProcess = (SinkProcess) searchThread(name); //current sink process
@@ -343,6 +394,5 @@ public class SinkProcess extends Thread {
         }
 
     }
-
 
 }

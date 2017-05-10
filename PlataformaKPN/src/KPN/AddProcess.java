@@ -7,58 +7,109 @@ package KPN;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import static plataformakpn.GUI.hardwareGraph;
 import static plataformakpn.GUI.userThreadDebuging;
 import plataformakpn.HardwareModel;
 
 /**
+ * This class contains the definition and the methods of the add process thread.
  *
- * @author Daniel
+ * @author Daniel Canessa Valverde
+ * @version 1.0
  */
 public class AddProcess extends Thread {
 
+    /**
+     * This variable represents the input queue 1 of the adder.
+     */
     private volatile Queue<Float> queueIn1;
+    /**
+     * This variable represents the input queue 2 of the adder.
+     */
     private volatile Queue<Float> queueIn2;
+    /**
+     * This variable represents the output queue of the adder.
+     */
     private volatile Queue<Float> queueOut;
+    /**
+     * This variable is used as thread stop condition.
+     */
     private volatile boolean killThread;
+    /**
+     * This variable is used as thread pause condition.
+     */
     private volatile boolean pauseThread;
-
+    /**
+     * This variable is used to know the name of the thread how share output
+     * queue with the adder input queue 1.
+     */
     private volatile String queue1InputAssigned;
+    /**
+     * This variable is used to know the name of the thread how share output
+     * queue with the adder input queue 2.
+     */
     private volatile String queue2InputAssigned;
+    /**
+     * This variable is used to know the name of the thread how share input
+     * queue with the adder output queue.
+     */
     private volatile String queueOutputAssigned;
 
+    /**
+     * Class constructor.
+     */
     public AddProcess() {
         this.queueIn1 = new LinkedList<>();
         this.queueIn2 = new LinkedList<>();
         this.queueOut = new LinkedList<>();
-        this.killThread = false;        
+        this.killThread = false;
         this.queue1InputAssigned = "";
         this.queue2InputAssigned = "";
         this.queueOutputAssigned = "";
-
     }
 
+    /**
+     * This method implements the logic of the adder process.
+     */
     @Override
     public void run() {
+        //stop condition
         while (!killThread) {
             try {
+                //iteration control condition
                 while (!isPauseThread()) {
+                    //logic
                     if (queueIn1.size() > 0 && queueIn2.size() > 0) {
                         this.queueOut.add(queueIn1.poll() + queueIn2.poll());
-
                     }
-
-                    //race condition
-                     if (userThreadDebuging) {
+                    //just in case infinite loop
+                    if (userThreadDebuging) {
                         setPauseThread(true);
                     }
-                }
+                    //waiting for another threads
+                    Thread.sleep(200);
+                    //updating GUI
+                    updateToolTip();
+                    }
+                //join threads
                 Thread.sleep(100);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
         }
     }
+    
+    /**
+     * This method updates the tooltip message of the labels with the most
+     * updated information about the queues.
+     */
+    public void updateToolTip() {
+        hardwareGraph.updateToolTip(this.getName(), this.getQueueIn1(), this.getQueueIn2(), this.getQueueOut(), null);
+    }
 
+    /**
+     * This method prints in the console the input queues and the output queue
+     */
     public void printQueues() {
         System.out.println("Add:");
         System.out.println("    queueIn1:" + this.getQueueIn1());
@@ -67,6 +118,10 @@ public class AddProcess extends Thread {
         System.out.println("----------------------------------------");
     }
 
+    /**
+     * This method established the name of the current thread.
+     * @param threadName 
+     */
     public void setThreadName(String threadName) {
         this.setName(threadName);
     }
@@ -205,8 +260,13 @@ public class AddProcess extends Thread {
     public String getQueueOutputAssigned() {
         return queueOutputAssigned;
     }
-    
-    
+
+    /**
+     * This method creates the join beetween the queues of each add process, 
+     * with all the other methods, guided by the hardware graph model.
+     * @param name String
+     * @param model HardwareModel
+     */
     public void joinAddProcess(String name, HardwareModel model) {
 
         AddProcess addProcess = (AddProcess) KPNNetwork.searchThread(name); //current add process
@@ -219,27 +279,28 @@ public class AddProcess extends Thread {
             switch (hardwareTypeInput) {
                 case 0: //duplication process case
                     DuplicationProcess duplicationInputProcess = (DuplicationProcess) KPNNetwork.searchThread(inputName); //getting the process
-                    JoinInput_Add_Duplication(addProcess, duplicationInputProcess);
+                    joinInput_Add_Duplication(addProcess, duplicationInputProcess);
                     break;
                 case 1: //add process case
                     AddProcess addInputProcess = (AddProcess) KPNNetwork.searchThread(inputName); //getting the process
-                    JoinInput_Add_Add(addProcess, addInputProcess);
+                    joinInput_Add_Add(addProcess, addInputProcess);
                     break;
-                case 2:
+                case 2: //product process case
                     ProductProcess productInputProcess = (ProductProcess) KPNNetwork.searchThread(inputName); //getting the process
-                    JoinInput_Add_Product(addProcess, productInputProcess);
+                    joinInput_Add_Product(addProcess, productInputProcess);
                     break;
-                case 3:
+                case 3: //constant generation process case
                     ConstantGenerationProcess constantGenerationInputProcess = (ConstantGenerationProcess) KPNNetwork.searchThread(inputName); //getting the process
-                    JoinInput_Add_ConstantGeneration(addProcess, constantGenerationInputProcess);
+                    joinInput_Add_ConstantGeneration(addProcess, constantGenerationInputProcess);
                     break;
-                case 4:
+                case 4: //sink process case
                     SinkProcess SinkInputProcess = (SinkProcess) KPNNetwork.searchThread(inputName); //getting the process
-                    JoinInput_Add_Sink(addProcess, SinkInputProcess);
+                    joinInput_Add_Sink(addProcess, SinkInputProcess);
                     break;
             }
 
         }
+        //join the process output with the inputs
         for (int j = 0; j < model.getOutputs().size(); j++) {
 
             String outputName = model.getOutputs().get(j).getName();
@@ -248,29 +309,35 @@ public class AddProcess extends Thread {
             switch (hardwareTypeOutput) {
                 case 0: //duplication process case
                     DuplicationProcess duplicationOutputProcess = (DuplicationProcess) KPNNetwork.searchThread(outputName); //getting the process
-                    JoinOutput_Add_Duplication(addProcess, duplicationOutputProcess);
+                    joinOutput_Add_Duplication(addProcess, duplicationOutputProcess);
                     break;
                 case 1: //add process case
                     AddProcess addOutputProcess = (AddProcess) KPNNetwork.searchThread(outputName); //getting the process
-                    JoinOutput_Add_Add(addProcess, addOutputProcess);
+                    joinOutput_Add_Add(addProcess, addOutputProcess);
                     break;
-                case 2:
+                case 2: // product process case
                     ProductProcess productOutputProcess = (ProductProcess) KPNNetwork.searchThread(outputName); //getting the process
-                    JoinOutput_Add_Product(addProcess, productOutputProcess);
+                    joinOutput_Add_Product(addProcess, productOutputProcess);
                     break;
-                case 3:
+                case 3: // constant generation process case
                     ConstantGenerationProcess constantGenerationOutputProcess = (ConstantGenerationProcess) KPNNetwork.searchThread(outputName); //getting the process
-                    JoinOutput_Add_ConstantGeneration(addProcess, constantGenerationOutputProcess);
+                    joinOutput_Add_ConstantGeneration(addProcess, constantGenerationOutputProcess);
                     break;
-                case 4:
+                case 4: // sink process case
                     SinkProcess sinkOutputProcess = (SinkProcess) KPNNetwork.searchThread(outputName); //getting the process
-                    JoinOutput_Add_Sink(addProcess, sinkOutputProcess);
+                    joinOutput_Add_Sink(addProcess, sinkOutputProcess);
                     break;
             }
         }
     }
 
-    private void JoinInput_Add_Duplication(AddProcess addProcess, DuplicationProcess duplicationInputProcess) {
+    /**
+     * This method makes the relation between an input of add process with the 
+     * output of an duplication process
+     * @param addProcess AddProcess
+     * @param duplicationInputProcess  DuplicationProcess
+     */
+    private void joinInput_Add_Duplication(AddProcess addProcess, DuplicationProcess duplicationInputProcess) {
         if (!addProcess.isQueue1InputAssigned()) { //if the input 1 of the add process still without assignation
             if (!duplicationInputProcess.isQueueOutput1Assigned()) { //if ouput1 of the duplication process still without assignation
                 addProcess.setQueueIn1(duplicationInputProcess.getQueueOut1());
@@ -294,7 +361,13 @@ public class AddProcess extends Thread {
         }
     }
 
-    private void JoinInput_Add_Add(AddProcess addProcess, AddProcess addInputProcess) {
+    /**
+     * This method makes the relation between an input of add process with the 
+     * output of another add process
+     * @param addProcess AddProcess
+     * @param addInputProcess  AddProcess
+     */
+    private void joinInput_Add_Add(AddProcess addProcess, AddProcess addInputProcess) {
         if (!addProcess.isQueue1InputAssigned()) { //if the input 1 of the add process still without assignation
             if (!addInputProcess.isQueueOutputAssigned()) { //if ouput of the add process still without assignation
                 addProcess.setQueueIn1(addInputProcess.getQueueOut());
@@ -310,7 +383,13 @@ public class AddProcess extends Thread {
         }
     }
 
-    private void JoinInput_Add_Product(AddProcess addProcess, ProductProcess productInputProcess) {
+    /**
+     * This method makes the relation between an input of add process with the 
+     * output of a product process
+     * @param addProcess AddProcess
+     * @param productInputProcess ProductProcess
+     */
+    private void joinInput_Add_Product(AddProcess addProcess, ProductProcess productInputProcess) {
         if (!addProcess.isQueue1InputAssigned()) { //if the input 1 of the add process still without assignation
             if (!productInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
                 addProcess.setQueueIn1(productInputProcess.getQueueOut());
@@ -326,7 +405,13 @@ public class AddProcess extends Thread {
         }
     }
 
-    private void JoinInput_Add_ConstantGeneration(AddProcess addProcess, ConstantGenerationProcess constantGenerationInputProcess) {
+    /**
+     * This method makes the relation between an input of add process with the 
+     * output of a constant generation process
+     * @param addProcess AddProcess
+     * @param constantGenerationInputProcess ConstantGenerationProcess
+     */
+    private void joinInput_Add_ConstantGeneration(AddProcess addProcess, ConstantGenerationProcess constantGenerationInputProcess) {
         if (!addProcess.isQueue1InputAssigned()) { //if the input 1 of the add process still without assignation
             if (!constantGenerationInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
                 addProcess.setQueueIn1(constantGenerationInputProcess.getQueueOut());
@@ -343,7 +428,13 @@ public class AddProcess extends Thread {
 
     }
 
-    private void JoinInput_Add_Sink(AddProcess addProcess, SinkProcess SinkInputProcess) {
+    /**
+     * This method makes the relation between an input of add process with the 
+     * output of a sink process
+     * @param addProcess AddProcess
+     * @param SinkInputProcess SinkProcess
+     */
+    private void joinInput_Add_Sink(AddProcess addProcess, SinkProcess SinkInputProcess) {
         if (!addProcess.isQueue1InputAssigned()) { //if the input 1 of the add process still without assignation
             if (!SinkInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
                 addProcess.setQueueIn1(SinkInputProcess.getQueueOut());
@@ -359,7 +450,13 @@ public class AddProcess extends Thread {
         }
     }
 
-    private void JoinOutput_Add_Duplication(AddProcess addProcess, DuplicationProcess duplicationOutputProcess) {
+    /**
+     * This method makes the relation between an input of add process with the 
+     * output of a duplication process
+     * @param addProcess AddProcess
+     * @param duplicationOutputProcess DuplicationProcess
+     */
+    private void joinOutput_Add_Duplication(AddProcess addProcess, DuplicationProcess duplicationOutputProcess) {
         if (!addProcess.isQueueOutputAssigned()) { //if the output of the add process still without assignation
             if (!duplicationOutputProcess.isQueueInputAssigned()) { //if ouput1 of the duplication process still without assignation
                 addProcess.setQueueOut(duplicationOutputProcess.getQueueIn());
@@ -370,7 +467,13 @@ public class AddProcess extends Thread {
 
     }
 
-    private void JoinOutput_Add_Add(AddProcess addProcess, AddProcess addOutputProcess) {
+    /**
+     * This method makes the relation between an output of add process with the 
+     * input of another add process
+     * @param addProcess AddProcess
+     * @param addOutputProcess AddProcess
+     */
+    private void joinOutput_Add_Add(AddProcess addProcess, AddProcess addOutputProcess) {
         if (!addProcess.isQueueOutputAssigned()) { //if the input 1 of the add process still without assignation
             if (!addOutputProcess.isQueue1InputAssigned()) { //if ouput of the add process still without assignation
                 addProcess.setQueueOut(addOutputProcess.getQueueIn1());
@@ -385,7 +488,13 @@ public class AddProcess extends Thread {
 
     }
 
-    private void JoinOutput_Add_Product(AddProcess addProcess, ProductProcess productOutputProcess) {
+    /**
+     * This method makes the relation between an output of add process with the 
+     * input of a product process
+     * @param addProcess AddProcess
+     * @param productOutputProcess ProductProcess
+     */
+    private void joinOutput_Add_Product(AddProcess addProcess, ProductProcess productOutputProcess) {
         if (!addProcess.isQueueOutputAssigned()) { //if the input 1 of the add process still without assignation
             if (!productOutputProcess.isQueue1InputAssigned()) { //if ouput of the add process still without assignation
                 addProcess.setQueueOut(productOutputProcess.getQueueIn1());
@@ -400,7 +509,13 @@ public class AddProcess extends Thread {
 
     }
 
-    private void JoinOutput_Add_ConstantGeneration(AddProcess addProcess, ConstantGenerationProcess constantGenerationOutputProcess) {
+    /**
+     * This method makes the relation between an output of add process with the 
+     * input of a constant generation process
+     * @param addProcess AddProcess
+     * @param constantGenerationOutputProcess ConstantGenerationProcess
+     */
+    private void joinOutput_Add_ConstantGeneration(AddProcess addProcess, ConstantGenerationProcess constantGenerationOutputProcess) {
         if (!addProcess.isQueueOutputAssigned()) { //if the input 1 of the add process still without assignation
             if (!constantGenerationOutputProcess.isQueueInputAssigned()) { //if ouput of the product process still without assignation
                 addProcess.setQueueOut(constantGenerationOutputProcess.getQueueIn());
@@ -411,7 +526,13 @@ public class AddProcess extends Thread {
 
     }
 
-    private void JoinOutput_Add_Sink(AddProcess addProcess, SinkProcess sinkOutputProcess) {
+    /**
+     * This method makes the relation between an output of add process with the 
+     * input of a sink process
+     * @param addProcess AddProcess
+     * @param constantGenerationOutputProcess SinkProcess
+     */
+    private void joinOutput_Add_Sink(AddProcess addProcess, SinkProcess sinkOutputProcess) {
         if (!addProcess.isQueueOutputAssigned()) { //if the input 1 of the add process still without assignation
             if (!sinkOutputProcess.isQueueInputAssigned()) { //if ouput of the product process still without assignation
                 addProcess.setQueueOut(sinkOutputProcess.getQueueIn());
@@ -419,7 +540,5 @@ public class AddProcess extends Thread {
                 addProcess.setQueueOutputAssigned(sinkOutputProcess.getName());
             }
         }
-
     }
-
 }

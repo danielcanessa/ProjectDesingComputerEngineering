@@ -12,6 +12,7 @@ import java.awt.*;
  *
  * @author Stanislav Lapitsky
  * @version 1.0
+ * http://java-sl.com/connector.html
  */
 public class JLabelConnector extends JPanel {    
     public static final int CONNECT_LINE_TYPE_RECTANGULAR = 1;

@@ -8,9 +8,7 @@ package plataformakpn;
 import ComponentConnector.ConnectorContainer;
 import ComponentConnector.DragLabel;
 import ComponentConnector.JLabelConnector;
-import KPN.AddProcess;
 import KPN.KPNNetwork;
-import KPN.ProductProcess;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.GridBagConstraints;
@@ -21,50 +19,86 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
+import static java.lang.Thread.sleep;
+import javax.swing.JOptionPane;
 
 /**
+ * This class contains all the graphical user interface definitions
  *
- * @author Daniel
+ * @author Daniel Canessa Valverde
+ * @version 1.0
  */
 public class GUI extends javax.swing.JFrame {
 
     /**
-     * Creates new form GUI
+     * This variable is used to know that the user has activated the connections
+     * mode
      */
-    public static boolean relationsFlag; //to fix
+    public static boolean creatingHardwareRelationsFlag;
+    /**
+     * This variable contains all the hardware abstractions that the user put
+     * over the work field
+     */
     public static HardwareGraph hardwareGraph;
-    public static HardwareModel selectedModelJDialog;
-    public static JLabel selectedJLabel;
-    public static boolean repaintFlag;
-    public static boolean removeFlag;
-    public static int currentHardwareIdentifier;
+    /**
+     * This variable contains all the information applied over a queue process
+     */
+    public static HardwareModel selectedQueueJDialog;
+    /**
+     * This variable contains the last JLabel selected when
+     * creatingHardwareRelationsFlag is true
+     */
+    public static JLabel lastSelectedHardware;
+    /**
+     * This variable is true when any change over the GUI is produced
+     */
+    public static boolean repaintWorkSpaceFlag;
+    /**
+     * This variable is used to know that the user has activated the connections
+     * mode
+     */
+    public static boolean removingHardwareFlag;
+    /**
+     * This variable is used to store the border color of the JLabels when are
+     * selected
+     */
     public static Color selectedColor;
-
+    /**
+     * This variable contains the KPN network, is initialize using the variable
+     * hardwareGraph as a parameter
+     */
     private KPNNetwork net;
-
+    /**
+     * This variable contains all the JLabels of the View JDialog
+     */
+    public static List<JLabel> JLabelArrayView;
+    /**
+     * This variable contains all the JTextField of the View JDialog
+     */
+    public static List<JTextField> JTextFieldArrayView;
+    /**
+     * This variable contains the thread who refresh and redraw the GUI
+     */
+    private GUIActions GUIActions;
+    /**
+     * This variable is used to control if the KPN is going to work infinetely
+     * or is going to work step by step
+     */
     public volatile static boolean userThreadDebuging;
 
-    public static List<JLabel> labelsView;
-    public static List<JTextField> textFieldView;
-
-    GUIActions GUIActions;
-
+    /**
+     * Constructor method of the class
+     */
     public GUI() {
-
         initComponents();
-
         modifyGUI();
-
         initValues();
-
     }
 
-    //http://java-sl.com/connector.html
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -132,12 +166,6 @@ public class GUI extends javax.swing.JFrame {
 
         jLabelFIFO.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jLabelFIFO.setText("FIFO items:");
-
-        jTextFieldFifo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextFieldFifoActionPerformed(evt);
-            }
-        });
 
         jButtonApplyQueue.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/apply32x32.png"))); // NOI18N
         jButtonApplyQueue.addActionListener(new java.awt.event.ActionListener() {
@@ -290,9 +318,9 @@ public class GUI extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("KPN Platform");
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/Images/icon.png")));
-        setMaximumSize(new java.awt.Dimension(1200, 770));
-        setMinimumSize(new java.awt.Dimension(1200, 770));
-        setPreferredSize(new java.awt.Dimension(1200, 770));
+        setMaximumSize(new java.awt.Dimension(1200, 790));
+        setMinimumSize(new java.awt.Dimension(1200, 790));
+        setPreferredSize(new java.awt.Dimension(1200, 790));
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -343,6 +371,7 @@ public class GUI extends javax.swing.JFrame {
 
         jButtonAdd.setBackground(new java.awt.Color(255, 255, 255));
         jButtonAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/add48x48.png"))); // NOI18N
+        jButtonAdd.setToolTipText("Insert Adder Abstraction");
         jButtonAdd.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 jButtonAddMouseDragged(evt);
@@ -362,6 +391,7 @@ public class GUI extends javax.swing.JFrame {
 
         jButtonRelations.setBackground(new java.awt.Color(255, 255, 255));
         jButtonRelations.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/union48x48.png"))); // NOI18N
+        jButtonRelations.setToolTipText("Make relation");
         jButtonRelations.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonRelationsActionPerformed(evt);
@@ -371,6 +401,7 @@ public class GUI extends javax.swing.JFrame {
 
         jButtonTrash.setBackground(new java.awt.Color(255, 255, 255));
         jButtonTrash.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/trash48x48.png"))); // NOI18N
+        jButtonTrash.setToolTipText("Delete Abstraction");
         jButtonTrash.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonTrashActionPerformed(evt);
@@ -380,6 +411,7 @@ public class GUI extends javax.swing.JFrame {
 
         jButtonConstantGeneration.setBackground(new java.awt.Color(255, 255, 255));
         jButtonConstantGeneration.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/constant48x48.png"))); // NOI18N
+        jButtonConstantGeneration.setToolTipText("Insert Constant Generator Abstraction");
         jButtonConstantGeneration.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 jButtonConstantGenerationMouseDragged(evt);
@@ -399,6 +431,7 @@ public class GUI extends javax.swing.JFrame {
 
         jButtonDuplication.setBackground(new java.awt.Color(255, 255, 255));
         jButtonDuplication.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/duplication48x48.png"))); // NOI18N
+        jButtonDuplication.setToolTipText("Insert Duplicator Abstraction");
         jButtonDuplication.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 jButtonDuplicationMouseDragged(evt);
@@ -418,6 +451,7 @@ public class GUI extends javax.swing.JFrame {
 
         jButtonSink.setBackground(new java.awt.Color(255, 255, 255));
         jButtonSink.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/sink48x48.png"))); // NOI18N
+        jButtonSink.setToolTipText("Insert Sink Abstraction");
         jButtonSink.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 jButtonSinkMouseDragged(evt);
@@ -445,6 +479,7 @@ public class GUI extends javax.swing.JFrame {
 
         jButtonProduct.setBackground(new java.awt.Color(255, 255, 255));
         jButtonProduct.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/product48x48.png"))); // NOI18N
+        jButtonProduct.setToolTipText("Insert Producer Abstraction");
         jButtonProduct.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 jButtonProductMouseDragged(evt);
@@ -464,6 +499,7 @@ public class GUI extends javax.swing.JFrame {
 
         jButtonQueue.setBackground(new java.awt.Color(255, 255, 255));
         jButtonQueue.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/queue48x48.png"))); // NOI18N
+        jButtonQueue.setToolTipText("Insert Queue Abstraction");
         jButtonQueue.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 jButtonQueueMouseDragged(evt);
@@ -518,6 +554,7 @@ public class GUI extends javax.swing.JFrame {
 
         jButtonView.setBackground(new java.awt.Color(255, 255, 255));
         jButtonView.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/view48x48.png"))); // NOI18N
+        jButtonView.setToolTipText("Insert Viewer Abstraction");
         jButtonView.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 jButtonViewMouseDragged(evt);
@@ -537,6 +574,7 @@ public class GUI extends javax.swing.JFrame {
 
         printKPN.setBackground(new java.awt.Color(255, 255, 255));
         printKPN.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/print.png"))); // NOI18N
+        printKPN.setToolTipText("Print the KPN");
         printKPN.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 printKPNActionPerformed(evt);
@@ -546,6 +584,7 @@ public class GUI extends javax.swing.JFrame {
 
         iterateKPN.setBackground(new java.awt.Color(255, 255, 255));
         iterateKPN.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/start.png"))); // NOI18N
+        iterateKPN.setToolTipText("Make a new iteration");
         iterateKPN.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 iterateKPNActionPerformed(evt);
@@ -555,6 +594,7 @@ public class GUI extends javax.swing.JFrame {
 
         createKPN.setBackground(new java.awt.Color(255, 255, 255));
         createKPN.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/createNetwork.png"))); // NOI18N
+        createKPN.setToolTipText("Initialize KPN");
         createKPN.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 createKPNActionPerformed(evt);
@@ -564,6 +604,7 @@ public class GUI extends javax.swing.JFrame {
 
         exportKPN.setBackground(new java.awt.Color(255, 255, 255));
         exportKPN.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/export.png"))); // NOI18N
+        exportKPN.setToolTipText("Export the KPN to XML");
         exportKPN.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportKPNActionPerformed(evt);
@@ -576,26 +617,34 @@ public class GUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextFieldFifoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldFifoActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextFieldFifoActionPerformed
-
+    /**
+     * This method takes the information in JDialog Queue and load it in the
+     * variable selectedQueueJDialog
+     *
+     * @param evt
+     */
     private void jButtonApplyQueueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonApplyQueueActionPerformed
-        selectedModelJDialog.getInputQueue().clear();
-
-        String text = this.jTextFieldFifo.getText().trim().replace(" ", "");
-        String[] parts = text.split(",");
-
-        selectedModelJDialog.setConstantGeneration(this.jCheckBoxFifo.isSelected());
-
+        selectedQueueJDialog.getInputQueue().clear(); //just in case that the variable was write before
+        String text = this.jTextFieldFifo.getText().trim().replace(" ", ""); //getting the numbers of the queue
+        String[] parts = text.split(","); //split in an array
+        selectedQueueJDialog.setConstantGeneration(this.jCheckBoxFifo.isSelected()); //verifies if constant generation option was selected
         for (String part : parts) {
             try {
-                selectedModelJDialog.getInputQueue().add(Float.parseFloat(part));
+                selectedQueueJDialog.getInputQueue().add(Float.parseFloat(part)); //adding the numbers to the queue
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         }
+
+        JOptionPane.showMessageDialog(this,
+                "Sucessfully operation. Is constant generation: "+selectedQueueJDialog.isConstantGeneration()+", Current elements: "+selectedQueueJDialog.getInputQueue(),
+                "Information",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+        
+        this.jDialogFifo.setVisible(false);
     }//GEN-LAST:event_jButtonApplyQueueActionPerformed
+
 
     private void jButtonQueueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonQueueActionPerformed
         createQueueRepresentation(0, 0);
@@ -607,7 +656,6 @@ public class GUI extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         hardwareGraph.printGraph();
-
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButtonSinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSinkActionPerformed
@@ -623,44 +671,36 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonConstantGenerationActionPerformed
 
     private void jButtonTrashActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonTrashActionPerformed
-
-        if (selectedJLabel != null) {
-            selectedJLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-            selectedJLabel = null;
+        if (lastSelectedHardware != null) { //if there was selected any hardware representation before
+            lastSelectedHardware.setBorder(BorderFactory.createLineBorder(Color.BLACK)); //establishing not selected border
+            lastSelectedHardware = null; //cleaning the variable
         }
-
         this.jButtonRelations.setBorder(BorderFactory.createEmptyBorder());
-
-        relationsFlag = false;
-
-        removeFlag = !removeFlag;
-
-        if (removeFlag) {
-            setCursor(Cursor.CROSSHAIR_CURSOR);
-            this.jButtonTrash.setBorder(BorderFactory.createLineBorder(selectedColor));
+        creatingHardwareRelationsFlag = false; //rebooting the variable of relations
+        removingHardwareFlag = !removingHardwareFlag; //if remove flag is true comes false, if remove flag is false comes true
+        if (removingHardwareFlag) {
+            setCursor(Cursor.CROSSHAIR_CURSOR); //changing the cursor
+            this.jButtonTrash.setBorder(BorderFactory.createLineBorder(selectedColor)); //making the border selected of the JLabel
         } else {
-            setCursor(Cursor.getDefaultCursor());
-            this.jButtonTrash.setBorder(BorderFactory.createEmptyBorder());
+            setCursor(Cursor.getDefaultCursor()); //reseting the cursor
+            this.jButtonTrash.setBorder(BorderFactory.createEmptyBorder()); //making the border not selected of the JLabel
         }
     }//GEN-LAST:event_jButtonTrashActionPerformed
 
     private void jButtonRelationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRelationsActionPerformed
-        if (selectedJLabel != null) {
-            selectedJLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-            selectedJLabel = null;
+        if (lastSelectedHardware != null) { //if there was selected any hardware representation before
+            lastSelectedHardware.setBorder(BorderFactory.createLineBorder(Color.BLACK)); //establishing not selected border
+            lastSelectedHardware = null; //cleaning the variable
         }
-
         this.jButtonTrash.setBorder(BorderFactory.createEmptyBorder());
-
-        removeFlag = false;
-        relationsFlag = !relationsFlag;
-
-        if (relationsFlag) {
-            setCursor(Cursor.HAND_CURSOR);
-            this.jButtonRelations.setBorder(BorderFactory.createLineBorder(selectedColor));
+        removingHardwareFlag = false; //setting remove flag as false
+        creatingHardwareRelationsFlag = !creatingHardwareRelationsFlag; //if relation flag is true comes false, if relation flag is false comes true
+        if (creatingHardwareRelationsFlag) {
+            setCursor(Cursor.HAND_CURSOR); //changing the cursor
+            this.jButtonRelations.setBorder(BorderFactory.createLineBorder(selectedColor));//making the border selected of the JLabel
         } else {
-            setCursor(Cursor.getDefaultCursor());
-            this.jButtonRelations.setBorder(BorderFactory.createEmptyBorder());
+            setCursor(Cursor.getDefaultCursor()); //resetig the cursor
+            this.jButtonRelations.setBorder(BorderFactory.createEmptyBorder()); //making the border not selected of the JLabel
         }
     }//GEN-LAST:event_jButtonRelationsActionPerformed
 
@@ -670,8 +710,12 @@ public class GUI extends javax.swing.JFrame {
 
     private void jButtonProductMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonProductMouseDragged
         this.jButtonProductDragable.setVisible(true);
-        this.jButtonProductDragable.setLocation(evt.getX() + 30, evt.getY() + 155);
+        this.jButtonProductDragable.setLocation(evt.getX() + 30, getYPositionOffset(evt.getY(), 1));
     }//GEN-LAST:event_jButtonProductMouseDragged
+
+    private int getYPositionOffset(int y, int offset) {
+        return y + (155 + (60 * offset));
+    }
 
     private void jButtonProductMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonProductMouseReleased
         try {
@@ -693,7 +737,7 @@ public class GUI extends javax.swing.JFrame {
 
     private void jButtonAddMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonAddMouseDragged
         this.jButtonAddDragable.setVisible(true);
-        this.jButtonAddDragable.setLocation(evt.getX() + 30, evt.getY() + 220);
+        this.jButtonAddDragable.setLocation(evt.getX() + 30, getYPositionOffset(evt.getY(), 0));
     }//GEN-LAST:event_jButtonAddMouseDragged
 
     private void jButtonConstantGenerationMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonConstantGenerationMouseReleased
@@ -708,7 +752,7 @@ public class GUI extends javax.swing.JFrame {
 
     private void jButtonConstantGenerationMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonConstantGenerationMouseDragged
         this.jButtonConstantGenerationDragable.setVisible(true);
-        this.jButtonConstantGenerationDragable.setLocation(evt.getX() + 30, evt.getY() + 280);
+        this.jButtonConstantGenerationDragable.setLocation(evt.getX() + 30, getYPositionOffset(evt.getY(), 3));
 
     }//GEN-LAST:event_jButtonConstantGenerationMouseDragged
 
@@ -723,12 +767,13 @@ public class GUI extends javax.swing.JFrame {
 
     private void jButtonDuplicationMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonDuplicationMouseDragged
         this.jButtonDuplicationDragable.setVisible(true);
-        this.jButtonDuplicationDragable.setLocation(evt.getX() + 30, evt.getY() + 340);
+        this.jButtonDuplicationDragable.setLocation(evt.getX() + 30, getYPositionOffset(evt.getY(), 4));
+
     }//GEN-LAST:event_jButtonDuplicationMouseDragged
 
     private void jButtonSinkMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonSinkMouseDragged
         this.jButtonSinkDragable.setVisible(true);
-        this.jButtonSinkDragable.setLocation(evt.getX() + 30, evt.getY() + 400);
+        this.jButtonSinkDragable.setLocation(evt.getX() + 30, getYPositionOffset(evt.getY(), 5));
     }//GEN-LAST:event_jButtonSinkMouseDragged
 
     private void jButtonSinkMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonSinkMouseReleased
@@ -751,12 +796,12 @@ public class GUI extends javax.swing.JFrame {
 
     private void jButtonQueueMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonQueueMouseDragged
         this.jButtonQueueDragable.setVisible(true);
-        this.jButtonQueueDragable.setLocation(evt.getX() + 30, evt.getY() + 460);
+        this.jButtonQueueDragable.setLocation(evt.getX() + 30, getYPositionOffset(evt.getY(), 2));
     }//GEN-LAST:event_jButtonQueueMouseDragged
 
     private void jButtonViewMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonViewMouseDragged
         this.jButtonViewDragable.setVisible(true);
-        this.jButtonViewDragable.setLocation(evt.getX() + 30, evt.getY() + 520);
+        this.jButtonViewDragable.setLocation(evt.getX() + 30, getYPositionOffset(evt.getY(), 8) - 10);
     }//GEN-LAST:event_jButtonViewMouseDragged
 
     private void jButtonViewMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonViewMouseReleased
@@ -782,26 +827,18 @@ public class GUI extends javax.swing.JFrame {
 
 
     private void printKPNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printKPNActionPerformed
-        /* add = new AddProcess();
-        product = new ProductProcess();
-
-        add.getQueueIn1().add(Float.valueOf(1));
-        add.getQueueIn2().add(Float.valueOf(1));
-
-        product.setQueueIn1(add.getQueueOut());
-        product.getQueueIn2().add(Float.valueOf(2));
-
-        add.setPauseThread(true);
-        product.setPauseThread(true);
-
-        add.start();
-        product.start();*/
-
-        net.printKPNNetwork();
-
-        this.jTextPaneOutput.setText("Output<br>");
-        this.jTextPaneOutput.setText(getTextPane() + net.getKPNNetworkOutput());
-        this.jTextPaneOutput.setText(getTextPane() + "-------------------------------------------<br>");
+        if (net != null) {
+            net.printKPNNetwork();
+            this.jTextPaneOutput.setText("Output<br>");
+            this.jTextPaneOutput.setText(getTextPane() + net.getKPNNetworkOutput());
+            this.jTextPaneOutput.setText(getTextPane() + "-------------------------------------------<br>");
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "You must initialized the KPN first.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
 
     }//GEN-LAST:event_printKPNActionPerformed
 
@@ -810,27 +847,26 @@ public class GUI extends javax.swing.JFrame {
     }
 
     private void iterateKPNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_iterateKPNActionPerformed
-        /* try {
-            System.out.println("New Iteration");
-       
-            add.setPauseThread(false);
-            product.setPauseThread(false);
-           add.printQueues();
-            product.printQueues();
-        } catch (Exception ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+        try {
+            //Verifing that the network is initialized
+            if (net != null) {
+                //Making an iteration
+                net.resumeKPNNetwork();
+                //Giving time to the threads
+                sleep(200);
+                //Updating output
+                this.jTextPaneOutput.setText(getTextPane() + net.getKPNNetworkOutput());
+                this.jTextPaneOutput.setText(getTextPane() + "-------------------------------------------<br>");
+            } else {
+                JOptionPane.showMessageDialog(this,
+                        "You must initialized the KPN first.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        } catch (InterruptedException ex) {
+            System.out.println(ex.getMessage());
         }
-         */
-        net.resumeKPNNetwork();
-        //net.printKPNNetwork();
-
-        //jTextPaneOutput.setContentType("text");
-        this.jTextPaneOutput.setText(getTextPane() + net.getKPNNetworkOutput());
-
-        this.jTextPaneOutput.setText(getTextPane() + "-------------------------------------------<br>");
-
-        // net.pauseKPNNetwork();
-
     }//GEN-LAST:event_iterateKPNActionPerformed
 
 
@@ -843,7 +879,13 @@ public class GUI extends javax.swing.JFrame {
         net.pauseKPNNetwork();
         net.startKPNNetwork();
 
-        this.jTextPaneOutput.setText("<b>Output<b/><br>");
+        net.printKPNNetwork();
+
+        this.jTextPaneOutput.setText("Output<br>KPN Created Successfully<br>");
+        this.jTextPaneOutput.setText(getTextPane() + "-------------------------------------------<br>");
+        this.jTextPaneOutput.setText(getTextPane() + net.getKPNNetworkOutput());
+        this.jTextPaneOutput.setText(getTextPane() + "-------------------------------------------<br>");
+
 
     }//GEN-LAST:event_createKPNActionPerformed
 
@@ -857,21 +899,35 @@ public class GUI extends javax.swing.JFrame {
 
     private void jButtonApplyDelayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonApplyDelayActionPerformed
         int delay = (int) this.jSpinnerDelay.getValue();
-        selectedModelJDialog.setDelayIterations(delay);
+        selectedQueueJDialog.setDelayIterations(delay);
+        JOptionPane.showMessageDialog(this,
+                "Sucessfully operation. Delay iterations: "+selectedQueueJDialog.getDelayIterations(),"Information",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+        this.jDialogDelay.setVisible(false);
 
 
     }//GEN-LAST:event_jButtonApplyDelayActionPerformed
 
     private void exportKPNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportKPNActionPerformed
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setBackground(Color.white);
+        //Verifing that the KPN is intialized
+        if (net != null) {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setBackground(Color.white);
+            // Demonstrate "Save" dialog:
+            int rVal = fileChooser.showSaveDialog(this);
+            if (rVal == JFileChooser.APPROVE_OPTION) {
+                String path = fileChooser.getCurrentDirectory().toString() + "/" + fileChooser.getSelectedFile().getName() + ".xml";
+                //Creating the export file
+                net.exportKPNToXML(path);
 
-        // Demonstrate "Save" dialog:
-        int rVal = fileChooser.showSaveDialog(this);
-        if (rVal == JFileChooser.APPROVE_OPTION) {
-            String path = fileChooser.getCurrentDirectory().toString() + "/" + fileChooser.getSelectedFile().getName() + ".xml";
-            net.exportKPNToXML(path);
-
+            }
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "You must initialized the KPN first.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
         }
     }//GEN-LAST:event_exportKPNActionPerformed
 
@@ -973,38 +1029,38 @@ public class GUI extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void initValues() {
-        relationsFlag = false;
+        creatingHardwareRelationsFlag = false;
         GUIActions = new GUIActions();
         GUIActions.start();
         selectedColor = Color.GREEN;
         hardwareGraph = new HardwareGraph();
         userThreadDebuging = true;
 
-        labelsView = new ArrayList<>();
-        textFieldView = new ArrayList<>();
+        JLabelArrayView = new ArrayList<>();
+        JTextFieldArrayView = new ArrayList<>();
 
-        labelsView.add(jLabelInput1);
-        labelsView.add(jLabelInput2);
-        labelsView.add(jLabelOutput1);
-        labelsView.add(jLabelOutput2);
+        JLabelArrayView.add(jLabelInput1);
+        JLabelArrayView.add(jLabelInput2);
+        JLabelArrayView.add(jLabelOutput1);
+        JLabelArrayView.add(jLabelOutput2);
 
-        textFieldView.add(jTextFieldInput1);
-        textFieldView.add(jTextFieldInput2);
-        textFieldView.add(jTextFieldOutput1);
-        textFieldView.add(jTextFieldOutput2);
+        JTextFieldArrayView.add(jTextFieldInput1);
+        JTextFieldArrayView.add(jTextFieldInput2);
+        JTextFieldArrayView.add(jTextFieldOutput1);
+        JTextFieldArrayView.add(jTextFieldOutput2);
 
     }
 
     private void modifyGUI() {
-        this.jXTaskPaneHardwareAbstraction.add(this.jButtonProduct);
         this.jXTaskPaneHardwareAbstraction.add(this.jButtonAdd);
+        this.jXTaskPaneHardwareAbstraction.add(this.jButtonProduct);
+        this.jXTaskPaneHardwareAbstraction.add(this.jButtonQueue);
         this.jXTaskPaneHardwareAbstraction.add(this.jButtonConstantGeneration);
         this.jXTaskPaneHardwareAbstraction.add(this.jButtonDuplication);
         this.jXTaskPaneHardwareAbstraction.add(this.jButtonSink);
-        this.jXTaskPaneHardwareAbstraction.add(this.jButtonQueue);
-        this.jXTaskPaneHardwareAbstraction.add(this.jButtonView);
 
         this.jXTaskPaneActions.add(this.jButtonRelations);
+        this.jXTaskPaneActions.add(this.jButtonView);
         this.jXTaskPaneActions.add(this.jButtonTrash);
 
         this.jButtonRelations.setBorder(BorderFactory.createEmptyBorder());
@@ -1109,7 +1165,7 @@ public class GUI extends javax.swing.JFrame {
     private void createAddRepresentation(int posX, int posY) {
         String imagePath = "/Images/add48x48.png";
         int hardwareType = 1;
-        String toolTip = "Hardware: adder, ID: ";
+        String toolTip = "Hardware: adder <br>ID: ";
         String name = "adder";
         createHardwareBlock(imagePath, hardwareType, toolTip, name, posX, posY);
 
@@ -1118,7 +1174,7 @@ public class GUI extends javax.swing.JFrame {
     private void createProductRepresentation(int posX, int posY) {
         String imagePath = "/Images/product48x48.png";
         int hardwareType = 2;
-        String toolTip = "Hardware: producer, ID: ";
+        String toolTip = "Hardware: producer <br>ID: ";
         String name = "product";
         createHardwareBlock(imagePath, hardwareType, toolTip, name, posX, posY);
 
@@ -1127,7 +1183,7 @@ public class GUI extends javax.swing.JFrame {
     private void createConstantGenerationRepresentation(int posX, int posY) {
         String imagePath = "/Images/constant48x48.png";
         int hardwareType = 3;
-        String toolTip = "Hardware: constant generator, ID: ";
+        String toolTip = "Hardware: constant generator <br>ID: ";
         String name = "constantGeneration";
         createHardwareBlock(imagePath, hardwareType, toolTip, name, posX, posY);
 
@@ -1136,7 +1192,7 @@ public class GUI extends javax.swing.JFrame {
     private void createDuplicationRepresentation(int posX, int posY) {
         String imagePath = "/Images/duplication48x48.png";
         int hardwareType = 0;
-        String toolTip = "Hardware: duplicate, ID: ";
+        String toolTip = "Hardware: duplicate <br>ID: ";
         String name = "duplication";
         createHardwareBlock(imagePath, hardwareType, toolTip, name, posX, posY);
 
@@ -1145,7 +1201,7 @@ public class GUI extends javax.swing.JFrame {
     private void createQueueRepresentation(int posX, int posY) {
         String imagePath = "/Images/queue48x48.png";
         int hardwareType = 5;
-        String toolTip = "Hardware: queue, ID: ";
+        String toolTip = "Hardware: queue <br>ID: ";
         String name = "queue";
         createHardwareBlock(imagePath, hardwareType, toolTip, name, posX, posY);
     }
@@ -1153,7 +1209,7 @@ public class GUI extends javax.swing.JFrame {
     private void createViewRepresentation(int posX, int posY) {
         String imagePath = "/Images/view48x48.png";
         int hardwareType = 6;
-        String toolTip = "Hardware: viewer, ID: ";
+        String toolTip = "Hardware: viewer <br>ID: ";
         String name = "view";
         createHardwareBlock(imagePath, hardwareType, toolTip, name, posX, posY);
     }
@@ -1161,7 +1217,7 @@ public class GUI extends javax.swing.JFrame {
     private void createSinkRepresentation(int posX, int posY) {
         String imagePath = "/Images/sink48x48.png";
         int hardwareType = 4;
-        String toolTip = "Hardware: sink, ID: ";
+        String toolTip = "Hardware: sink <br>ID: ";
         String name = "sink";
         createHardwareBlock(imagePath, hardwareType, toolTip, name, posX, posY);
     }
@@ -1171,9 +1227,9 @@ public class GUI extends javax.swing.JFrame {
         @Override
         public void run() {
             while (true) {
-                if (GUI.repaintFlag) {
+                if (GUI.repaintWorkSpaceFlag) {
                     paintHardware();
-                    GUI.repaintFlag = false;
+                    GUI.repaintWorkSpaceFlag = false;
 
                 }
                 try {

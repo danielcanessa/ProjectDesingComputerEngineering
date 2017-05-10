@@ -8,24 +8,54 @@ package KPN;
 import static KPN.KPNNetwork.searchThread;
 import java.util.LinkedList;
 import java.util.Queue;
-import plataformakpn.GUI;
+import static plataformakpn.GUI.hardwareGraph;
 import static plataformakpn.GUI.userThreadDebuging;
 import plataformakpn.HardwareModel;
 
 /**
+ * This class contains the definition and the methods of the product process
+ * thread.
  *
- * @author Daniel
+ * @author Daniel Canessa Valverde
+ * @version 1.0
+ *
  */
 public class ProductProcess extends Thread {
 
+    /**
+     * This variable represents the input queue 1 of the product process.
+     */
     private volatile Queue<Float> queueIn1;
+    /**
+     * This variable represents the input queue 2 of the product process.
+     */
     private volatile Queue<Float> queueIn2;
+    /**
+     * This variable represents the output queue of the product process.
+     */
     private volatile Queue<Float> queueOut;
+    /**
+     * This variable is used as thread stop condition.
+     */
     private volatile boolean killThread;
+    /**
+     * This variable is used as thread pause condition.
+     */
     private volatile boolean pauseThread;
-
+    /**
+     * This variable is used to know the name of the thread how share output
+     * queue with the product process input queue 1.
+     */
     private volatile String queue1InputAssigned;
+    /**
+     * This variable is used to know the name of the thread how share output
+     * queue with the product process input queue 2.
+     */
     private volatile String queue2InputAssigned;
+    /**
+     * This variable is used to know the name of the thread how share input
+     * queue with the product process output queue.
+     */
     private volatile String queueOutputAssigned;
 
     public ProductProcess() {
@@ -39,22 +69,31 @@ public class ProductProcess extends Thread {
 
     }
 
+    /**
+     * This method implements the logic of the product process.
+     */
     @Override
     public void run() {
+        //stop condition
         while (!killThread) {
             try {
+                //iteration control condition
                 while (!isPauseThread()) {
+                    //logic
                     if (queueIn1.size() > 0 && queueIn2.size() > 0) {
                         this.queueOut.add(queueIn1.poll() * queueIn2.poll());
 
                     }
-
-                    //race condition
+                    //just in case infinite loop
                     if (userThreadDebuging) {
                         setPauseThread(true);
                     }
-
+                    //waiting for another threads
+                    Thread.sleep(200);
+                    //updating GUI
+                    updateToolTip();
                 }
+                //join threads
                 Thread.sleep(100);
 
             } catch (Exception ex) {
@@ -63,6 +102,17 @@ public class ProductProcess extends Thread {
         }
     }
 
+    /**
+     * This method updates the tooltip message of the labels with the most
+     * updated information about the queues.
+     */
+    public void updateToolTip() {
+        hardwareGraph.updateToolTip(this.getName(), this.getQueueIn1(), this.getQueueIn2(), this.getQueueOut(), null);
+    }
+
+    /**
+     * This method prints in the console the input queues and the output queue
+     */
     public void printQueues() {
         System.out.println("Product:");
         System.out.println("    queueIn1:" + this.getQueueIn1());
@@ -71,6 +121,11 @@ public class ProductProcess extends Thread {
         System.out.println("----------------------------------------");
     }
 
+     /**
+     * This method established the name of the current thread.
+     *
+     * @param threadName
+     */
     public void setThreadName(String threadName) {
         this.setName(threadName);
     }

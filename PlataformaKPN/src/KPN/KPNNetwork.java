@@ -10,25 +10,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import plataformakpn.HardwareGraph;
-import plataformakpn.HardwareModel;
-
-import java.io.File;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  *
- * @author Daniel
+ * @author Daniel Canessa Valverde
+ * @version 1.0
+ * 
  */
 public class KPNNetwork {
 
@@ -49,7 +36,27 @@ public class KPNNetwork {
         this.createThreads();
         this.joinThreads();
         this.intializeDelaysThread();
+        this.updateToolTips();
 
+    }
+    
+    private void updateToolTips() {
+        for (int i = 0; i < constantGenerationProcessList.size(); i++) {
+            constantGenerationProcessList.get(i).updateToolTip();
+        }
+        for (int i = 0; i < duplicationProcessList.size(); i++) {
+            duplicationProcessList.get(i).updateToolTip();
+        }
+        for (int i = 0; i < addProcessList.size(); i++) {
+            addProcessList.get(i).updateToolTip();
+        }
+        for (int i = 0; i < productProcessList.size(); i++) {
+            productProcessList.get(i).updateToolTip();
+        }
+
+        for (int i = 0; i < sinkProcessList.size(); i++) {
+            sinkProcessList.get(i).updateToolTip();
+        }
     }
 
     private void createThreads() {
@@ -108,6 +115,7 @@ public class KPNNetwork {
 
     }
 
+    @SuppressWarnings("empty-statement")
     private void intializeDelaysThread() {
         for (int i = 0; i < hardwareAbstraction.size(); i++) {
 
@@ -120,7 +128,7 @@ public class KPNNetwork {
 
                 ConstantGenerationProcess thread = (ConstantGenerationProcess) searchThread(name);
 
-                Queue<Float> queueAux = new LinkedList<>();;
+                Queue<Float> queueAux = new LinkedList<>();
 
                 //Adding 0's delay
                 for (int j = 0; j < delayIteration; j++) {
@@ -266,15 +274,14 @@ public class KPNNetwork {
         for (int i = 0; i < this.sinkProcessList.size(); i++) {
             sinkProcessList.get(i).start();
         }
+      
         for (int i = 0; i < this.constantGenerationProcessList.size(); i++) {
             constantGenerationProcessList.get(i).start();
         }
     }
 
     public void pauseKPNNetwork() {
-        for (int i = 0; i < this.constantGenerationProcessList.size(); i++) {
-            constantGenerationProcessList.get(i).setPauseThread(true);
-        }
+       
         for (int i = 0; i < this.duplicationProcessList.size(); i++) {
             duplicationProcessList.get(i).setPauseThread(true);
         }
@@ -287,6 +294,10 @@ public class KPNNetwork {
 
         for (int i = 0; i < this.sinkProcessList.size(); i++) {
             sinkProcessList.get(i).setPauseThread(true);
+        }
+        
+         for (int i = 0; i < this.constantGenerationProcessList.size(); i++) {
+            constantGenerationProcessList.get(i).setPauseThread(true);
         }
     }
 
@@ -303,6 +314,7 @@ public class KPNNetwork {
         for (int i = 0; i < this.sinkProcessList.size(); i++) {
             sinkProcessList.get(i).setPauseThread(false);
         }
+        
         for (int i = 0; i < this.constantGenerationProcessList.size(); i++) {
             constantGenerationProcessList.get(i).setPauseThread(false);
         }
@@ -321,6 +333,7 @@ public class KPNNetwork {
         for (int i = 0; i < this.sinkProcessList.size(); i++) {
             sinkProcessList.get(i).setKillThread(true);
         }
+        
         for (int i = 0; i < this.constantGenerationProcessList.size(); i++) {
             constantGenerationProcessList.get(i).setKillThread(true);
         }

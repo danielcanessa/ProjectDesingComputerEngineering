@@ -28,7 +28,9 @@ import org.w3c.dom.Element;
 
 /**
  *
- * @author Daniel
+ * @author Daniel Canessa Valverde
+ * @version 1.0
+ * 
  */
 public class XML {
     

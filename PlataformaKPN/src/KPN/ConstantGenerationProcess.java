@@ -8,26 +8,61 @@ package KPN;
 import static KPN.KPNNetwork.searchThread;
 import java.util.LinkedList;
 import java.util.Queue;
+import static plataformakpn.GUI.hardwareGraph;
 import static plataformakpn.GUI.userThreadDebuging;
 import plataformakpn.HardwareGraph;
 import plataformakpn.HardwareModel;
 
 /**
+ * This class contains the definition and the methods of the constant generation
+ * process thread.
  *
- * @author Daniel
+ * @author Daniel Canessa Valverde
+ * @version 1.0
  */
 public class ConstantGenerationProcess extends Thread {
 
+    /**
+     * This variable represents the input queue of the constant generation
+     * block.
+     */
     private volatile Queue<Float> queueIn;
+    /**
+     * This variable represents the input queue of the constant generation
+     * block.
+     */
     private volatile Queue<Float> queueOut;
+    /**
+     * This variable is used to know if the thread has to be of constant
+     * generation.
+     */
     private volatile boolean constantGeneration;
-    private volatile boolean killThread;
-    private volatile boolean pauseThread;
+    /**
+     * This variable is used to know the amount of delay that the process has.
+     */
     private volatile int delayIterations;
-
+    /**
+     * This variable is used as thread stop condition.
+     */
+    private volatile boolean killThread;
+    /**
+     * This variable is used as thread pause condition.
+     */
+    private volatile boolean pauseThread;
+    /**
+     * This variable is used to know the name of the thread how share output
+     * queue with the constant generation input queue.
+     */
     private volatile String queueInputAssigned;
+    /**
+     * This variable is used to know the name of the thread how share input
+     * queue with the constant generation output queue.
+     */
     private volatile String queueOutputAssigned;
 
+    /**
+     * Class constructor.
+     */
     public ConstantGenerationProcess() {
         this.queueIn = new LinkedList<>();
         this.queueOut = new LinkedList<>();
@@ -36,37 +71,56 @@ public class ConstantGenerationProcess extends Thread {
         this.queueOutputAssigned = "";
     }
 
+    /**
+     * This method implements the logic of the constant generation process.
+     */
     @Override
     public void run() {
+        //stop condition
         while (!killThread) {
             try {
+                //iteration control condition
                 while (!isPauseThread()) {
+                    //logic
                     if (queueIn.size() > 0) {
                         float nextNumber = queueIn.poll();
-
+                        //in case of constant generation the number is reloaded at the end of the queue
                         if (isConstantGeneration() && getDelayIterations() == 0) {
                             queueIn.add(nextNumber);
-                        } else if (getDelayIterations() > 0) {
+                        } //in case that a delay exist 
+                        else if (getDelayIterations() > 0) {
                             setDelayIterations(getDelayIterations() - 1);
                         }
-
                         this.queueOut.add(nextNumber);
-
                     }
-                    //race condition
+                    //just in case infinite loop
                     if (userThreadDebuging) {
                         setPauseThread(true);
                     }
-
+                    //waiting for another threads
+                    Thread.sleep(200);
+                    //updating GUI
+                    updateToolTip();
                 }
+                //join threads
                 Thread.sleep(100);
-
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
             }
         }
     }
 
+    /**
+     * This method updates the tooltip message of the labels with the most
+     * updated information about the queues.
+     */
+    public void updateToolTip() {
+        hardwareGraph.updateToolTip(this.getName(), this.getQueueIn(), null, this.getQueueOut(), null);
+    }
+
+    /**
+     * This method prints in the console the input queues and the output queue
+     */
     public void printQueues() {
         System.out.println("Sink:");
         System.out.println("    queueIn:" + this.getQueueIn());
@@ -74,6 +128,11 @@ public class ConstantGenerationProcess extends Thread {
         System.out.println("----------------------------------------");
     }
 
+    /**
+     * This method established the name of the current thread.
+     *
+     * @param threadName
+     */
     public void setThreadName(String threadName) {
         this.setName(threadName);
     }
@@ -192,6 +251,14 @@ public class ConstantGenerationProcess extends Thread {
         return queueOutputAssigned;
     }
 
+    /**
+     * This method creates the join beetween the queues of each constant
+     * generation process, with all the other methods, guided by the hardware
+     * graph model.
+     *
+     * @param name String
+     * @param model HardwareModel
+     */
     public void joinConstantGenerationProcess(String name, HardwareModel model, HardwareGraph hardwareAbstraction) {
 
         ConstantGenerationProcess constantGenerationProcess = (ConstantGenerationProcess) searchThread(name); //current constantGeneration process
@@ -206,28 +273,28 @@ public class ConstantGenerationProcess extends Thread {
                     DuplicationProcess duplicationInputProcess = (DuplicationProcess) searchThread(inputName); //getting the process
                     JoinInput_ConstantGeneration_Duplication(constantGenerationProcess, duplicationInputProcess);
                     break;
-                case 1: //constantGeneration process case
+                case 1: //add process case
                     AddProcess addInputProcess = (AddProcess) searchThread(inputName); //getting the process
                     JoinInput_ConstantGeneration_Add(constantGenerationProcess, addInputProcess);
                     break;
-                case 2:
+                case 2: //product process case
                     ProductProcess productInputProcess = (ProductProcess) searchThread(inputName); //getting the process
                     JoinInput_ConstantGeneration_Product(constantGenerationProcess, productInputProcess);
                     break;
-                case 3:
+                case 3: //constante generation process case
                     ConstantGenerationProcess constantGenerationInputProcess = (ConstantGenerationProcess) searchThread(inputName); //getting the process
                     JoinInput_ConstantGeneration_ConstantGeneration(constantGenerationProcess, constantGenerationInputProcess);
                     break;
-                case 4:
+                case 4: //sink process case
                     SinkProcess sinkInputProcess = (SinkProcess) searchThread(inputName); //getting the process
                     JoinInput_ConstantGeneration_Sink(constantGenerationProcess, sinkInputProcess);
                     break;
-                case 5:
+                case 5: //queue process case
                     JoinInput_ConstantGeneration_Queue(constantGenerationProcess, hardwareAbstraction.search(model.getInputs().get(j)));
                     break;
             }
 
-        }
+        } // joining the process output
         for (int j = 0; j < model.getOutputs().size(); j++) {
 
             String outputName = model.getOutputs().get(j).getName();
@@ -238,19 +305,19 @@ public class ConstantGenerationProcess extends Thread {
                     DuplicationProcess duplicationOutputProcess = (DuplicationProcess) searchThread(outputName); //getting the process
                     JoinOutput_ConstantGeneration_Duplication(constantGenerationProcess, duplicationOutputProcess);
                     break;
-                case 1: //constantGeneration process case
+                case 1: //add process case
                     AddProcess addOutputProcess = (AddProcess) searchThread(outputName); //getting the process
                     JoinOutput_ConstantGeneration_Add(constantGenerationProcess, addOutputProcess);
                     break;
-                case 2:
+                case 2: //product process case
                     ProductProcess productOutputProcess = (ProductProcess) searchThread(outputName); //getting the process
                     JoinOutput_ConstantGeneration_Product(constantGenerationProcess, productOutputProcess);
                     break;
-                case 3:
+                case 3: //constant generation process case
                     ConstantGenerationProcess constantGenerationOutputProcess = (ConstantGenerationProcess) searchThread(outputName); //getting the process
                     JoinOutput_ConstantGeneration_ConstantGeneration(constantGenerationProcess, constantGenerationOutputProcess);
                     break;
-                case 4:
+                case 4: //sink process case
                     SinkProcess sinkOutputProcess = (SinkProcess) searchThread(outputName); //getting the process
                     JoinOutput_ConstantGeneration_Sink(constantGenerationProcess, sinkOutputProcess);
                     break;
@@ -258,6 +325,13 @@ public class ConstantGenerationProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the constant
+     * generation process with the output of an duplication process.
+     *
+     * @param constantGenerationProcess ConstantGenerationProcess
+     * @param duplicationInputProcess DuplicationProcess
+     */
     private void JoinInput_ConstantGeneration_Duplication(ConstantGenerationProcess constantGenerationProcess, DuplicationProcess duplicationInputProcess) {
         if (!constantGenerationProcess.isQueueInputAssigned()) { //if the input 1 of the constantGeneration process still without assignation
 
@@ -279,6 +353,13 @@ public class ConstantGenerationProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the constant
+     * generation process with the output of an add process.
+     *
+     * @param constantGenerationProcess ConstantGenerationProcess
+     * @param addInputProcess AddProcess
+     */
     private void JoinInput_ConstantGeneration_Add(ConstantGenerationProcess constantGenerationProcess, AddProcess addInputProcess) {
         if (!constantGenerationProcess.isQueueInputAssigned()) {//if the input 1 of the constantGeneration process still without assignation
             if (!addInputProcess.isQueueOutputAssigned()) { //if ouput of the constantGeneration process still without assignation
@@ -289,6 +370,13 @@ public class ConstantGenerationProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the constant
+     * generation process with the output of an product process.
+     *
+     * @param constantGenerationProcess ConstantGenerationProcess
+     * @param productInputProcess ProductProcess
+     */
     private void JoinInput_ConstantGeneration_Product(ConstantGenerationProcess constantGenerationProcess, ProductProcess productInputProcess) {
         if (!constantGenerationProcess.isQueueInputAssigned()) { //if the input 1 of the constantGeneration process still without assignation
             if (!productInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
@@ -299,6 +387,14 @@ public class ConstantGenerationProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the constant
+     * generation process with the output of another constant generation
+     * process.
+     *
+     * @param constantGenerationProcess ConstantGenerationProcess
+     * @param constantGenerationInputProcess ConstantGenerationProcess
+     */
     private void JoinInput_ConstantGeneration_ConstantGeneration(ConstantGenerationProcess constantGenerationProcess, ConstantGenerationProcess constantGenerationInputProcess) {
         if (!constantGenerationProcess.isQueueInputAssigned()) { //if the input 1 of the constantGeneration process still without assignation
             if (!constantGenerationInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
@@ -309,6 +405,13 @@ public class ConstantGenerationProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the constant
+     * generation process with the output of a sink process.
+     *
+     * @param constantGenerationProcess ConstantGenerationProcess
+     * @param sinkInputProcess SinkProcess
+     */
     private void JoinInput_ConstantGeneration_Sink(ConstantGenerationProcess constantGenerationProcess, SinkProcess sinkInputProcess) {
         if (!constantGenerationProcess.isQueueInputAssigned()) { //if the input 1 of the constantGeneration process still without assignation
             if (!sinkInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
@@ -319,12 +422,26 @@ public class ConstantGenerationProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the constant
+     * generation process with the output of a queue.
+     *
+     * @param constantGenerationProcess ConstantGenerationProcess
+     * @param model HardwareModel
+     */
     private void JoinInput_ConstantGeneration_Queue(ConstantGenerationProcess constantGenerationProcess, HardwareModel model) {
 
         constantGenerationProcess.setQueueIn(model.getInputQueue());
         constantGenerationProcess.setConstantGeneration(model.isConstantGeneration());
     }
 
+    /**
+     * This method makes the relation between the output of the constant
+     * generation process with the input of a duplication process
+     *
+     * @param constantGenerationProcess ConstantGenerationProcess
+     * @param duplicationOutputProcess DuplicationProcess
+     */
     private void JoinOutput_ConstantGeneration_Duplication(ConstantGenerationProcess constantGenerationProcess, DuplicationProcess duplicationOutputProcess) {
         if (!constantGenerationProcess.isQueueOutputAssigned()) { //if the output of the constantGeneration process still without assignation
             if (!duplicationOutputProcess.isQueueInputAssigned()) { //if ouput1 of the duplication process still without assignation
@@ -335,6 +452,13 @@ public class ConstantGenerationProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the output of the constant
+     * generation process with the input of a add process
+     *
+     * @param constantGenerationProcess ConstantGenerationProcess
+     * @param addOutputProcess AddProcess
+     */
     private void JoinOutput_ConstantGeneration_Add(ConstantGenerationProcess constantGenerationProcess, AddProcess addOutputProcess) {
         if (!constantGenerationProcess.isQueueOutputAssigned()) { //if the input 1 of the constantGeneration process still without assignation
             if (!addOutputProcess.isQueue1InputAssigned()) { //if ouput of the constantGeneration process still without assignation
@@ -349,6 +473,13 @@ public class ConstantGenerationProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the output of the constant
+     * generation process with the input of a product process
+     *
+     * @param constantGenerationProcess ConstantGenerationProcess
+     * @param productOutputProcess ProductProcess
+     */
     private void JoinOutput_ConstantGeneration_Product(ConstantGenerationProcess constantGenerationProcess, ProductProcess productOutputProcess) {
         if (!constantGenerationProcess.isQueueOutputAssigned()) { //if the input 1 of the constantGeneration process still without assignation
             if (!productOutputProcess.isQueue1InputAssigned()) { //if ouput of the constantGeneration process still without assignation
@@ -363,6 +494,13 @@ public class ConstantGenerationProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the output of the cpnstant
+     * generation process with the input of another constant generation process
+     *
+     * @param constantGenerationProcess ConstantGenerationProcess
+     * @param constantGenerationOutputProcess ConstantGenerationProcess
+     */
     private void JoinOutput_ConstantGeneration_ConstantGeneration(ConstantGenerationProcess constantGenerationProcess, ConstantGenerationProcess constantGenerationOutputProcess) {
         if (!constantGenerationProcess.isQueueOutputAssigned()) { //if the input 1 of the constantGeneration process still without assignation
             if (!constantGenerationOutputProcess.isQueueInputAssigned()) { //if ouput of the product process still without assignation
@@ -374,6 +512,13 @@ public class ConstantGenerationProcess extends Thread {
 
     }
 
+    /**
+     * This method makes the relation between the output of the constant
+     * generation process with the input of a sink process
+     *
+     * @param constantGenerationProcess ConstantGenerationProcess
+     * @param sinkOutputProcess SinkProcess
+     */
     private void JoinOutput_ConstantGeneration_Sink(ConstantGenerationProcess constantGenerationProcess, SinkProcess sinkOutputProcess) {
         if (!constantGenerationProcess.isQueueOutputAssigned()) { //if the input 1 of the constantGeneration process still without assignation
             if (!sinkOutputProcess.isQueueInputAssigned()) { //if ouput of the product process still without assignation

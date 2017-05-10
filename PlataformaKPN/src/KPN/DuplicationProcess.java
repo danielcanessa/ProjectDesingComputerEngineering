@@ -8,57 +8,101 @@ package KPN;
 import static KPN.KPNNetwork.searchThread;
 import java.util.LinkedList;
 import java.util.Queue;
+import static plataformakpn.GUI.hardwareGraph;
 import static plataformakpn.GUI.userThreadDebuging;
 import plataformakpn.HardwareModel;
 
 /**
+ * This class contains the definition and the methods of the duplication process
+ * thread.
  *
- * @author Daniel
+ * @author Daniel Canessa Valverde
+ * @version 1.0
  */
 public class DuplicationProcess extends Thread {
 
-    private Queue<Float> queueIn1;
-    private Queue<Float> queueOut2;
+    /**
+     * This variable represents the input queue of the duplication process.
+     */
+    private Queue<Float> queueIn;
+    /**
+     * This variable represents the output queue 1 of the duplication process.
+     */
     private Queue<Float> queueOut1;
+    /**
+     * This variable represents the output queue 2 of the duplication process.
+     */
+    private Queue<Float> queueOut2;
+    /**
+     * This variable is used as thread stop condition.
+     */
     private boolean killThread;
+    /**
+     * This variable is used as thread pause condition.
+     */
     private boolean pauseThread;
-
+    /**
+     * This variable is used to know the name of the thread how share output
+     * queue with the duplication process input queue.
+     */
     private String queueInputAssigned;
+    /**
+     * This variable is used to know the name of the thread how share input
+     * queue with the duplication process output queue 1.
+     */
     private String queueOutput1Assigned;
+    /**
+     * This variable is used to know the name of the thread how share input
+     * queue with the duplication process output queue 2.
+     */
     private String queueOutput2Assigned;
-    
+    /**
+     * This variable is used to know the output assigned in the XML generated.
+     */
     private int XMLOutput;
 
+    /**
+     * Class constructor.
+     */
     public DuplicationProcess() {
-        this.queueIn1 = new LinkedList<>();
+        this.queueIn = new LinkedList<>();
         this.queueOut2 = new LinkedList<>();
         this.queueOut1 = new LinkedList<>();
         this.killThread = false;
         this.queueInputAssigned = "";
         this.queueOutput1Assigned = "";
         this.queueOutput2Assigned = "";
-        
-        XMLOutput=0;
+
+        XMLOutput = 0;
 
     }
 
+    /**
+     * This method implements the logic of the duplication process.
+     */
     @Override
     public void run() {
+        //stop condition
         while (!killThread) {
             try {
+                //iteration control condition
                 while (!isPauseThread()) {
-                    if (queueIn1.size() > 0) {
-                        float value = queueIn1.poll();
+                    //logic
+                    if (queueIn.size() > 0) {
+                        float value = queueIn.poll();
                         this.queueOut1.add(value);
                         this.queueOut2.add(value);
                     }
-
-                    //race condition
-                     if (userThreadDebuging) {
+                    //just in case infinite loop
+                    if (userThreadDebuging) {
                         setPauseThread(true);
                     }
-
+                    //waiting for another threads
+                    Thread.sleep(200);
+                    //updating GUI
+                    updateToolTip();
                 }
+                //join threads
                 Thread.sleep(100);
 
             } catch (Exception ex) {
@@ -67,6 +111,17 @@ public class DuplicationProcess extends Thread {
         }
     }
 
+    /**
+     * This method updates the tooltip message of the labels with the most
+     * updated information about the queues.
+     */
+    public void updateToolTip() {
+        hardwareGraph.updateToolTip(this.getName(), this.getQueueIn(), null, this.getQueueOut1(), this.getQueueOut2());
+    }
+
+     /**
+     * This method prints in the console the input queues and the output queue
+     */
     public void printQueues() {
         System.out.println("Duplication:");
         System.out.println("    queueIn:" + this.getQueueIn());
@@ -75,22 +130,27 @@ public class DuplicationProcess extends Thread {
         System.out.println("----------------------------------------");
     }
 
+     /**
+     * This method established the name of the current thread.
+     *
+     * @param threadName
+     */
     public void setThreadName(String threadName) {
         this.setName(threadName);
     }
 
     /**
-     * @return the queueIn1
+     * @return the queueIn
      */
     public Queue<Float> getQueueIn() {
-        return queueIn1;
+        return queueIn;
     }
 
     /**
-     * @param queueIn1 the queueIn1 to set
+     * @param queueIn the queueIn to set
      */
-    public void setQueueIn1(Queue<Float> queueIn1) {
-        this.queueIn1 = queueIn1;
+    public void setQueueIn(Queue<Float> queueIn) {
+        this.queueIn = queueIn;
     }
 
     /**
@@ -213,7 +273,15 @@ public class DuplicationProcess extends Thread {
     public String getQueueOutput2Assigned() {
         return queueOutput2Assigned;
     }
-    
+
+    /**
+     * This method creates the join beetween the queues of each constant
+     * duplication process, with all the other methods, guided by the hardware
+     * graph model.
+     *
+     * @param name String
+     * @param model HardwareModel
+     */
     public void joinDuplicationProcess(String name, HardwareModel model) {
 
         DuplicationProcess duplicationProcess = (DuplicationProcess) searchThread(name); //current duplication process
@@ -228,27 +296,26 @@ public class DuplicationProcess extends Thread {
                     DuplicationProcess duplicationInputProcess = (DuplicationProcess) searchThread(inputName); //getting the process
                     JoinInput_Duplication_Duplication(duplicationProcess, duplicationInputProcess);
                     break;
-                case 1: //duplication process case
+                case 1: //add process case
                     AddProcess addInputProcess = (AddProcess) searchThread(inputName); //getting the process
                     JoinInput_Duplication_Add(duplicationProcess, addInputProcess);
                     break;
-                case 2:
+                case 2: //product process case
                     ProductProcess productInputProcess = (ProductProcess) searchThread(inputName); //getting the process
                     JoinInput_Duplication_Product(duplicationProcess, productInputProcess);
                     break;
-                case 3:
+                case 3: //constant generation process case
                     ConstantGenerationProcess constantGenerationInputProcess = (ConstantGenerationProcess) searchThread(inputName); //getting the process
                     JoinInput_Duplication_ConstantGeneration(duplicationProcess, constantGenerationInputProcess);
                     break;
-                case 4:
+                case 4: //sink process case
                     SinkProcess SinkInputProcess = (SinkProcess) searchThread(inputName); //getting the process
                     JoinInput_Duplication_Sink(duplicationProcess, SinkInputProcess);
                     break;
             }
 
         }
-        for (int j = 0; j < model.getOutputs().size(); j++) {
-
+        for (int j = 0; j < model.getOutputs().size(); j++) { //join the process with the outputs
             String outputName = model.getOutputs().get(j).getName();
             int hardwareTypeOutput = KPNNetwork.getHardwareTypeByName(outputName);
 
@@ -257,19 +324,19 @@ public class DuplicationProcess extends Thread {
                     DuplicationProcess duplicationOutputProcess = (DuplicationProcess) searchThread(outputName); //getting the process
                     JoinOutput_Duplication_Duplication(duplicationProcess, duplicationOutputProcess);
                     break;
-                case 1: //duplication process case
+                case 1: //add process case
                     AddProcess addOutputProcess = (AddProcess) searchThread(outputName); //getting the process
                     JoinOutput_Duplication_Add(duplicationProcess, addOutputProcess);
                     break;
-                case 2:
+                case 2: //product process case
                     ProductProcess productOutputProcess = (ProductProcess) searchThread(outputName); //getting the process
                     JoinOutput_Duplication_Product(duplicationProcess, productOutputProcess);
                     break;
-                case 3:
+                case 3: //constant generation process case
                     ConstantGenerationProcess constantGenerationOutputProcess = (ConstantGenerationProcess) searchThread(outputName); //getting the process
                     JoinOutput_Duplication_ConstantGeneration(duplicationProcess, constantGenerationOutputProcess);
                     break;
-                case 4:
+                case 4: //sink process case
                     SinkProcess sinkOutputProcess = (SinkProcess) searchThread(outputName); //getting the process
                     JoinOutput_Duplication_Sink(duplicationProcess, sinkOutputProcess);
                     break;
@@ -277,14 +344,21 @@ public class DuplicationProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the duplication
+     * process with the output of another duplication process.
+     *
+     * @param duplicationProcess DuplicationProcess
+     * @param duplicationInputProcess DuplicationProcess
+     */
     private void JoinInput_Duplication_Duplication(DuplicationProcess duplicationProcess, DuplicationProcess duplicationInputProcess) {
         if (!duplicationProcess.isQueueInputAssigned()) { //if the input 1 of the duplication process still without assignation
             if (!duplicationInputProcess.isQueueOutput1Assigned()) { //if ouput1 of the duplication process still without assignation
-                duplicationProcess.setQueueIn1(duplicationInputProcess.getQueueOut1());
+                duplicationProcess.setQueueIn(duplicationInputProcess.getQueueOut1());
                 duplicationInputProcess.setQueueOutput1Assigned(duplicationProcess.getName());
                 duplicationProcess.setQueueInputAssigned(duplicationInputProcess.getName());
             } else if (!duplicationInputProcess.isQueueOutput2Assigned()) { //if ouput2 of the duplication process still without assignation
-                duplicationProcess.setQueueIn1(duplicationInputProcess.getQueueOut2());
+                duplicationProcess.setQueueIn(duplicationInputProcess.getQueueOut2());
                 duplicationInputProcess.setQueueOutput2Assigned(duplicationProcess.getName());
                 duplicationProcess.setQueueInputAssigned(duplicationInputProcess.getName());
             }
@@ -292,46 +366,81 @@ public class DuplicationProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the duplication
+     * process with the output of an add process.
+     *
+     * @param duplicationProcess DuplicationProcess
+     * @param addInputProcess AddProcess
+     */
     private void JoinInput_Duplication_Add(DuplicationProcess duplicationProcess, AddProcess addInputProcess) {
         if (!duplicationProcess.isQueueInputAssigned()) { //if the input 1 of the duplication process still without assignation
             if (!addInputProcess.isQueueOutputAssigned()) { //if ouput of the duplication process still without assignation
-                duplicationProcess.setQueueIn1(addInputProcess.getQueueOut());
+                duplicationProcess.setQueueIn(addInputProcess.getQueueOut());
                 addInputProcess.setQueueOutputAssigned(duplicationProcess.getName());
                 duplicationProcess.setQueueInputAssigned(addInputProcess.getName());
             }
         }
     }
 
+    /**
+     * This method makes the relation between the input of the duplication
+     * process with the output of a product process.
+     *
+     * @param duplicationProcess DuplicationProcess
+     * @param productInputProcess ProductProcess
+     */
     private void JoinInput_Duplication_Product(DuplicationProcess duplicationProcess, ProductProcess productInputProcess) {
         if (!duplicationProcess.isQueueInputAssigned()) { //if the input 1 of the duplication process still without assignation
             if (!productInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
-                duplicationProcess.setQueueIn1(productInputProcess.getQueueOut());
+                duplicationProcess.setQueueIn(productInputProcess.getQueueOut());
                 productInputProcess.setQueueOutputAssigned(duplicationProcess.getName());
                 duplicationProcess.setQueueInputAssigned(productInputProcess.getName());
             }
         }
     }
 
+    /**
+     * This method makes the relation between the input of the duplication
+     * process with the output of a constant generation process.
+     *
+     * @param duplicationProcess DuplicationProcess
+     * @param constantGenerationInputProcess ConstantGenerationProcess
+     */
     private void JoinInput_Duplication_ConstantGeneration(DuplicationProcess duplicationProcess, ConstantGenerationProcess constantGenerationInputProcess) {
         if (!duplicationProcess.isQueueInputAssigned()) { //if the input 1 of the duplication process still without assignation
             if (!constantGenerationInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
-                duplicationProcess.setQueueIn1(constantGenerationInputProcess.getQueueOut());
+                duplicationProcess.setQueueIn(constantGenerationInputProcess.getQueueOut());
                 constantGenerationInputProcess.setQueueOutputAssigned(duplicationProcess.getName());
                 duplicationProcess.setQueueInputAssigned(constantGenerationInputProcess.getName());
             }
         }
     }
 
+    /**
+     * This method makes the relation between the input of the duplication
+     * process with the output of a sink process.
+     *
+     * @param duplicationProcess DuplicationProcess
+     * @param SinkInputProcess SinkProcess
+     */
     private void JoinInput_Duplication_Sink(DuplicationProcess duplicationProcess, SinkProcess SinkInputProcess) {
         if (!duplicationProcess.isQueueInputAssigned()) { //if the input 1 of the duplication process still without assignation
             if (!SinkInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
-                duplicationProcess.setQueueIn1(SinkInputProcess.getQueueOut());
+                duplicationProcess.setQueueIn(SinkInputProcess.getQueueOut());
                 SinkInputProcess.setQueueOutputAssigned(duplicationProcess.getName());
                 duplicationProcess.setQueueInputAssigned(SinkInputProcess.getName());
             }
         }
     }
 
+    /**
+     * This method makes the relation between the output of the duplication
+     * process with the input of another duplication process
+     *
+     * @param duplicationProcess DuplicationProcess
+     * @param duplicationOutputProcess DuplicationProcess
+     */
     private void JoinOutput_Duplication_Duplication(DuplicationProcess duplicationProcess, DuplicationProcess duplicationOutputProcess) {
         if (!duplicationProcess.isQueueOutput1Assigned()) { //if the output of the duplication process still without assignation
             if (!duplicationOutputProcess.isQueueInputAssigned()) { //if ouput1 of the duplication process still without assignation
@@ -348,6 +457,13 @@ public class DuplicationProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the output of the duplication
+     * process with the input of an add process
+     *
+     * @param duplicationProcess DuplicationProcess
+     * @param addOutputProcess AddProcess
+     */
     private void JoinOutput_Duplication_Add(DuplicationProcess duplicationProcess, AddProcess addOutputProcess) {
         if (!duplicationProcess.isQueueOutput1Assigned()) { //if the input 1 of the duplication process still without assignation
             if (!addOutputProcess.isQueue1InputAssigned()) { //if ouput of the duplication process still without assignation
@@ -374,6 +490,13 @@ public class DuplicationProcess extends Thread {
 
     }
 
+    /**
+     * This method makes the relation between the output of the duplication
+     * process with the input of a product process
+     *
+     * @param duplicationProcess DuplicationProcess
+     * @param productOutputProcess ProductProcess
+     */
     private void JoinOutput_Duplication_Product(DuplicationProcess duplicationProcess, ProductProcess productOutputProcess) {
         if (!duplicationProcess.isQueueOutput1Assigned()) { //if the input 1 of the duplication process still without assignation
             if (!productOutputProcess.isQueue1InputAssigned()) { //if ouput of the duplication process still without assignation
@@ -400,6 +523,13 @@ public class DuplicationProcess extends Thread {
 
     }
 
+    /**
+     * This method makes the relation between the output of the duplication
+     * process with the input of a constant generation process
+     *
+     * @param duplicationProcess DuplicationProcess
+     * @param constantGenerationOutputProcess ConstantGenerationProcess
+     */
     private void JoinOutput_Duplication_ConstantGeneration(DuplicationProcess duplicationProcess, ConstantGenerationProcess constantGenerationOutputProcess) {
         if (!duplicationProcess.isQueueOutput1Assigned()) { //if the input 1 of the duplication process still without assignation
             if (!constantGenerationOutputProcess.isQueueInputAssigned()) { //if ouput of the product process still without assignation
@@ -407,19 +537,24 @@ public class DuplicationProcess extends Thread {
                 constantGenerationOutputProcess.setQueueInputAssigned(duplicationProcess.getName());
                 duplicationProcess.setQueueOutput1Assigned(constantGenerationOutputProcess.getName());
             }
-        }
-        else if(!duplicationProcess.isQueueOutput2Assigned())
-        {
-              if (!constantGenerationOutputProcess.isQueueInputAssigned()) { //if ouput of the product process still without assignation
+        } else if (!duplicationProcess.isQueueOutput2Assigned()) {
+            if (!constantGenerationOutputProcess.isQueueInputAssigned()) { //if ouput of the product process still without assignation
                 duplicationProcess.setQueueOut2(constantGenerationOutputProcess.getQueueIn());
                 constantGenerationOutputProcess.setQueueInputAssigned(duplicationProcess.getName());
                 duplicationProcess.setQueueOutput2Assigned(constantGenerationOutputProcess.getName());
             }
-            
+
         }
 
     }
 
+    /**
+     * This method makes the relation between the output of the duplication
+     * process with the input of a sink process
+     *
+     * @param duplicationProcess DuplicationProcess
+     * @param sinkOutputProcess SinkProcess
+     */
     private void JoinOutput_Duplication_Sink(DuplicationProcess duplicationProcess, SinkProcess sinkOutputProcess) {
         if (!duplicationProcess.isQueueOutput1Assigned()) { //if the input 1 of the duplication process still without assignation
             if (!sinkOutputProcess.isQueueInputAssigned()) { //if ouput of the product process still without assignation
@@ -427,8 +562,7 @@ public class DuplicationProcess extends Thread {
                 sinkOutputProcess.setQueueInputAssigned(duplicationProcess.getName());
                 duplicationProcess.setQueueOutput1Assigned(sinkOutputProcess.getName());
             }
-        }
-        else if (!duplicationProcess.isQueueOutput2Assigned()) { //if the input 1 of the duplication process still without assignation
+        } else if (!duplicationProcess.isQueueOutput2Assigned()) { //if the input 1 of the duplication process still without assignation
             if (!sinkOutputProcess.isQueueInputAssigned()) { //if ouput of the product process still without assignation
                 duplicationProcess.setQueueOut2(sinkOutputProcess.getQueueIn());
                 sinkOutputProcess.setQueueInputAssigned(duplicationProcess.getName());
@@ -444,13 +578,13 @@ public class DuplicationProcess extends Thread {
     public int getXMLOutput() {
         switch (XMLOutput) {
             case 0:
-                XMLOutput=1;
+                XMLOutput = 1;
                 break;
             case 1:
-                XMLOutput=2;
+                XMLOutput = 2;
                 break;
             case 2:
-                XMLOutput=1;
+                XMLOutput = 1;
                 break;
             default:
                 break;

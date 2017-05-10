@@ -72,9 +72,6 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="jTextFieldFifo">
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTextFieldFifoActionPerformed"/>
-              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="jButtonApplyQueue">
               <Properties>
@@ -312,13 +309,13 @@
       <Connection code="Toolkit.getDefaultToolkit().getImage(getClass().getResource(&quot;/Images/icon.png&quot;))" type="code"/>
     </Property>
     <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[1200, 770]"/>
+      <Dimension value="[1200, 790]"/>
     </Property>
     <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[1200, 770]"/>
+      <Dimension value="[1200, 790]"/>
     </Property>
     <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[1200, 770]"/>
+      <Dimension value="[1200, 790]"/>
     </Property>
     <Property name="resizable" type="boolean" value="false"/>
   </Properties>
@@ -352,7 +349,7 @@
           <Color blue="ff" green="ff" red="ff" type="rgb"/>
         </Property>
         <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-          <Color id="Default Cursor"/>
+          <Color id="Cursor Por defecto"/>
         </Property>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[1200, 700]"/>
@@ -506,6 +503,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/Images/add48x48.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Insert Adder Abstraction"/>
           </Properties>
           <Events>
             <EventHandler event="mouseDragged" listener="java.awt.event.MouseMotionListener" parameters="java.awt.event.MouseEvent" handler="jButtonAddMouseDragged"/>
@@ -526,6 +524,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/Images/union48x48.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Make relation"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonRelationsActionPerformed"/>
@@ -544,6 +543,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/Images/trash48x48.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Delete Abstraction"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonTrashActionPerformed"/>
@@ -562,6 +562,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/Images/constant48x48.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Insert Constant Generator Abstraction"/>
           </Properties>
           <Events>
             <EventHandler event="mouseDragged" listener="java.awt.event.MouseMotionListener" parameters="java.awt.event.MouseEvent" handler="jButtonConstantGenerationMouseDragged"/>
@@ -582,6 +583,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/Images/duplication48x48.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Insert Duplicator Abstraction"/>
           </Properties>
           <Events>
             <EventHandler event="mouseDragged" listener="java.awt.event.MouseMotionListener" parameters="java.awt.event.MouseEvent" handler="jButtonDuplicationMouseDragged"/>
@@ -602,6 +604,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/Images/sink48x48.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Insert Sink Abstraction"/>
           </Properties>
           <Events>
             <EventHandler event="mouseDragged" listener="java.awt.event.MouseMotionListener" parameters="java.awt.event.MouseEvent" handler="jButtonSinkMouseDragged"/>
@@ -635,6 +638,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/Images/product48x48.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Insert Producer Abstraction"/>
           </Properties>
           <Events>
             <EventHandler event="mouseDragged" listener="java.awt.event.MouseMotionListener" parameters="java.awt.event.MouseEvent" handler="jButtonProductMouseDragged"/>
@@ -655,6 +659,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/Images/queue48x48.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Insert Queue Abstraction"/>
           </Properties>
           <Events>
             <EventHandler event="mouseDragged" listener="java.awt.event.MouseMotionListener" parameters="java.awt.event.MouseEvent" handler="jButtonQueueMouseDragged"/>
@@ -745,6 +750,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/Images/view48x48.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Insert Viewer Abstraction"/>
           </Properties>
           <Events>
             <EventHandler event="mouseDragged" listener="java.awt.event.MouseMotionListener" parameters="java.awt.event.MouseEvent" handler="jButtonViewMouseDragged"/>
@@ -765,6 +771,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/Images/print.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Print the KPN"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="printKPNActionPerformed"/>
@@ -783,6 +790,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/Images/start.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Make a new iteration"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="iterateKPNActionPerformed"/>
@@ -801,6 +809,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/Images/createNetwork.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Initialize KPN"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="createKPNActionPerformed"/>
@@ -819,6 +828,7 @@
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
               <Image iconType="3" name="/Images/export.png"/>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Export the KPN to XML"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="exportKPNActionPerformed"/>

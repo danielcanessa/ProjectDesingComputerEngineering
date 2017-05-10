@@ -11,14 +11,14 @@ import java.awt.event.*;
 import javax.swing.*;
 import plataformakpn.HardwareModel;
 import plataformakpn.GUI;
-import static plataformakpn.GUI.selectedJLabel;
 import static plataformakpn.GUI.hardwareGraph;
-import static plataformakpn.GUI.labelsView;
-import static plataformakpn.GUI.relationsFlag;
-import static plataformakpn.GUI.removeFlag;
 import static plataformakpn.GUI.selectedColor;
-import static plataformakpn.GUI.textFieldView;
-import static plataformakpn.GUI.selectedModelJDialog;
+import static plataformakpn.GUI.creatingHardwareRelationsFlag;
+import static plataformakpn.GUI.selectedQueueJDialog;
+import static plataformakpn.GUI.removingHardwareFlag;
+import static plataformakpn.GUI.lastSelectedHardware;
+import static plataformakpn.GUI.JTextFieldArrayView;
+import static plataformakpn.GUI.JLabelArrayView;
 
 public class DragLabel extends JLabel {
 
@@ -49,7 +49,7 @@ public class DragLabel extends JLabel {
         setBounds(posX, posY, 48, 48);
         int id = hardwareGraph.getHardwareIdentifier();
         setName("ID: " + id + ", Name: " + name);
-        setToolTipText(toolTip + id);
+        setToolTipText("<html>" + toolTip + id + ".</html>");
     }
 
     protected class DragProcessor extends MouseAdapter implements MouseListener, MouseMotionListener {
@@ -64,8 +64,8 @@ public class DragLabel extends JLabel {
 
         private void makeVisibleJDialogFifo() {
             for (int i = 0; i < 4; i++) {
-                textFieldView.get(i).setVisible(true);
-                labelsView.get(i).setVisible(true);
+                JTextFieldArrayView.get(i).setVisible(true);
+                JLabelArrayView.get(i).setVisible(true);
             }
 
         }
@@ -80,7 +80,7 @@ public class DragLabel extends JLabel {
 
                 //constant generation process, jDialogDelay
                 if (model.getHardwareType() == 3) {
-                    selectedModelJDialog = model;
+                    selectedQueueJDialog = model;
 
                     spinner.setValue(model.getDelayIterations());
                     jDialog.setLocationRelativeTo(label);
@@ -92,7 +92,7 @@ public class DragLabel extends JLabel {
                 } //queue process, jDialogFiFo
                 else if (model.getHardwareType() == 5) {
 
-                    selectedModelJDialog = model;
+                    selectedQueueJDialog = model;
 
                     jTextFieldFifo.setText(model.getInputQueue().toString().replace("[", "").replace("]", ""));
 
@@ -102,70 +102,79 @@ public class DragLabel extends JLabel {
                     jDialog.setVisible(true);
                 } //view process, FDialogView
                 else if (model.getHardwareType() == 6) {
+                    try {
+                        makeVisibleJDialogFifo();
+                        jDialog.setLocationRelativeTo(label);
 
-                    makeVisibleJDialogFifo();
-                    jDialog.setLocationRelativeTo(label);
+                        if (model.getOutputs().get(0) != null) {
+                            String hardware = model.getOutputs().get(0).getName();
+                            if (hardware.contains("duplication")) {
+                                DuplicationProcess thread = (DuplicationProcess) KPNNetwork.searchThread(hardware);
 
-                    if (model.getOutputs().get(0) != null) {
-                        String hardware = model.getOutputs().get(0).getName();
-                        if (hardware.contains("duplication")) {
-                            DuplicationProcess thread = (DuplicationProcess) KPNNetwork.searchThread(hardware);
+                                JLabelArrayView.get(1).setVisible(false);
+                                JTextFieldArrayView.get(1).setVisible(false);
 
-                            labelsView.get(1).setVisible(false);
-                            textFieldView.get(1).setVisible(false);
+                                JTextFieldArrayView.get(0).setText(thread.getQueueIn().toString());
+                                JTextFieldArrayView.get(2).setText(thread.getQueueOut1().toString());
+                                JTextFieldArrayView.get(3).setText(thread.getQueueOut2().toString());
 
-                            textFieldView.get(0).setText(thread.getQueueIn().toString());
-                            textFieldView.get(2).setText(thread.getQueueOut1().toString());
-                            textFieldView.get(3).setText(thread.getQueueOut2().toString());
+                            } else if (hardware.contains("add")) {
+                                AddProcess thread = (AddProcess) KPNNetwork.searchThread(hardware);
 
-                        } else if (hardware.contains("add")) {
-                            AddProcess thread = (AddProcess) KPNNetwork.searchThread(hardware);
+                                JLabelArrayView.get(3).setVisible(false);
+                                JTextFieldArrayView.get(3).setVisible(false);
 
-                            labelsView.get(3).setVisible(false);
-                            textFieldView.get(3).setVisible(false);
+                                JTextFieldArrayView.get(0).setText(thread.getQueueIn1().toString());
+                                JTextFieldArrayView.get(1).setText(thread.getQueueIn2().toString());
+                                JTextFieldArrayView.get(2).setText(thread.getQueueOut().toString());
 
-                            textFieldView.get(0).setText(thread.getQueueIn1().toString());
-                            textFieldView.get(1).setText(thread.getQueueIn2().toString());
-                            textFieldView.get(2).setText(thread.getQueueOut().toString());
+                            } else if (hardware.contains("product")) {
+                                ProductProcess thread = (ProductProcess) KPNNetwork.searchThread(hardware);
 
-                        } else if (hardware.contains("product")) {
-                            ProductProcess thread = (ProductProcess) KPNNetwork.searchThread(hardware);
+                                JLabelArrayView.get(3).setVisible(false);
+                                JTextFieldArrayView.get(3).setVisible(false);
 
-                            labelsView.get(3).setVisible(false);
-                            textFieldView.get(3).setVisible(false);
+                                JTextFieldArrayView.get(0).setText(thread.getQueueIn1().toString());
+                                JTextFieldArrayView.get(1).setText(thread.getQueueIn2().toString());
+                                JTextFieldArrayView.get(2).setText(thread.getQueueOut().toString());
 
-                            textFieldView.get(0).setText(thread.getQueueIn1().toString());
-                            textFieldView.get(1).setText(thread.getQueueIn2().toString());
-                            textFieldView.get(2).setText(thread.getQueueOut().toString());
+                            } else if (hardware.contains("constantGeneration")) {
+                                ConstantGenerationProcess thread = (ConstantGenerationProcess) KPNNetwork.searchThread(hardware);
 
-                        } else if (hardware.contains("constantGeneration")) {
-                            ConstantGenerationProcess thread = (ConstantGenerationProcess) KPNNetwork.searchThread(hardware);
+                                JLabelArrayView.get(1).setVisible(false);
+                                JTextFieldArrayView.get(1).setVisible(false);
+                                JLabelArrayView.get(3).setVisible(false);
+                                JTextFieldArrayView.get(3).setVisible(false);
 
-                            labelsView.get(1).setVisible(false);
-                            textFieldView.get(1).setVisible(false);
-                            labelsView.get(3).setVisible(false);
-                            textFieldView.get(3).setVisible(false);
+                                JTextFieldArrayView.get(0).setText(thread.getQueueIn().toString());
+                                JTextFieldArrayView.get(2).setText(thread.getQueueOut().toString());
+                            } else if (hardware.contains("sink")) {
+                                SinkProcess thread = (SinkProcess) KPNNetwork.searchThread(hardware);
 
-                            textFieldView.get(0).setText(thread.getQueueIn().toString());
-                            textFieldView.get(2).setText(thread.getQueueOut().toString());
-                        } else if (hardware.contains("sink")) {
-                            SinkProcess thread = (SinkProcess) KPNNetwork.searchThread(hardware);
+                                JLabelArrayView.get(1).setVisible(false);
+                                JTextFieldArrayView.get(1).setVisible(false);
+                                JLabelArrayView.get(3).setVisible(false);
+                                JTextFieldArrayView.get(3).setVisible(false);
 
-                            labelsView.get(1).setVisible(false);
-                            textFieldView.get(1).setVisible(false);
-                            labelsView.get(3).setVisible(false);
-                            textFieldView.get(3).setVisible(false);
+                                JTextFieldArrayView.get(0).setText(thread.getQueueIn().toString());
+                                JTextFieldArrayView.get(2).setText(thread.getQueueOut().toString());
+                            }
 
-                            textFieldView.get(0).setText(thread.getQueueIn().toString());
-                            textFieldView.get(2).setText(thread.getQueueOut().toString());
                         }
 
+                        jDialog.setModal(true);
+                        jDialog.pack();
+                        jDialog.setVisible(true);
+
+                    } catch (Exception ex) {
+                        System.out.println(ex.getMessage());
+
+                        JOptionPane.showMessageDialog(jGUI,
+                                "You must initialized the KPN first, also this process has to be connected to some hardware abstraction.",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE
+                        );
                     }
-
-                    jDialog.setModal(true);
-                    jDialog.pack();
-                    jDialog.setVisible(true);
-
                 }
             }
         }
@@ -244,11 +253,11 @@ public class DragLabel extends JLabel {
             deleteHardware(label);
 
             //activating repaint
-            GUI.repaintFlag = true;
+            GUI.repaintWorkSpaceFlag = true;
         }
 
         private void deleteHardware(JLabel label) {
-            if (removeFlag) {
+            if (removingHardwareFlag) {
                 hardwareGraph.remove(label);
             }
         }
@@ -264,21 +273,21 @@ public class DragLabel extends JLabel {
         }
 
         private void createNewRelation(JLabel label) {
-            if (relationsFlag) {
+            if (creatingHardwareRelationsFlag) {
 
-                if (selectedJLabel == null) {
-                    selectedJLabel = label;
-                    selectedJLabel.setBorder(BorderFactory.createLineBorder(selectedColor));
+                if (lastSelectedHardware == null) {
+                    lastSelectedHardware = label;
+                    lastSelectedHardware.setBorder(BorderFactory.createLineBorder(selectedColor));
 
                 } else {
 
-                    HardwareModel modelSource = getModel(selectedJLabel);
+                    HardwareModel modelSource = getModel(lastSelectedHardware);
                     HardwareModel modelDest = getModel(label);
 
                     System.out.println(verifyModels(modelSource, modelDest));
                     if (verifyModels(modelSource, modelDest)) {
                         modelSource.getOutputs().add(label);
-                        modelDest.getInputs().add(selectedJLabel);
+                        modelDest.getInputs().add(lastSelectedHardware);
                     } else {
                         //custom title, error icon          
 
@@ -290,8 +299,8 @@ public class DragLabel extends JLabel {
 
                     }
 
-                    selectedJLabel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-                    selectedJLabel = null;
+                    lastSelectedHardware.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                    lastSelectedHardware = null;
 
                 }
             }
