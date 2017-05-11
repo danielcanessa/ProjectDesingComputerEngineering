@@ -11,9 +11,10 @@ import static KPN.KPNNetwork.duplicationProcessList;
 import static KPN.KPNNetwork.productProcessList;
 import static KPN.KPNNetwork.sinkProcessList;
 
-
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,11 +31,92 @@ import org.w3c.dom.Element;
  *
  * @author Daniel Canessa Valverde
  * @version 1.0
- * 
+ *
  */
 public class XML {
-    
-    
+
+    private int fifoCount;
+
+    private List<FifoModel> fifoList;
+
+    public XML() {
+        this.fifoList = new ArrayList<>();
+        this.fifoCount = 0;
+        fillFifoList();
+
+    }
+
+    private FifoModel searchFifo(String name) {
+        for (int i = 0; i < fifoList.size(); i++) {
+            if (fifoList.get(i).hardwareName.equals(name)) {
+                return fifoList.get(i);
+            }
+
+        }
+        return null;
+    }
+
+    private void fillFifoList() {
+        fifoCount = addProcessList.size() + productProcessList.size()
+                + duplicationProcessList.size() + sinkProcessList.size()
+                + constantGenerationProcessList.size();
+
+        for (int i = 0; i < addProcessList.size(); i++) {
+            FifoModel model = new FifoModel();
+            model.hardwareName = addProcessList.get(i).getName();
+            model.idFifo1 = this.getFifoCount();
+            fifoList.add(model);
+        }
+        for (int i = 0; i < productProcessList.size(); i++) {
+            FifoModel model = new FifoModel();
+            model.hardwareName = productProcessList.get(i).getName();
+            model.idFifo1 = this.getFifoCount();
+            fifoList.add(model);
+        }
+        for (int i = 0; i < duplicationProcessList.size(); i++) {
+            FifoModel model = new FifoModel();
+            model.hardwareName = duplicationProcessList.get(i).getName();
+            model.idFifo1 = this.getFifoCount();
+            model.idFifo2 = this.getFifoCount();
+            fifoList.add(model);
+        }
+        for (int i = 0; i < sinkProcessList.size(); i++) {
+            FifoModel model = new FifoModel();
+            model.hardwareName = sinkProcessList.get(i).getName();
+            model.idFifo1 = this.getFifoCount();
+            fifoList.add(model);
+        }
+        for (int i = 0; i < constantGenerationProcessList.size(); i++) {
+            FifoModel model = new FifoModel();
+            model.hardwareName = constantGenerationProcessList.get(i).getName();
+            model.idFifo1 = this.getFifoCount();
+            fifoList.add(model);
+        }
+
+    }
+
+    private void insertEntry(Document doc, Element module, String element, String tagName) {
+        Element tag;
+        FifoModel model = searchFifo(element);
+        if (element.contains("duplication")) {
+            tag = doc.createElement("tagName");
+            if (model.getOutput() == 1) {
+                tag.appendChild(doc.createTextNode("fifo_" + model.idFifo1
+                        + "_1"));
+            } else {
+                tag.appendChild(doc.createTextNode("fifo_" + model.idFifo2
+                        + "_1"));
+            }
+
+        } else {
+            tag = doc.createElement("tagName");
+            tag.appendChild(doc.createTextNode("fifo_" + model.idFifo1 + "_1"));
+
+        }
+
+        module.appendChild(tag);
+    }
+
     private void addAdderToXML(Document doc, Element rootElement) {
         for (int i = 0; i < addProcessList.size(); i++) {
             // staff elements
@@ -49,36 +131,18 @@ public class XML {
             module.setAttribute("elements", "");
 
             //tags
-            Element tag = null;
+            String element;
 
-            String element = addProcessList.get(i).getQueue1InputAssigned();
+            element = addProcessList.get(i).getQueue1InputAssigned();
+
             if (!element.equals("")) {
-                if (element.contains("duplication")) {
-                    tag = doc.createElement("entry_1");
-                    tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element)
-                            + "_" + this.getDuplicationProcessOutput(addProcessList.get(i).getName(), element)));
-
-                } else {
-                    tag = doc.createElement("entry_1");
-                    tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element) + "_" + "_1"));
-
-                }
-                module.appendChild(tag);
+                this.insertEntry(doc, module, element, "entry_1");
 
             }
+
             element = addProcessList.get(i).getQueue2InputAssigned();
             if (!element.equals("")) {
-                if (element.contains("duplication")) {
-                    tag = doc.createElement("entry_2");
-                    tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element)
-                            + "_" + this.getDuplicationProcessOutput(addProcessList.get(i).getName(), element)));
-
-                } else {
-                    tag = doc.createElement("entry_2");
-                    tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element) + "_" + "_1"));
-
-                }
-                module.appendChild(tag);
+                this.insertEntry(doc, module, element, "entry_2");
             }
 
         }
@@ -97,42 +161,24 @@ public class XML {
             module.setAttribute("outputs", "1");
             module.setAttribute("elements", "");
 
-            //tags
-            Element tag = null;
+            //tags    
+            String element;
+            element = productProcessList.get(i).getQueue1InputAssigned();
 
-            String element = productProcessList.get(i).getQueue1InputAssigned();
             if (!element.equals("")) {
-                if (element.contains("duplication")) {
-                    tag = doc.createElement("entry_1");
-                    tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element)
-                            + "_" + this.getDuplicationProcessOutput(productProcessList.get(i).getName(), element)));
-
-                } else {
-                    tag = doc.createElement("entry_1");
-                    tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element) + "_" + "_1"));
-
-                }
-                module.appendChild(tag);
+                this.insertEntry(doc, module, element, "entry_1");
             }
 
             element = productProcessList.get(i).getQueue2InputAssigned();
             if (!element.equals("")) {
-                if (element.contains("duplication")) {
-                    tag = doc.createElement("entry_2");
-                    tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element)
-                            + "_" + this.getDuplicationProcessOutput(productProcessList.get(i).getName(), element)));
-                } else {
-                    tag = doc.createElement("entry_2");
-                    tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element) + "_" + "_1"));
-                }
-                module.appendChild(tag);
+                this.insertEntry(doc, module, element, "entry_2");
             }
 
         }
     }
 
     private void addDuplicationToXML(Document doc, Element rootElement) {
-        for (int i = 0; i < KPNNetwork.duplicationProcessList.size(); i++) {
+        for (int i = 0; i < duplicationProcessList.size(); i++) {
             // staff elements
             Element module = doc.createElement("module");
             rootElement.appendChild(module);
@@ -145,27 +191,17 @@ public class XML {
             module.setAttribute("elements", "");
 
             //tags
-            Element tag = null;
-
-            String element = duplicationProcessList.get(i).getQueueInputAssigned();
+            String element;
+            element = duplicationProcessList.get(i).getQueueInputAssigned();
             if (!element.equals("")) {
-                if (element.contains("duplication")) {
-                    tag = doc.createElement("entry_1");
-                    tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element)
-                            + "_" + this.getDuplicationProcessOutput(duplicationProcessList.get(i).getName(), element)));
-
-                } else {
-                    tag = doc.createElement("entry_1");
-                    tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element) + "_" + "_1"));
-
-                }
-                module.appendChild(tag);
+                this.insertEntry(doc, module, element, "entry_1");
             }
+
         }
     }
 
     private void addSinkToXML(Document doc, Element rootElement) {
-        for (int i = 0; i < KPNNetwork.sinkProcessList.size(); i++) {
+        for (int i = 0; i < sinkProcessList.size(); i++) {
             // staff elements
             Element module = doc.createElement("module");
             rootElement.appendChild(module);
@@ -180,33 +216,23 @@ public class XML {
 
             //tags
             Element tag = null;
-
-            String element = sinkProcessList.get(i).getQueueInputAssigned();
+            String element;
+            element = sinkProcessList.get(i).getQueueInputAssigned();
             if (!element.equals("")) {
-                if (element.contains("duplication")) {
-                    tag = doc.createElement("entry_1");
-                    tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element)
-                            + "_" + this.getDuplicationProcessOutput(sinkProcessList.get(i).getName(), element)));
-
-                } else {
-                    tag = doc.createElement("entry_1");
-                    tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element) + "_" + "_1"));
-
-                }
-                module.appendChild(tag);
+                this.insertEntry(doc, module, element, "entry_1");
             }
         }
     }
 
     private void addConstantGenerationToXML(Document doc, Element rootElement) {
-        for (int i = 0; i < KPNNetwork.constantGenerationProcessList.size(); i++) {
+        for (int i = 0; i < constantGenerationProcessList.size(); i++) {
             // staff elements
             Element module = doc.createElement("module");
             rootElement.appendChild(module);
 
             // set attribute to staff element
             module.setAttribute("id", getID(constantGenerationProcessList.get(i).getName()));
-            module.setAttribute("type", "fifo");
+            module.setAttribute("type", "queue");
             module.setAttribute("entries", "1");
             module.setAttribute("outputs", "1");
             module.setAttribute("constantGeneration", Boolean.toString(constantGenerationProcessList.get(i).isConstantGeneration()));
@@ -220,26 +246,49 @@ public class XML {
                 a.remove();
             }
 
-            module.setAttribute("elements", a.toString());
+            module.setAttribute("elements", a.toString().replace("[", "").replace("]", ""));
 
             //tags
             Element tag = null;
 
             String element = constantGenerationProcessList.get(i).getQueueInputAssigned();
             if (!element.equals("")) {
-                if (element.contains("duplication")) {
-                    tag = doc.createElement("entry_1");
-                    tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element)
-                            + "_" + this.getDuplicationProcessOutput(constantGenerationProcessList.get(i).getName(), element)));
+                 this.insertEntry(doc, module, element, "entry_1");
+            }           
+        }
+    }
 
-                } else {
-                    tag = doc.createElement("entry_1");
-                    tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element) + "_" + "_1"));
-
-                }
-                module.appendChild(tag);
+    private void addFIFOToXML(Document doc, Element rootElement) {
+        for (int i = 0; i < fifoList.size(); i++) {
+            FifoModel model = fifoList.get(i);
+            if (model.idFifo1 != 0) {
+                addFIFOToXMLAux(doc, rootElement, model.hardwareName, String.valueOf(model.idFifo1), "1");
+            }
+            if (model.idFifo2 != 0) {
+                addFIFOToXMLAux(doc, rootElement, model.hardwareName, String.valueOf(model.idFifo2), "2");
             }
         }
+    }
+
+    private void addFIFOToXMLAux(Document doc, Element rootElement, String hardwareName, String id, String output) {
+        // staff elements
+        Element module = doc.createElement("module");
+        rootElement.appendChild(module);
+
+        // set attribute to staff element
+        module.setAttribute("id", id);
+        module.setAttribute("type", "fifo");
+        module.setAttribute("entries", "1");
+        module.setAttribute("outputs", "1");
+        module.setAttribute("elements", "");
+
+        //tags
+        Element tag = null;
+        tag = doc.createElement("entry_1");
+        tag.appendChild(doc.createTextNode(this.getHardwareNameXML(hardwareName) + "_" + this.getID(hardwareName)
+                + "_" + output));
+
+        module.appendChild(tag);
     }
 
     public void exportKPNToXML(String path) {
@@ -253,7 +302,9 @@ public class XML {
             Element rootElement = doc.createElement("modules");
             doc.appendChild(rootElement);
 
+            addFIFOToXML(doc, rootElement);
             addAdderToXML(doc, rootElement);
+
             addProductToXML(doc, rootElement);
             addConstantGenerationToXML(doc, rootElement);
             addSinkToXML(doc, rootElement);
@@ -288,7 +339,7 @@ public class XML {
         } else if (name.contains("product")) {
             return "multiplier";
         } else if (name.contains("constantGeneration")) {
-            return "fifo";
+            return "queue";
         } else if (name.contains("sink")) {
             return "fifo";
         } else {
@@ -296,6 +347,7 @@ public class XML {
         }
     }
 
+    /*
     //to fix: caso en que amas esten conectadas al mismo bloque
     public String getDuplicationProcessOutput(String duplicationProcess, String hardware) {
         String result = "";
@@ -316,6 +368,20 @@ public class XML {
             }
         }
         return result;
+    }*/
+    /**
+     * @return the fifoCount
+     */
+    public int getFifoCount() {
+        fifoCount++;
+        return fifoCount;
     }
-    
+
+    /**
+     * @param fifoCount the fifoCount to set
+     */
+    public void setFifoCount(int fifoCount) {
+        this.fifoCount = fifoCount;
+    }
+
 }

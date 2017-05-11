@@ -763,6 +763,15 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextFieldInput2ActionPerformed
 
     private void jButtonApplyDelayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonApplyDelayActionPerformed
+        /*if()
+        {
+            
+        }
+        else
+        {
+            
+        }*/
+
         selectedQueueJDialog.getInputQueue().clear(); //just in case that the variable was write before
         String text = this.jTextFieldFifo.getText().trim().replace(" ", ""); //getting the numbers of the queue
         String[] parts = text.split(","); //split in an array       
@@ -813,6 +822,12 @@ public class GUI extends javax.swing.JFrame {
                 String path = fileChooser.getCurrentDirectory().toString() + "/" + fileChooser.getSelectedFile().getName() + ".xml";
                 //Creating the export file
                 net.exportKPNToXML(path);
+
+                JOptionPane.showMessageDialog(this,
+                        "File saved",                        
+                        "Information",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
 
             }
         } else {
@@ -945,7 +960,7 @@ public class GUI extends javax.swing.JFrame {
 
     private void modifyGUI() {
         this.jXTaskPaneHardwareAbstraction.add(this.jButtonAdd);
-        this.jXTaskPaneHardwareAbstraction.add(this.jButtonProduct);   
+        this.jXTaskPaneHardwareAbstraction.add(this.jButtonProduct);
         this.jXTaskPaneHardwareAbstraction.add(this.jButtonConstantGeneration);
         this.jXTaskPaneHardwareAbstraction.add(this.jButtonDuplication);
         this.jXTaskPaneHardwareAbstraction.add(this.jButtonSink);
@@ -1030,13 +1045,13 @@ public class GUI extends javax.swing.JFrame {
 
         switch (hardwareType) {
             case 3:
-                newLabel = new DragLabel(imagePath, toolTip, jDialogDelay, name, posX, posY, jTextFieldFifo, jSpinnerDelay, this,jCheckBoxFifo);
+                newLabel = new DragLabel(imagePath, toolTip, jDialogDelay, name, posX, posY, jTextFieldFifo, jSpinnerDelay, this, jCheckBoxFifo);
                 break;
             case 6:
-                newLabel = new DragLabel(imagePath, toolTip, jDialogView, name, posX, posY, null, null, this,null);
+                newLabel = new DragLabel(imagePath, toolTip, jDialogView, name, posX, posY, null, null, this, null);
                 break;
             default:
-                newLabel = new DragLabel(imagePath, toolTip, null, name, posX, posY, null, null, this,null);
+                newLabel = new DragLabel(imagePath, toolTip, null, name, posX, posY, null, null, this, null);
                 break;
         }
 
@@ -1092,7 +1107,6 @@ public class GUI extends javax.swing.JFrame {
         String name = "queue";
         createHardwareBlock(imagePath, hardwareType, toolTip, name, posX, posY);
     }*/
-
     private void createViewRepresentation(int posX, int posY) {
         String imagePath = "/Images/view48x48.png";
         int hardwareType = 6;
