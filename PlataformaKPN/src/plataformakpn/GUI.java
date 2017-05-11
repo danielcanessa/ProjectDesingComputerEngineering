@@ -108,12 +108,6 @@ public class GUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jDialogFifo = new javax.swing.JDialog();
-        jPanelDialog = new javax.swing.JPanel();
-        jLabelFIFO = new javax.swing.JLabel();
-        jTextFieldFifo = new javax.swing.JTextField();
-        jButtonApplyQueue = new javax.swing.JButton();
-        jCheckBoxFifo = new javax.swing.JCheckBox();
         jDialogView = new javax.swing.JDialog();
         jPanelDialog1 = new javax.swing.JPanel();
         jTextFieldInput2 = new javax.swing.JTextField();
@@ -131,13 +125,15 @@ public class GUI extends javax.swing.JFrame {
         jLabelDelay = new javax.swing.JLabel();
         jButtonApplyDelay = new javax.swing.JButton();
         jSpinnerDelay = new javax.swing.JSpinner();
+        jLabelFIFO = new javax.swing.JLabel();
+        jTextFieldFifo = new javax.swing.JTextField();
+        jCheckBoxFifo = new javax.swing.JCheckBox();
         jPanel_Main = new javax.swing.JPanel();
         jButtonProductDragable = new javax.swing.JButton();
         jButtonAddDragable = new javax.swing.JButton();
         jButtonConstantGenerationDragable = new javax.swing.JButton();
         jButtonDuplicationDragable = new javax.swing.JButton();
         jButtonViewDragable = new javax.swing.JButton();
-        jButtonQueueDragable = new javax.swing.JButton();
         jButtonSinkDragable = new javax.swing.JButton();
         jPanelBoard = new javax.swing.JPanel();
         jButtonAdd = new javax.swing.JButton();
@@ -148,7 +144,6 @@ public class GUI extends javax.swing.JFrame {
         jButtonSink = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButtonProduct = new javax.swing.JButton();
-        jButtonQueue = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextPaneOutput = new javax.swing.JTextPane();
         jPanelJXTaskContainer = new javax.swing.JPanel();
@@ -159,58 +154,6 @@ public class GUI extends javax.swing.JFrame {
         iterateKPN = new javax.swing.JButton();
         createKPN = new javax.swing.JButton();
         exportKPN = new javax.swing.JButton();
-
-        jDialogFifo.getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jPanelDialog.setBackground(new java.awt.Color(255, 255, 255));
-
-        jLabelFIFO.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        jLabelFIFO.setText("FIFO items:");
-
-        jButtonApplyQueue.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/apply32x32.png"))); // NOI18N
-        jButtonApplyQueue.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonApplyQueueActionPerformed(evt);
-            }
-        });
-
-        jCheckBoxFifo.setText("Constant Generation");
-
-        javax.swing.GroupLayout jPanelDialogLayout = new javax.swing.GroupLayout(jPanelDialog);
-        jPanelDialog.setLayout(jPanelDialogLayout);
-        jPanelDialogLayout.setHorizontalGroup(
-            jPanelDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelDialogLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanelDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanelDialogLayout.createSequentialGroup()
-                        .addComponent(jCheckBoxFifo)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanelDialogLayout.createSequentialGroup()
-                        .addComponent(jLabelFIFO, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextFieldFifo, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
-                        .addGap(68, 68, 68))))
-            .addGroup(jPanelDialogLayout.createSequentialGroup()
-                .addGap(129, 129, 129)
-                .addComponent(jButtonApplyQueue, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
-        jPanelDialogLayout.setVerticalGroup(
-            jPanelDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelDialogLayout.createSequentialGroup()
-                .addGap(22, 22, 22)
-                .addGroup(jPanelDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelFIFO, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextFieldFifo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jCheckBoxFifo)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
-                .addComponent(jButtonApplyQueue)
-                .addContainerGap())
-        );
-
-        jDialogFifo.getContentPane().add(jPanelDialog, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         jDialogView.getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
@@ -268,9 +211,11 @@ public class GUI extends javax.swing.JFrame {
         jDialogView.getContentPane().add(jPanelDialog1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 390, 90));
 
         jPanelDialog2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanelDialog2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabelDelay.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jLabelDelay.setText("Delay iterations:");
+        jPanelDialog2.add(jLabelDelay, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 120, 20));
 
         jButtonApplyDelay.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/apply32x32.png"))); // NOI18N
         jButtonApplyDelay.addActionListener(new java.awt.event.ActionListener() {
@@ -278,41 +223,31 @@ public class GUI extends javax.swing.JFrame {
                 jButtonApplyDelayActionPerformed(evt);
             }
         });
+        jPanelDialog2.add(jButtonApplyDelay, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 90, 40, -1));
+        jPanelDialog2.add(jSpinnerDelay, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 50, 40, -1));
 
-        javax.swing.GroupLayout jPanelDialog2Layout = new javax.swing.GroupLayout(jPanelDialog2);
-        jPanelDialog2.setLayout(jPanelDialog2Layout);
-        jPanelDialog2Layout.setHorizontalGroup(
-            jPanelDialog2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelDialog2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabelDelay, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanelDialog2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButtonApplyDelay, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSpinnerDelay))
-                .addGap(0, 27, Short.MAX_VALUE))
-        );
-        jPanelDialog2Layout.setVerticalGroup(
-            jPanelDialog2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelDialog2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanelDialog2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelDelay, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSpinnerDelay, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButtonApplyDelay)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        jLabelFIFO.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
+        jLabelFIFO.setText("FIFO items:");
+        jPanelDialog2.add(jLabelFIFO, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 82, 34));
+        jPanelDialog2.add(jTextFieldFifo, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 20, 240, -1));
+
+        jCheckBoxFifo.setText("Is Constant Generation");
+        jCheckBoxFifo.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jCheckBoxFifoStateChanged(evt);
+            }
+        });
+        jPanelDialog2.add(jCheckBoxFifo, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 50, -1, -1));
 
         javax.swing.GroupLayout jDialogDelayLayout = new javax.swing.GroupLayout(jDialogDelay.getContentPane());
         jDialogDelay.getContentPane().setLayout(jDialogDelayLayout);
         jDialogDelayLayout.setHorizontalGroup(
             jDialogDelayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanelDialog2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanelDialog2, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
         );
         jDialogDelayLayout.setVerticalGroup(
             jDialogDelayLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanelDialog2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanelDialog2, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -355,10 +290,6 @@ public class GUI extends javax.swing.JFrame {
         jButtonViewDragable.setBackground(new java.awt.Color(255, 255, 255));
         jButtonViewDragable.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/view48x48.png"))); // NOI18N
         jPanel_Main.add(jButtonViewDragable, new org.netbeans.lib.awtextra.AbsoluteConstraints(1200, 590, 70, -1));
-
-        jButtonQueueDragable.setBackground(new java.awt.Color(255, 255, 255));
-        jButtonQueueDragable.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/queue48x48.png"))); // NOI18N
-        jPanel_Main.add(jButtonQueueDragable, new org.netbeans.lib.awtextra.AbsoluteConstraints(1280, 520, 66, 64));
 
         jButtonSinkDragable.setBackground(new java.awt.Color(255, 255, 255));
         jButtonSinkDragable.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/sink48x48.png"))); // NOI18N
@@ -497,26 +428,6 @@ public class GUI extends javax.swing.JFrame {
         });
         jPanel_Main.add(jButtonProduct, new org.netbeans.lib.awtextra.AbsoluteConstraints(1200, 20, 60, -1));
 
-        jButtonQueue.setBackground(new java.awt.Color(255, 255, 255));
-        jButtonQueue.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/queue48x48.png"))); // NOI18N
-        jButtonQueue.setToolTipText("Insert Queue Abstraction");
-        jButtonQueue.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
-                jButtonQueueMouseDragged(evt);
-            }
-        });
-        jButtonQueue.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jButtonQueueMouseReleased(evt);
-            }
-        });
-        jButtonQueue.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonQueueActionPerformed(evt);
-            }
-        });
-        jPanel_Main.add(jButtonQueue, new org.netbeans.lib.awtextra.AbsoluteConstraints(1280, 150, 66, 64));
-
         jScrollPane1.setViewportView(jTextPaneOutput);
 
         jPanel_Main.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 570, 970, 180));
@@ -617,38 +528,6 @@ public class GUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * This method takes the information in JDialog Queue and load it in the
-     * variable selectedQueueJDialog
-     *
-     * @param evt
-     */
-    private void jButtonApplyQueueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonApplyQueueActionPerformed
-        selectedQueueJDialog.getInputQueue().clear(); //just in case that the variable was write before
-        String text = this.jTextFieldFifo.getText().trim().replace(" ", ""); //getting the numbers of the queue
-        String[] parts = text.split(","); //split in an array
-        selectedQueueJDialog.setConstantGeneration(this.jCheckBoxFifo.isSelected()); //verifies if constant generation option was selected
-        for (String part : parts) {
-            try {
-                selectedQueueJDialog.getInputQueue().add(Float.parseFloat(part)); //adding the numbers to the queue
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-        }
-
-        JOptionPane.showMessageDialog(this,
-                "Sucessfully operation. Is constant generation: "+selectedQueueJDialog.isConstantGeneration()+", Current elements: "+selectedQueueJDialog.getInputQueue(),
-                "Information",
-                JOptionPane.INFORMATION_MESSAGE
-        );
-        
-        this.jDialogFifo.setVisible(false);
-    }//GEN-LAST:event_jButtonApplyQueueActionPerformed
-
-
-    private void jButtonQueueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonQueueActionPerformed
-        createQueueRepresentation(0, 0);
-    }//GEN-LAST:event_jButtonQueueActionPerformed
 
     private void jButtonProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonProductActionPerformed
         createProductRepresentation(0, 0);
@@ -752,7 +631,7 @@ public class GUI extends javax.swing.JFrame {
 
     private void jButtonConstantGenerationMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonConstantGenerationMouseDragged
         this.jButtonConstantGenerationDragable.setVisible(true);
-        this.jButtonConstantGenerationDragable.setLocation(evt.getX() + 30, getYPositionOffset(evt.getY(), 3));
+        this.jButtonConstantGenerationDragable.setLocation(evt.getX() + 30, getYPositionOffset(evt.getY(), 2));
 
     }//GEN-LAST:event_jButtonConstantGenerationMouseDragged
 
@@ -767,13 +646,13 @@ public class GUI extends javax.swing.JFrame {
 
     private void jButtonDuplicationMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonDuplicationMouseDragged
         this.jButtonDuplicationDragable.setVisible(true);
-        this.jButtonDuplicationDragable.setLocation(evt.getX() + 30, getYPositionOffset(evt.getY(), 4));
+        this.jButtonDuplicationDragable.setLocation(evt.getX() + 30, getYPositionOffset(evt.getY(), 3));
 
     }//GEN-LAST:event_jButtonDuplicationMouseDragged
 
     private void jButtonSinkMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonSinkMouseDragged
         this.jButtonSinkDragable.setVisible(true);
-        this.jButtonSinkDragable.setLocation(evt.getX() + 30, getYPositionOffset(evt.getY(), 5));
+        this.jButtonSinkDragable.setLocation(evt.getX() + 30, getYPositionOffset(evt.getY(), 4));
     }//GEN-LAST:event_jButtonSinkMouseDragged
 
     private void jButtonSinkMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonSinkMouseReleased
@@ -785,23 +664,9 @@ public class GUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButtonSinkMouseReleased
 
-    private void jButtonQueueMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonQueueMouseReleased
-        try {
-            createQueueRepresentation(this.jPanelBoard.getMousePosition().x, this.jPanelBoard.getMousePosition().y);
-        } catch (Exception e) {
-        } finally {
-            this.jButtonQueueDragable.setVisible(false);
-        }
-    }//GEN-LAST:event_jButtonQueueMouseReleased
-
-    private void jButtonQueueMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonQueueMouseDragged
-        this.jButtonQueueDragable.setVisible(true);
-        this.jButtonQueueDragable.setLocation(evt.getX() + 30, getYPositionOffset(evt.getY(), 2));
-    }//GEN-LAST:event_jButtonQueueMouseDragged
-
     private void jButtonViewMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonViewMouseDragged
         this.jButtonViewDragable.setVisible(true);
-        this.jButtonViewDragable.setLocation(evt.getX() + 30, getYPositionOffset(evt.getY(), 8) - 10);
+        this.jButtonViewDragable.setLocation(evt.getX() + 30, getYPositionOffset(evt.getY(), 7) - 10);
     }//GEN-LAST:event_jButtonViewMouseDragged
 
     private void jButtonViewMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButtonViewMouseReleased
@@ -898,10 +763,38 @@ public class GUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextFieldInput2ActionPerformed
 
     private void jButtonApplyDelayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonApplyDelayActionPerformed
+        selectedQueueJDialog.getInputQueue().clear(); //just in case that the variable was write before
+        String text = this.jTextFieldFifo.getText().trim().replace(" ", ""); //getting the numbers of the queue
+        String[] parts = text.split(","); //split in an array       
+
+        if (selectedQueueJDialog.getInputs().isEmpty()) {
+            selectedQueueJDialog.setConstantGeneration(this.jCheckBoxFifo.isSelected()); //verifies if constant generation option was selected
+        } else if (this.jCheckBoxFifo.isSelected()) {
+            JOptionPane.showMessageDialog(this,
+                    "The constant generation option can only be actived if the constant generation hardware doesn't have any hardware input.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+
+        for (String part : parts) {
+            try {
+                selectedQueueJDialog.getInputQueue().add(Float.parseFloat(part)); //adding the numbers to the queue
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
         int delay = (int) this.jSpinnerDelay.getValue();
         selectedQueueJDialog.setDelayIterations(delay);
+
         JOptionPane.showMessageDialog(this,
-                "Sucessfully operation. Delay iterations: "+selectedQueueJDialog.getDelayIterations(),"Information",
+                "Sucessfully operation. Is constant generation: "
+                + selectedQueueJDialog.isConstantGeneration()
+                + ", Current elements: "
+                + selectedQueueJDialog.getInputQueue()
+                + ", Delay iterations: " + selectedQueueJDialog.getDelayIterations(),
+                "Information",
                 JOptionPane.INFORMATION_MESSAGE
         );
         this.jDialogDelay.setVisible(false);
@@ -938,6 +831,10 @@ public class GUI extends javax.swing.JFrame {
         }
         // TODO add your handling code here:
     }//GEN-LAST:event_formWindowClosing
+
+    private void jCheckBoxFifoStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jCheckBoxFifoStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBoxFifoStateChanged
 
     /**
      * @param args the command line arguments
@@ -982,15 +879,12 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JButton jButtonAdd;
     private javax.swing.JButton jButtonAddDragable;
     private javax.swing.JButton jButtonApplyDelay;
-    private javax.swing.JButton jButtonApplyQueue;
     private javax.swing.JButton jButtonConstantGeneration;
     private javax.swing.JButton jButtonConstantGenerationDragable;
     private javax.swing.JButton jButtonDuplication;
     private javax.swing.JButton jButtonDuplicationDragable;
     private javax.swing.JButton jButtonProduct;
     private javax.swing.JButton jButtonProductDragable;
-    private javax.swing.JButton jButtonQueue;
-    private javax.swing.JButton jButtonQueueDragable;
     private javax.swing.JButton jButtonRelations;
     private javax.swing.JButton jButtonSink;
     private javax.swing.JButton jButtonSinkDragable;
@@ -999,7 +893,6 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JButton jButtonViewDragable;
     private javax.swing.JCheckBox jCheckBoxFifo;
     private javax.swing.JDialog jDialogDelay;
-    private javax.swing.JDialog jDialogFifo;
     private javax.swing.JDialog jDialogView;
     private javax.swing.JLabel jLabelDelay;
     private javax.swing.JLabel jLabelFIFO;
@@ -1010,7 +903,6 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabelOutput1;
     private javax.swing.JLabel jLabelOutput2;
     private javax.swing.JPanel jPanelBoard;
-    private javax.swing.JPanel jPanelDialog;
     private javax.swing.JPanel jPanelDialog1;
     private javax.swing.JPanel jPanelDialog2;
     private javax.swing.JPanel jPanelJXTaskContainer;
@@ -1053,8 +945,7 @@ public class GUI extends javax.swing.JFrame {
 
     private void modifyGUI() {
         this.jXTaskPaneHardwareAbstraction.add(this.jButtonAdd);
-        this.jXTaskPaneHardwareAbstraction.add(this.jButtonProduct);
-        this.jXTaskPaneHardwareAbstraction.add(this.jButtonQueue);
+        this.jXTaskPaneHardwareAbstraction.add(this.jButtonProduct);   
         this.jXTaskPaneHardwareAbstraction.add(this.jButtonConstantGeneration);
         this.jXTaskPaneHardwareAbstraction.add(this.jButtonDuplication);
         this.jXTaskPaneHardwareAbstraction.add(this.jButtonSink);
@@ -1071,7 +962,6 @@ public class GUI extends javax.swing.JFrame {
         this.jTextPaneOutput.setText("<b>Output</b><br>");
 
         this.jDialogDelay.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/Images/icon.png")));
-        this.jDialogFifo.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/Images/icon.png")));
         this.jDialogView.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/Images/icon.png")));
     }
 
@@ -1140,16 +1030,13 @@ public class GUI extends javax.swing.JFrame {
 
         switch (hardwareType) {
             case 3:
-                newLabel = new DragLabel(imagePath, toolTip, jDialogDelay, name, posX, posY, null, jSpinnerDelay, this);
-                break;
-            case 5:
-                newLabel = new DragLabel(imagePath, toolTip, jDialogFifo, name, posX, posY, jTextFieldFifo, null, this);
+                newLabel = new DragLabel(imagePath, toolTip, jDialogDelay, name, posX, posY, jTextFieldFifo, jSpinnerDelay, this,jCheckBoxFifo);
                 break;
             case 6:
-                newLabel = new DragLabel(imagePath, toolTip, jDialogView, name, posX, posY, null, null, this);
+                newLabel = new DragLabel(imagePath, toolTip, jDialogView, name, posX, posY, null, null, this,null);
                 break;
             default:
-                newLabel = new DragLabel(imagePath, toolTip, null, name, posX, posY, null, null, this);
+                newLabel = new DragLabel(imagePath, toolTip, null, name, posX, posY, null, null, this,null);
                 break;
         }
 
@@ -1198,13 +1085,13 @@ public class GUI extends javax.swing.JFrame {
 
     }
 
-    private void createQueueRepresentation(int posX, int posY) {
+    /*private void createQueueRepresentation(int posX, int posY) {
         String imagePath = "/Images/queue48x48.png";
         int hardwareType = 5;
         String toolTip = "Hardware: queue <br>ID: ";
         String name = "queue";
         createHardwareBlock(imagePath, hardwareType, toolTip, name, posX, posY);
-    }
+    }*/
 
     private void createViewRepresentation(int posX, int posY) {
         String imagePath = "/Images/view48x48.png";

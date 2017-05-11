@@ -10,12 +10,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import plataformakpn.HardwareGraph;
+import plataformakpn.HardwareModel;
 
 /**
  *
  * @author Daniel Canessa Valverde
  * @version 1.0
- * 
+ *
  */
 public class KPNNetwork {
 
@@ -39,7 +40,7 @@ public class KPNNetwork {
         this.updateToolTips();
 
     }
-    
+
     private void updateToolTips() {
         for (int i = 0; i < constantGenerationProcessList.size(); i++) {
             constantGenerationProcessList.get(i).updateToolTip();
@@ -73,7 +74,7 @@ public class KPNNetwork {
                     productProcessList.add(createProductProcess(hardwareAbstraction.get(i).getLabel().getName()));
                     break;
                 case 3:
-                    constantGenerationProcessList.add(createConstantGenerationProcess(hardwareAbstraction.get(i).getLabel().getName()));
+                    constantGenerationProcessList.add(createConstantGenerationProcess(hardwareAbstraction.get(i)));
                     break;
                 case 4:
                     sinkProcessList.add(createSinkProcess(hardwareAbstraction.get(i).getLabel().getName()));
@@ -205,9 +206,12 @@ public class KPNNetwork {
         return add;
     }
 
-    public ConstantGenerationProcess createConstantGenerationProcess(String name) {
+    public ConstantGenerationProcess createConstantGenerationProcess(HardwareModel model) {
         ConstantGenerationProcess constantGeneration = new ConstantGenerationProcess();
-        constantGeneration.setThreadName(name);
+        constantGeneration.setThreadName(model.getLabel().getName());
+        constantGeneration.setDelayIterations(model.getDelayIterations());
+        constantGeneration.setConstantGeneration(model.isConstantGeneration());
+        constantGeneration.setQueueIn(model.getInputQueue());
         return constantGeneration;
     }
 
@@ -274,14 +278,14 @@ public class KPNNetwork {
         for (int i = 0; i < this.sinkProcessList.size(); i++) {
             sinkProcessList.get(i).start();
         }
-      
+
         for (int i = 0; i < this.constantGenerationProcessList.size(); i++) {
             constantGenerationProcessList.get(i).start();
         }
     }
 
     public void pauseKPNNetwork() {
-       
+
         for (int i = 0; i < this.duplicationProcessList.size(); i++) {
             duplicationProcessList.get(i).setPauseThread(true);
         }
@@ -295,8 +299,8 @@ public class KPNNetwork {
         for (int i = 0; i < this.sinkProcessList.size(); i++) {
             sinkProcessList.get(i).setPauseThread(true);
         }
-        
-         for (int i = 0; i < this.constantGenerationProcessList.size(); i++) {
+
+        for (int i = 0; i < this.constantGenerationProcessList.size(); i++) {
             constantGenerationProcessList.get(i).setPauseThread(true);
         }
     }
@@ -314,12 +318,12 @@ public class KPNNetwork {
         for (int i = 0; i < this.sinkProcessList.size(); i++) {
             sinkProcessList.get(i).setPauseThread(false);
         }
-        
+
         for (int i = 0; i < this.constantGenerationProcessList.size(); i++) {
             constantGenerationProcessList.get(i).setPauseThread(false);
         }
     }
-    
+
     public void freeKPNNetwork() {
         for (int i = 0; i < this.duplicationProcessList.size(); i++) {
             duplicationProcessList.get(i).setKillThread(true);
@@ -333,7 +337,7 @@ public class KPNNetwork {
         for (int i = 0; i < this.sinkProcessList.size(); i++) {
             sinkProcessList.get(i).setKillThread(true);
         }
-        
+
         for (int i = 0; i < this.constantGenerationProcessList.size(); i++) {
             constantGenerationProcessList.get(i).setKillThread(true);
         }
@@ -394,78 +398,81 @@ public class KPNNetwork {
 
     public String getKPNNetworkOutput() {
         String result = "";
-        for (int i = 0; i < this.duplicationProcessList.size(); i++) {
-            result = result + "<b>" + duplicationProcessList.get(i).getName() + "</b>" + "<br>";
+        try {
+            for (int i = 0; i < duplicationProcessList.size(); i++) {
+                result = result + "<b>" + duplicationProcessList.get(i).getName() + "</b>" + "<br>";
 
-            if (!duplicationProcessList.get(i).getQueueInputAssigned().equals("")) {
-                result = result + "    Input assigned: " + duplicationProcessList.get(i).getQueueInputAssigned()
-                        + ", Queue elements: " + duplicationProcessList.get(i).getQueueIn() + "<br>";
-            }
-            if (!duplicationProcessList.get(i).getQueueOutput1Assigned().equals("")) {
-                result = result + "    Output 1 assigned: " + duplicationProcessList.get(i).getQueueOutput1Assigned()
-                        + ", Queue elements: " + duplicationProcessList.get(i).getQueueOut1() + "<br>";
-            }
+                if (!duplicationProcessList.get(i).getQueueInputAssigned().equals("")) {
+                    result = result + "    Input assigned: " + duplicationProcessList.get(i).getQueueInputAssigned()
+                            + ", Queue elements: " + duplicationProcessList.get(i).getQueueIn() + "<br>";
+                }
+                if (!duplicationProcessList.get(i).getQueueOutput1Assigned().equals("")) {
+                    result = result + "    Output 1 assigned: " + duplicationProcessList.get(i).getQueueOutput1Assigned()
+                            + ", Queue elements: " + duplicationProcessList.get(i).getQueueOut1() + "<br>";
+                }
 
-            result = result + "    Output 2 assigned: " + duplicationProcessList.get(i).getQueueOutput2Assigned()
-                    + ", Queue elements: " + duplicationProcessList.get(i).getQueueOut2() + "<br>";
+                result = result + "    Output 2 assigned: " + duplicationProcessList.get(i).getQueueOutput2Assigned()
+                        + ", Queue elements: " + duplicationProcessList.get(i).getQueueOut2() + "<br>";
 
-        }
-        for (int i = 0; i < this.addProcessList.size(); i++) {
-            result = result + "<b>" + addProcessList.get(i).getName() + "</b>" + "<br>";
-            if (!addProcessList.get(i).getQueue1InputAssigned().equals("")) {
-                result = result + "    Input 1 assigned: " + addProcessList.get(i).getQueue1InputAssigned()
-                        + ", Queue elements: " + addProcessList.get(i).getQueueIn1() + "<br>";
             }
-            if (!addProcessList.get(i).getQueue2InputAssigned().equals("")) {
-                result = result + "    Input 2 assigned: " + addProcessList.get(i).getQueue2InputAssigned()
-                        + ", Queue elements: " + addProcessList.get(i).getQueueIn2() + "<br>";
-            }
-            result = result + "    Output assigned: " + addProcessList.get(i).getQueueOutputAssigned()
-                    + ", Queue elements: " + addProcessList.get(i).getQueueOut() + "<br>";
+            for (int i = 0; i < addProcessList.size(); i++) {
+                result = result + "<b>" + addProcessList.get(i).getName() + "</b>" + "<br>";
+                if (!addProcessList.get(i).getQueue1InputAssigned().equals("")) {
+                    result = result + "    Input 1 assigned: " + addProcessList.get(i).getQueue1InputAssigned()
+                            + ", Queue elements: " + addProcessList.get(i).getQueueIn1() + "<br>";
+                }
+                if (!addProcessList.get(i).getQueue2InputAssigned().equals("")) {
+                    result = result + "    Input 2 assigned: " + addProcessList.get(i).getQueue2InputAssigned()
+                            + ", Queue elements: " + addProcessList.get(i).getQueueIn2() + "<br>";
+                }
+                result = result + "    Output assigned: " + addProcessList.get(i).getQueueOutputAssigned()
+                        + ", Queue elements: " + addProcessList.get(i).getQueueOut() + "<br>";
 
-        }
-        for (int i = 0; i < this.productProcessList.size(); i++) {
-            result = result + "<b>" + productProcessList.get(i).getName() + "</b>" + "<br>";
-            if (!productProcessList.get(i).getQueue1InputAssigned().equals("")) {
-                result = result + "    Input 1 assigned: " + productProcessList.get(i).getQueue1InputAssigned()
-                        + ", Queue elements: " + productProcessList.get(i).getQueueIn1() + "<br>";
             }
-            if (!productProcessList.get(i).getQueue2InputAssigned().equals("")) {
-                result = result + "    Input 2 assigned: " + productProcessList.get(i).getQueue2InputAssigned()
-                        + ", Queue elements: " + productProcessList.get(i).getQueueIn2() + "<br>";
-            }
-            result = result + "    Output assigned: " + productProcessList.get(i).getQueueOutputAssigned()
-                    + ", Queue elements: " + productProcessList.get(i).getQueueOut() + "<br>";
+            for (int i = 0; i < productProcessList.size(); i++) {
+                result = result + "<b>" + productProcessList.get(i).getName() + "</b>" + "<br>";
+                if (!productProcessList.get(i).getQueue1InputAssigned().equals("")) {
+                    result = result + "    Input 1 assigned: " + productProcessList.get(i).getQueue1InputAssigned()
+                            + ", Queue elements: " + productProcessList.get(i).getQueueIn1() + "<br>";
+                }
+                if (!productProcessList.get(i).getQueue2InputAssigned().equals("")) {
+                    result = result + "    Input 2 assigned: " + productProcessList.get(i).getQueue2InputAssigned()
+                            + ", Queue elements: " + productProcessList.get(i).getQueueIn2() + "<br>";
+                }
+                result = result + "    Output assigned: " + productProcessList.get(i).getQueueOutputAssigned()
+                        + ", Queue elements: " + productProcessList.get(i).getQueueOut() + "<br>";
 
-        }
-        for (int i = 0; i < this.constantGenerationProcessList.size(); i++) {
-            result = result + "<b>" + constantGenerationProcessList.get(i).getName() + "</b>" + "<br>";
-            if (!constantGenerationProcessList.get(i).getQueueInputAssigned().equals("") || constantGenerationProcessList.get(i).getQueueIn().size() > 0) {
-                result = result + "    Input assigned:" + constantGenerationProcessList.get(i).getQueueInputAssigned()
-                        + ", Queue elements: " + constantGenerationProcessList.get(i).getQueueIn()
-                        + ", Is constant Generation: " + constantGenerationProcessList.get(i).isConstantGeneration()
-                        + ", Delay time: " + constantGenerationProcessList.get(i).getDelayIterations() + "<br>";
             }
-            result = result + "    Output assigned:" + constantGenerationProcessList.get(i).getQueueOutputAssigned()
-                    + ", Queue elements: " + constantGenerationProcessList.get(i).getQueueOut() + "<br>";
+            for (int i = 0; i < constantGenerationProcessList.size(); i++) {
+                result = result + "<b>" + constantGenerationProcessList.get(i).getName() + "</b>" + "<br>";
+                if (!constantGenerationProcessList.get(i).getQueueInputAssigned().equals("") || constantGenerationProcessList.get(i).getQueueIn().size() > 0) {
+                    result = result + "    Input assigned:" + constantGenerationProcessList.get(i).getQueueInputAssigned()
+                            + ", Queue elements: " + constantGenerationProcessList.get(i).getQueueIn()
+                            + ", Is constant Generation: " + constantGenerationProcessList.get(i).isConstantGeneration()
+                            + ", Delay time: " + constantGenerationProcessList.get(i).getDelayIterations() + "<br>";
+                }
+                result = result + "    Output assigned:" + constantGenerationProcessList.get(i).getQueueOutputAssigned()
+                        + ", Queue elements: " + constantGenerationProcessList.get(i).getQueueOut() + "<br>";
 
-        }
-        for (int i = 0; i < this.sinkProcessList.size(); i++) {
-            result = result + "<b>" + sinkProcessList.get(i).getName() + "</b>" + "<br>";
-            if (!sinkProcessList.get(i).getQueueInputAssigned().equals("")) {
-                result = result + "    Input assigned:" + sinkProcessList.get(i).getQueueInputAssigned()
-                        + ", Queue elements: " + sinkProcessList.get(i).getQueueIn() + "<br>";
             }
-            result = result + "    Output assigned:" + sinkProcessList.get(i).getQueueOutputAssigned()
-                    + ", Queue elements: " + sinkProcessList.get(i).getQueueOut() + "<br>";
+            for (int i = 0; i < sinkProcessList.size(); i++) {
+                result = result + "<b>" + sinkProcessList.get(i).getName() + "</b>" + "<br>";
+                if (!sinkProcessList.get(i).getQueueInputAssigned().equals("")) {
+                    result = result + "    Input assigned:" + sinkProcessList.get(i).getQueueInputAssigned()
+                            + ", Queue elements: " + sinkProcessList.get(i).getQueueIn() + "<br>";
+                }
+                result = result + "    Output assigned:" + sinkProcessList.get(i).getQueueOutputAssigned()
+                        + ", Queue elements: " + sinkProcessList.get(i).getQueueOut() + "<br>";
 
+            }
+        }catch(Exception ex)
+        {
+            System.out.println(ex.getMessage());
         }
         return result;
     }
 
-
-    public void exportKPNToXML(String path)
-    {
+    public void exportKPNToXML(String path) {
         XML xml = new XML();
         xml.exportKPNToXML(path);
     }

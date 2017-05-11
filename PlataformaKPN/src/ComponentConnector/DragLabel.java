@@ -25,18 +25,19 @@ public class DragLabel extends JLabel {
     Point sourcePoint;
     Point destinationPoint;
     DragProcessor dragProcessor = new DragProcessor();
-    JPanel panel;
     JDialog jDialog;
     JTextField jTextFieldFifo;
     JSpinner spinner;
     Component jGUI;
+    JCheckBox jCheckBoxFifo;
 
-    public DragLabel(String imagePath, String toolTip, JDialog jDialog, String name, int posX, int posY, JTextField jTextFieldFifo, JSpinner spinner, Component jGUI) {
+    public DragLabel(String imagePath, String toolTip, JDialog jDialog, String name, int posX, int posY, JTextField jTextFieldFifo, JSpinner spinner, Component jGUI, JCheckBox jCheckBoxFifo) {
         this.jDialog = jDialog;
         this.jTextFieldFifo = jTextFieldFifo;
         this.spinner = spinner;
         this.jGUI = jGUI;
         this.initializeJLabel(imagePath, toolTip, name, posX, posY);
+        this.jCheckBoxFifo = jCheckBoxFifo;
 
     }
 
@@ -83,23 +84,16 @@ public class DragLabel extends JLabel {
                     selectedQueueJDialog = model;
 
                     spinner.setValue(model.getDelayIterations());
-                    jDialog.setLocationRelativeTo(label);
-
-                    jDialog.setModal(true);
-                    jDialog.pack();
-                    jDialog.setVisible(true);
-
-                } //queue process, jDialogFiFo
-                else if (model.getHardwareType() == 5) {
-
-                    selectedQueueJDialog = model;
 
                     jTextFieldFifo.setText(model.getInputQueue().toString().replace("[", "").replace("]", ""));
+                    jCheckBoxFifo.setSelected(model.isConstantGeneration());
 
                     jDialog.setLocationRelativeTo(label);
+
                     jDialog.setModal(true);
                     jDialog.pack();
                     jDialog.setVisible(true);
+
                 } //view process, FDialogView
                 else if (model.getHardwareType() == 6) {
                     try {
@@ -332,11 +326,16 @@ public class DragLabel extends JLabel {
             boolean resultDest = false;
 
             if (modelSource.getHardwareType() != 0 && modelSource.getHardwareType() != 4 && modelSource.getOutputs().size() < 1) {
-                if (modelSource.getHardwareType() == 5) { //queue process can only be connect to a constant generation process
-                    if (modelDest.getHardwareType() == 3) {
-                        resultSource = true;
+                if (modelDest.getHardwareType() == 3) {
+                    if (modelDest.isConstantGeneration()) {
+                        modelDest.setConstantGeneration(false);
+                        JOptionPane.showMessageDialog(jGUI,
+                                "The hardware abstraction: " + modelDest.getLabel().getName() + ", has passed to be Constant Generation: false",
+                                "Information",
+                                JOptionPane.INFORMATION_MESSAGE
+                        );
                     }
-
+                    resultSource = true;
                 } else {
                     resultSource = true;
                 }

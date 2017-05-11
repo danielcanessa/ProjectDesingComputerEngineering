@@ -289,9 +289,6 @@ public class ConstantGenerationProcess extends Thread {
                     SinkProcess sinkInputProcess = (SinkProcess) searchThread(inputName); //getting the process
                     JoinInput_ConstantGeneration_Sink(constantGenerationProcess, sinkInputProcess);
                     break;
-                case 5: //queue process case
-                    JoinInput_ConstantGeneration_Queue(constantGenerationProcess, hardwareAbstraction.search(model.getInputs().get(j)));
-                    break;
             }
 
         } // joining the process output
@@ -337,16 +334,14 @@ public class ConstantGenerationProcess extends Thread {
 
             if (!duplicationInputProcess.isQueueOutput1Assigned()) { //if ouput1 of the duplication process still without assignation
 
-                constantGenerationProcess.setQueueIn(duplicationInputProcess.getQueueOut1());
+                duplicationInputProcess.setQueueOut1(constantGenerationProcess.getQueueIn());
 
                 duplicationInputProcess.setQueueOutput1Assigned(constantGenerationProcess.getName());
 
                 constantGenerationProcess.setQueueInputAssigned(duplicationInputProcess.getName());
 
             } else if (!duplicationInputProcess.isQueueOutput2Assigned()) { //if ouput2 of the duplication process still without assignation
-                System.out.println("aqui2");
-
-                constantGenerationProcess.setQueueIn(duplicationInputProcess.getQueueOut2());
+                duplicationInputProcess.setQueueOut2(constantGenerationProcess.getQueueIn());
                 duplicationInputProcess.setQueueOutput2Assigned(constantGenerationProcess.getName());
                 constantGenerationProcess.setQueueInputAssigned(duplicationInputProcess.getName());
             }
@@ -363,7 +358,7 @@ public class ConstantGenerationProcess extends Thread {
     private void JoinInput_ConstantGeneration_Add(ConstantGenerationProcess constantGenerationProcess, AddProcess addInputProcess) {
         if (!constantGenerationProcess.isQueueInputAssigned()) {//if the input 1 of the constantGeneration process still without assignation
             if (!addInputProcess.isQueueOutputAssigned()) { //if ouput of the constantGeneration process still without assignation
-                constantGenerationProcess.setQueueIn(addInputProcess.getQueueOut());
+                addInputProcess.setQueueOut(constantGenerationProcess.getQueueIn());
                 addInputProcess.setQueueOutputAssigned(constantGenerationProcess.getName());
                 constantGenerationProcess.setQueueInputAssigned(addInputProcess.getName());
             }
@@ -380,7 +375,7 @@ public class ConstantGenerationProcess extends Thread {
     private void JoinInput_ConstantGeneration_Product(ConstantGenerationProcess constantGenerationProcess, ProductProcess productInputProcess) {
         if (!constantGenerationProcess.isQueueInputAssigned()) { //if the input 1 of the constantGeneration process still without assignation
             if (!productInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
-                constantGenerationProcess.setQueueIn(productInputProcess.getQueueOut());
+                productInputProcess.setQueueOut(constantGenerationProcess.getQueueIn());
                 productInputProcess.setQueueOutputAssigned(constantGenerationProcess.getName());
                 constantGenerationProcess.setQueueInputAssigned(productInputProcess.getName());
             }
@@ -398,7 +393,8 @@ public class ConstantGenerationProcess extends Thread {
     private void JoinInput_ConstantGeneration_ConstantGeneration(ConstantGenerationProcess constantGenerationProcess, ConstantGenerationProcess constantGenerationInputProcess) {
         if (!constantGenerationProcess.isQueueInputAssigned()) { //if the input 1 of the constantGeneration process still without assignation
             if (!constantGenerationInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
-                constantGenerationProcess.setQueueIn(constantGenerationInputProcess.getQueueOut());
+
+                constantGenerationInputProcess.setQueueOut(constantGenerationProcess.getQueueIn());
                 constantGenerationInputProcess.setQueueOutputAssigned(constantGenerationProcess.getName());
                 constantGenerationProcess.setQueueInputAssigned(constantGenerationInputProcess.getName());
             }
@@ -415,24 +411,11 @@ public class ConstantGenerationProcess extends Thread {
     private void JoinInput_ConstantGeneration_Sink(ConstantGenerationProcess constantGenerationProcess, SinkProcess sinkInputProcess) {
         if (!constantGenerationProcess.isQueueInputAssigned()) { //if the input 1 of the constantGeneration process still without assignation
             if (!sinkInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
-                constantGenerationProcess.setQueueIn(sinkInputProcess.getQueueOut());
+                sinkInputProcess.setQueueOut(constantGenerationProcess.getQueueIn());
                 sinkInputProcess.setQueueOutputAssigned(constantGenerationProcess.getName());
                 constantGenerationProcess.setQueueInputAssigned(sinkInputProcess.getName());
             }
         }
-    }
-
-    /**
-     * This method makes the relation between the input of the constant
-     * generation process with the output of a queue.
-     *
-     * @param constantGenerationProcess ConstantGenerationProcess
-     * @param model HardwareModel
-     */
-    private void JoinInput_ConstantGeneration_Queue(ConstantGenerationProcess constantGenerationProcess, HardwareModel model) {
-
-        constantGenerationProcess.setQueueIn(model.getInputQueue());
-        constantGenerationProcess.setConstantGeneration(model.isConstantGeneration());
     }
 
     /**
