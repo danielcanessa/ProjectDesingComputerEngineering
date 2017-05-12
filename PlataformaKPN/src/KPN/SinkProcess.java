@@ -281,6 +281,13 @@ public class SinkProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the sink
+     * process with the output of a duplication process.
+     *
+     * @param sinkProcess SinkProcess
+     * @param duplicationInputProcess DuplicationProcess
+     */
     private void JoinInput_Sink_Duplication(SinkProcess sinkProcess, DuplicationProcess duplicationInputProcess) {
         if (!sinkProcess.isQueueInputAssigned()) { //if the input 1 of the sink process still without assignation
             if (!duplicationInputProcess.isQueueOutput1Assigned()) { //if ouput1 of the duplication process still without assignation
@@ -295,6 +302,13 @@ public class SinkProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the sink
+     * process with the output of an add process.
+     *
+     * @param sinkProcess SinkProcess
+     * @param addInputProcess AddProcess
+     */
     private void JoinInput_Sink_Add(SinkProcess sinkProcess, AddProcess addInputProcess) {
         if (!sinkProcess.isQueueInputAssigned()) {//if the input 1 of the sink process still without assignation
             if (!addInputProcess.isQueueOutputAssigned()) { //if ouput of the sink process still without assignation
@@ -305,6 +319,13 @@ public class SinkProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the sink
+     * process with the output of a product process.
+     *
+     * @param sinkProcess SinkProcess
+     * @param productInputProcess ProductProcess
+     */
     private void JoinInput_Sink_Product(SinkProcess sinkProcess, ProductProcess productInputProcess) {
         if (!sinkProcess.isQueueInputAssigned()) { //if the input 1 of the sink process still without assignation
             if (!productInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
@@ -315,6 +336,13 @@ public class SinkProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the sink
+     * process with the output of a constant generation process.
+     *
+     * @param sinkProcess SinkProcess
+     * @param constantGenerationInputProcess ConstantGenerationProcess
+     */
     private void JoinInput_Sink_ConstantGeneration(SinkProcess sinkProcess, ConstantGenerationProcess constantGenerationInputProcess) {
         if (!sinkProcess.isQueueInputAssigned()) { //if the input 1 of the sink process still without assignation
             if (!constantGenerationInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
@@ -325,6 +353,13 @@ public class SinkProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the sink
+     * process with the output of a sink process.
+     *
+     * @param sinkProcess SinkProcess
+     * @param SinkInputProcess SinkProcess
+     */
     private void JoinInput_Sink_Sink(SinkProcess sinkProcess, SinkProcess SinkInputProcess) {
         if (!sinkProcess.isQueueInputAssigned()) { //if the input 1 of the sink process still without assignation
             if (!SinkInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
@@ -335,6 +370,13 @@ public class SinkProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the output of the sink
+     * process with the input of a duplication process
+     *
+     * @param duplicationOutputProcess DuplicationProcess
+     * @param SinkProcess sinkProcess
+     */
     private void JoinOutput_Sink_Duplication(SinkProcess sinkProcess, DuplicationProcess duplicationOutputProcess) {
         if (!sinkProcess.isQueueOutputAssigned()) { //if the output of the sink process still without assignation
             if (!duplicationOutputProcess.isQueueInputAssigned()) { //if ouput1 of the duplication process still without assignation
@@ -345,6 +387,13 @@ public class SinkProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the output of the sink
+     * process with the input of an add process
+     *
+     * @param sinkProcess SinkProcess
+     * @param addOutputProcess AddProcess
+     */
     private void JoinOutput_Sink_Add(SinkProcess sinkProcess, AddProcess addOutputProcess) {
         if (!sinkProcess.isQueueOutputAssigned()) { //if the input 1 of the sink process still without assignation
             if (!addOutputProcess.isQueue1InputAssigned()) { //if ouput of the sink process still without assignation
@@ -359,6 +408,13 @@ public class SinkProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the output of the sink
+     * process with the input of a product process
+     *
+     * @param sinkProcess SinkProcess
+     * @param productOutputProcess ProductProcess
+     */
     private void JoinOutput_Sink_Product(SinkProcess sinkProcess, ProductProcess productOutputProcess) {
         if (!sinkProcess.isQueueOutputAssigned()) { //if the input 1 of the sink process still without assignation
             if (!productOutputProcess.isQueue1InputAssigned()) { //if ouput of the sink process still without assignation
@@ -373,6 +429,13 @@ public class SinkProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the output of the sink
+     * process with the input of a constant generation process
+     *
+     * @param sinkProcess SinkProcess
+     * @param constantGenerationOutputProcess ConstantGenerationProcess
+     */
     private void JoinOutput_Sink_ConstantGeneration(SinkProcess sinkProcess, ConstantGenerationProcess constantGenerationOutputProcess) {
         if (!sinkProcess.isQueueOutputAssigned()) { //if the input 1 of the sink process still without assignation
             if (!constantGenerationOutputProcess.isQueueInputAssigned()) { //if ouput of the product process still without assignation
@@ -384,6 +447,13 @@ public class SinkProcess extends Thread {
 
     }
 
+    /**
+     * This method makes the relation between the output of the sink
+     * process with the input of another sink process
+     *
+     * @param sinkProcess SinkProcess
+     * @param sinkOutputProcess SinkProcess
+     */
     private void JoinOutput_Sink_Sink(SinkProcess sinkProcess, SinkProcess sinkOutputProcess) {
         if (!sinkProcess.isQueueOutputAssigned()) { //if the input 1 of the sink process still without assignation
             if (!sinkOutputProcess.isQueueInputAssigned()) { //if ouput of the product process still without assignation

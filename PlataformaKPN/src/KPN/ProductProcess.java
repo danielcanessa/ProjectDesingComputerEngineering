@@ -328,6 +328,13 @@ public class ProductProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the product
+     * process with the output of a duplication process.
+     *
+     * @param productProcess ProductProcess
+     * @param duplicationInputProcess DuplicationProcess
+     */
     private void JoinInput_Product_Duplication(ProductProcess productProcess, DuplicationProcess duplicationInputProcess) {
         if (!productProcess.isQueue1InputAssigned()) { //if the input 1 of the product process still without assignation
             if (!duplicationInputProcess.isQueueOutput1Assigned()) { //if ouput1 of the duplication process still without assignation
@@ -352,6 +359,13 @@ public class ProductProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the product
+     * process with the output of an add process.
+     *
+     * @param productProcess ProductProcess
+     * @param addInputProcess AddProcess
+     */
     private void JoinInput_Product_Add(ProductProcess productProcess, AddProcess addInputProcess) {
         if (!productProcess.isQueue1InputAssigned()) { //if the input 1 of the product process still without assignation
             if (!addInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
@@ -368,6 +382,13 @@ public class ProductProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the product
+     * process with the output of another product process.
+     *
+     * @param productProcess ProductProcess
+     * @param productInputProcess ProductProcess
+     */
     private void JoinInput_Product_Product(ProductProcess productProcess, ProductProcess productInputProcess) {
         if (!productProcess.isQueue1InputAssigned()) { //if the input 1 of the product process still without assignation
             if (!productInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
@@ -384,6 +405,13 @@ public class ProductProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the input of the product
+     * process with the output of a constant generation process.
+     *
+     * @param productProcess ProductProcess
+     * @param constantGenerationInputProcess ConstantGenerationProcess
+     */
     private void JoinInput_Product_ConstantGeneration(ProductProcess productProcess, ConstantGenerationProcess constantGenerationInputProcess) {
         if (!productProcess.isQueue1InputAssigned()) { //if the input 1 of the product process still without assignation
             if (!constantGenerationInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
@@ -401,6 +429,13 @@ public class ProductProcess extends Thread {
 
     }
 
+    /**
+     * This method makes the relation between the input of the product
+     * process with the output of a sink process.
+     *
+     * @param productProcess ProductProcess
+     * @param SinkInputProcess SinkProcess
+     */
     private void JoinInput_Product_Sink(ProductProcess productProcess, SinkProcess SinkInputProcess) {
         if (!productProcess.isQueue1InputAssigned()) { //if the input 1 of the product process still without assignation
             if (!SinkInputProcess.isQueueOutputAssigned()) { //if ouput of the product process still without assignation
@@ -417,6 +452,13 @@ public class ProductProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the output of the product
+     * process with the input of a duplication process
+     *
+     * @param productProcess ProductProcess
+     * @param duplicationOutputProcess DuplicationProcess
+     */
     private void JoinOutput_Product_Duplication(ProductProcess productProcess, DuplicationProcess duplicationOutputProcess) {
         if (!productProcess.isQueueOutputAssigned()) { //if the output of the product process still without assignation
             if (!duplicationOutputProcess.isQueueInputAssigned()) { //if ouput1 of the duplication process still without assignation
@@ -427,6 +469,13 @@ public class ProductProcess extends Thread {
         }
     }
 
+    /**
+     * This method makes the relation between the output of the product
+     * process with the input of an add process
+     *
+     * @param productProcess ProductProcess
+     * @param addOutputProcess AddProcess
+     */
     private void JoinOutput_Product_Add(ProductProcess productProcess, AddProcess addOutputProcess) {
         if (!productProcess.isQueueOutputAssigned()) { //if the input 1 of the product process still without assignation
             if (!addOutputProcess.isQueue1InputAssigned()) { //if ouput of the product process still without assignation
@@ -442,6 +491,13 @@ public class ProductProcess extends Thread {
 
     }
 
+    /**
+     * This method makes the relation between the output of the product
+     * process with the input of a product process
+     *
+     * @param productProcess ProductProcess
+     * @param productOutputProcess ProductProcess
+     */
     private void JoinOutput_Product_Product(ProductProcess productProcess, ProductProcess productOutputProcess) {
         if (!productProcess.isQueueOutputAssigned()) { //if the input 1 of the product process still without assignation
             if (!productOutputProcess.isQueue1InputAssigned()) { //if ouput of the product process still without assignation
@@ -457,6 +513,13 @@ public class ProductProcess extends Thread {
 
     }
 
+    /**
+     * This method makes the relation between the output of the product
+     * process with the input of a constant generation process
+     *
+     * @param productProcess ProductProcess
+     * @param constantGenerationOutputProcess ConstantGenerationProcess
+     */
     private void JoinOutput_Product_ConstantGeneration(ProductProcess productProcess, ConstantGenerationProcess constantGenerationOutputProcess) {
         if (!productProcess.isQueueOutputAssigned()) { //if the input 1 of the product process still without assignation
             if (!constantGenerationOutputProcess.isQueueInputAssigned()) { //if ouput of the product process still without assignation
@@ -468,6 +531,13 @@ public class ProductProcess extends Thread {
 
     }
 
+    /**
+     * This method makes the relation between the output of the product
+     * process with the input of a sink process
+     *
+     * @param productProcess ProductProcess
+     * @param sinkOutputProcess SinkProcess
+     */
     private void JoinOutput_Product_Sink(ProductProcess productProcess, SinkProcess sinkOutputProcess) {
         if (!productProcess.isQueueOutputAssigned()) { //if the input 1 of the product process still without assignation
             if (!sinkOutputProcess.isQueueInputAssigned()) { //if ouput of the product process still without assignation

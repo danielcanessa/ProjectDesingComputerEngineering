@@ -571,25 +571,6 @@ public class DuplicationProcess extends Thread {
         }
 
     }
-
-    /**
-     * @return the XMLOutput
-     */
-    public int getXMLOutput() {
-        switch (XMLOutput) {
-            case 0:
-                XMLOutput = 1;
-                break;
-            case 1:
-                XMLOutput = 2;
-                break;
-            case 2:
-                XMLOutput = 1;
-                break;
-            default:
-                break;
-        }
-        return XMLOutput;
-    }
+  
 
 }
