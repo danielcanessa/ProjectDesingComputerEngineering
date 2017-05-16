@@ -122,7 +122,7 @@ public class XML {
         Element tag;
         FifoModel model = searchFifo(element);
         if (element.contains("duplication")) {
-            tag = doc.createElement("tagName");
+            tag = doc.createElement(tagName);
             if (model.getOutput() == 1) {
                 tag.appendChild(doc.createTextNode("fifo_" + model.getIdFifo1()
                         + "_1"));
@@ -131,10 +131,17 @@ public class XML {
                         + "_1"));
             }
         } else {
-            tag = doc.createElement("tagName");
+            tag = doc.createElement(tagName);
             tag.appendChild(doc.createTextNode("fifo_" + model.getIdFifo1() + "_1"));
         }
 
+        module.appendChild(tag);
+    }
+
+    private void insertEmptyEntry(Document doc, Element module, String tagName) {
+        Element tag;
+        tag = doc.createElement(tagName);
+        tag.appendChild(doc.createTextNode(" "));
         module.appendChild(tag);
     }
 
@@ -160,10 +167,14 @@ public class XML {
             element = addProcessList.get(i).getQueue1InputAssigned();
             if (!element.equals("")) {
                 this.insertEntry(doc, module, element, "entry_1");
+            } else {
+                this.insertEmptyEntry(doc, module, "entry_1");
             }
             element = addProcessList.get(i).getQueue2InputAssigned();
             if (!element.equals("")) {
                 this.insertEntry(doc, module, element, "entry_2");
+            } else {
+                this.insertEmptyEntry(doc, module, "entry_2");
             }
         }
     }
@@ -190,10 +201,14 @@ public class XML {
             element = productProcessList.get(i).getQueue1InputAssigned();
             if (!element.equals("")) {
                 this.insertEntry(doc, module, element, "entry_1");
+            } else {
+                this.insertEmptyEntry(doc, module, "entry_1");
             }
             element = productProcessList.get(i).getQueue2InputAssigned();
             if (!element.equals("")) {
                 this.insertEntry(doc, module, element, "entry_2");
+            } else {
+                this.insertEmptyEntry(doc, module, "entry_2");
             }
         }
     }
@@ -220,7 +235,12 @@ public class XML {
             element = duplicationProcessList.get(i).getQueueInputAssigned();
             if (!element.equals("")) {
                 this.insertEntry(doc, module, element, "entry_1");
+            } else {
+                this.insertEmptyEntry(doc, module, "entry_1");
             }
+
+            this.insertEmptyEntry(doc, module, "entry_2");
+
         }
     }
 
@@ -242,12 +262,15 @@ public class XML {
             module.setAttribute("outputs", "1");
             module.setAttribute("KPNOutput", "1");
             module.setAttribute("elements", "");
-            //tags
+            //tagsmodule.setAttribute("KPNOutput", "1");
             String element;
             element = sinkProcessList.get(i).getQueueInputAssigned();
             if (!element.equals("")) {
                 this.insertEntry(doc, module, element, "entry_1");
+            } else {
+                this.insertEmptyEntry(doc, module, "entry_1");
             }
+            this.insertEmptyEntry(doc, module, "entry_2");
         }
     }
 
@@ -280,14 +303,18 @@ public class XML {
             String element = constantGenerationProcessList.get(i).getQueueInputAssigned();
             if (!element.equals("")) {
                 this.insertEntry(doc, module, element, "entry_1");
+            } else {
+                this.insertEmptyEntry(doc, module, "entry_1");
             }
+            this.insertEmptyEntry(doc, module, "entry_2");
         }
     }
 
     /**
      * This method is used to add the fifos to the XML file.
+     *
      * @param doc
-     * @param rootElement 
+     * @param rootElement
      */
     private void addFIFOToXML(Document doc, Element rootElement) {
         for (int i = 0; i < fifoList.size(); i++) {
@@ -311,22 +338,25 @@ public class XML {
         module.setAttribute("entries", "1");
         module.setAttribute("outputs", "1");
         module.setAttribute("elements", "");
+        module.setAttribute("KPNOutput", "0");
         //tags
         Element tag = null;
         tag = doc.createElement("entry_1");
         tag.appendChild(doc.createTextNode(this.getHardwareNameXML(hardwareName) + "_" + this.getID(hardwareName)
                 + "_" + output));
+       
+        this.insertEmptyEntry(doc, module, "entry_2");
 
         module.appendChild(tag);
     }
 
     /**
      * This method manages all the XML file generation.
-     * @param path 
+     *
+     * @param path
      */
     public void exportKPNToXML(String path) {
         try {
-
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
             // root elements
@@ -355,9 +385,10 @@ public class XML {
     }
 
     /**
-     * This method returns the id of any hardware. 
+     * This method returns the id of any hardware.
+     *
      * @param word
-     * @return 
+     * @return
      */
     private String getID(String word) {
         return word.substring(word.indexOf("ID: ") + 4, word.indexOf(", Name"));
@@ -365,8 +396,9 @@ public class XML {
 
     /**
      * This method returns the xml name of any hardware.
+     *
      * @param name
-     * @return 
+     * @return
      */
     private String getHardwareNameXML(String name) {
         if (name.contains("duplication")) {

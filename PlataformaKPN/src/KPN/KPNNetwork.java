@@ -536,5 +536,10 @@ public class KPNNetwork {
     public void exportKPNToXML(String path) {
         XML xml = new XML();
         xml.exportKPNToXML(path);
+        
+        //Esta es el path que ocupa
+        System.out.println(path);
+        
+       
     }
 }
