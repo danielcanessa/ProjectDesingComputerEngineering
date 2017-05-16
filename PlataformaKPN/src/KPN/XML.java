@@ -78,35 +78,43 @@ public class XML {
                 + constantGenerationProcessList.size();
 
         for (int i = 0; i < addProcessList.size(); i++) {
-            FifoModel model = new FifoModel();
-            model.setHardwareName(addProcessList.get(i).getName());
-            model.setIdFifo1(this.getFifoCount());
-            fifoList.add(model);
+            if (!addProcessList.get(i).getQueueOutputAssigned().contains("sink")) {
+                FifoModel model = new FifoModel();
+                model.setHardwareName(addProcessList.get(i).getName());
+                model.setIdFifo1(this.getFifoCount());
+                fifoList.add(model);
+            }
         }
         for (int i = 0; i < productProcessList.size(); i++) {
-            FifoModel model = new FifoModel();
-            model.setHardwareName(productProcessList.get(i).getName());
-            model.setIdFifo1(this.getFifoCount());
-            fifoList.add(model);
+            if (!productProcessList.get(i).getQueueOutputAssigned().contains("sink")) {
+                FifoModel model = new FifoModel();
+                model.setHardwareName(productProcessList.get(i).getName());
+                model.setIdFifo1(this.getFifoCount());
+                fifoList.add(model);
+            }
         }
         for (int i = 0; i < duplicationProcessList.size(); i++) {
+            //  if (!duplicationProcessList.get(i).getQueueOutputAssigned().contains("sink")) {
             FifoModel model = new FifoModel();
             model.setHardwareName(duplicationProcessList.get(i).getName());
             model.setIdFifo1(this.getFifoCount());
             model.setIdFifo2(this.getFifoCount());
             fifoList.add(model);
+            //  }
         }
-        for (int i = 0; i < sinkProcessList.size(); i++) {
+        /*   for (int i = 0; i < sinkProcessList.size(); i++) {
             FifoModel model = new FifoModel();
             model.setHardwareName(sinkProcessList.get(i).getName());
             model.setIdFifo1(this.getFifoCount());
             fifoList.add(model);
-        }
+        }*/
         for (int i = 0; i < constantGenerationProcessList.size(); i++) {
-            FifoModel model = new FifoModel();
-            model.setHardwareName(constantGenerationProcessList.get(i).getName());
-            model.setIdFifo1(this.getFifoCount());
-            fifoList.add(model);
+            if (!constantGenerationProcessList.get(i).getQueueOutputAssigned().contains("sink")) {
+                FifoModel model = new FifoModel();
+                model.setHardwareName(constantGenerationProcessList.get(i).getName());
+                model.setIdFifo1(this.getFifoCount());
+                fifoList.add(model);
+            }
         }
     }
 
@@ -170,6 +178,7 @@ public class XML {
             } else {
                 this.insertEmptyEntry(doc, module, "entry_1");
             }
+
             element = addProcessList.get(i).getQueue2InputAssigned();
             if (!element.equals("")) {
                 this.insertEntry(doc, module, element, "entry_2");
@@ -265,11 +274,16 @@ public class XML {
             //tagsmodule.setAttribute("KPNOutput", "1");
             String element;
             element = sinkProcessList.get(i).getQueueInputAssigned();
+
             if (!element.equals("")) {
-                this.insertEntry(doc, module, element, "entry_1");
+                 Element tag;        
+                tag = doc.createElement("entry_1");
+                 tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element) + "_1"));
+                 module.appendChild(tag);
             } else {
                 this.insertEmptyEntry(doc, module, "entry_1");
             }
+
             this.insertEmptyEntry(doc, module, "entry_2");
         }
     }
@@ -289,7 +303,7 @@ public class XML {
             module.setAttribute("id", getID(constantGenerationProcessList.get(i).getName()));
             module.setAttribute("type", "queue");
             module.setAttribute("entries", "1");
-            module.setAttribute("outputs", "1");
+            module.setAttribute("outputs", "0");
             module.setAttribute("constantGeneration", Boolean.toString(constantGenerationProcessList.get(i).isConstantGeneration()));
             module.setAttribute("delay", Integer.toString(constantGenerationProcessList.get(i).getDelayIterations()));
             Queue<Float> a = new LinkedList<>();
@@ -344,7 +358,7 @@ public class XML {
         tag = doc.createElement("entry_1");
         tag.appendChild(doc.createTextNode(this.getHardwareNameXML(hardwareName) + "_" + this.getID(hardwareName)
                 + "_" + output));
-       
+
         this.insertEmptyEntry(doc, module, "entry_2");
 
         module.appendChild(tag);
