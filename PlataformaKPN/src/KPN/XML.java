@@ -94,20 +94,20 @@ public class XML {
             }
         }
         for (int i = 0; i < duplicationProcessList.size(); i++) {
-            //  if (!duplicationProcessList.get(i).getQueueOutputAssigned().contains("sink")) {
-            FifoModel model = new FifoModel();
-            model.setHardwareName(duplicationProcessList.get(i).getName());
-            model.setIdFifo1(this.getFifoCount());
-            model.setIdFifo2(this.getFifoCount());
-            fifoList.add(model);
-            //  }
+
+            if (!duplicationProcessList.get(i).getQueueOutput1Assigned().contains("sink")
+                    || !duplicationProcessList.get(i).getQueueOutput2Assigned().contains("sink")) {
+                FifoModel model = new FifoModel();
+                model.setHardwareName(duplicationProcessList.get(i).getName());
+                model.setIdFifo1(this.getFifoCount());
+
+                if (!duplicationProcessList.get(i).getQueueOutput2Assigned().contains("sink")) {
+                    model.setIdFifo2(this.getFifoCount());
+                }
+
+                fifoList.add(model);
+            }
         }
-        /*   for (int i = 0; i < sinkProcessList.size(); i++) {
-            FifoModel model = new FifoModel();
-            model.setHardwareName(sinkProcessList.get(i).getName());
-            model.setIdFifo1(this.getFifoCount());
-            fifoList.add(model);
-        }*/
         for (int i = 0; i < constantGenerationProcessList.size(); i++) {
             if (!constantGenerationProcessList.get(i).getQueueOutputAssigned().contains("sink")) {
                 FifoModel model = new FifoModel();
@@ -146,6 +146,13 @@ public class XML {
         module.appendChild(tag);
     }
 
+    /**
+     * This method is used for  empty entry's insertion in the XML file.
+     *
+     * @param doc
+     * @param module
+     * @param tagName
+     */
     private void insertEmptyEntry(Document doc, Element module, String tagName) {
         Element tag;
         tag = doc.createElement(tagName);
@@ -276,10 +283,21 @@ public class XML {
             element = sinkProcessList.get(i).getQueueInputAssigned();
 
             if (!element.equals("")) {
-                 Element tag;        
+
+                String output = "_1";
+
+                FifoModel model = searchFifo(element);
+
+                if (model != null) {
+                    output = "_2";
+
+                }
+
+                Element tag;
                 tag = doc.createElement("entry_1");
-                 tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element) + "_1"));
-                 module.appendChild(tag);
+                tag.appendChild(doc.createTextNode(this.getHardwareNameXML(element) + "_" + this.getID(element) + output));
+                module.appendChild(tag);
+
             } else {
                 this.insertEmptyEntry(doc, module, "entry_1");
             }
@@ -302,8 +320,8 @@ public class XML {
             // set attribute to staff element
             module.setAttribute("id", getID(constantGenerationProcessList.get(i).getName()));
             module.setAttribute("type", "queue");
-            module.setAttribute("entries", "1");
-            module.setAttribute("outputs", "0");
+            module.setAttribute("entries", "0");
+            module.setAttribute("outputs", "1");
             module.setAttribute("constantGeneration", Boolean.toString(constantGenerationProcessList.get(i).isConstantGeneration()));
             module.setAttribute("delay", Integer.toString(constantGenerationProcessList.get(i).getDelayIterations()));
             Queue<Float> a = new LinkedList<>();
@@ -342,6 +360,14 @@ public class XML {
         }
     }
 
+    /**
+     * This method inserts all the fifo's in the XML file.
+     * @param doc
+     * @param rootElement
+     * @param hardwareName
+     * @param id
+     * @param output 
+     */
     private void addFIFOToXMLAux(Document doc, Element rootElement, String hardwareName, String id, String output) {
         // staff elements
         Element module = doc.createElement("module");
